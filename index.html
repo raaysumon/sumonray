@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sumon Ray</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Times New Roman', Times, serif;
+            overflow-x: hidden;
+            background-color: #0d1117;
+            color: #e5e7eb;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: rgba(31, 41, 55, 0.5);
+            color: #d1d5db;
+            padding: 0.75rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .scroll-to-top:hover {
+            background-color: rgba(31, 41, 55, 0.7);
+            transform: translateY(-5px);
+        }
+
+        .section-container {
+            background-color: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(55, 65, 81, 0.5);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            margin: 4rem auto;
+            max-width: 1200px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .text-neon {
+            text-shadow: 0 0 5px #7c3aed, 0 0 10px #7c3aed, 0 0 20px #7c3aed;
+            color: #a78bfa;
+        }
+        .yellow-skill { color: #facc15; } /* Tailwind's yellow-400 */
+        .green-skill { color: #4ade80; } /* Tailwind's green-400 */
+        .blue-skill { color: #3b82f6; } /* Tailwind's blue-500 */
+
+        /* Animation for glowing dots */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.4); opacity: 1; }
+        }
+
+        .glow-yellow {
+            animation: pulseGlow 2s infinite;
+            color: #facc15;
+        }
+        .glow-green {
+            animation: pulseGlow 2s infinite;
+            animation-delay: 0.4s;
+            color: #4ade80;
+        }
+        .glow-blue {
+            animation: pulseGlow 2s infinite;
+            animation-delay: 0.8s;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black py-4 transition-all duration-300 ease-in-out">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center">
+            <a href="#" class="text-3xl font-bold text-white transition-colors hover:text-purple-400 mb-4 md:mb-0">Sumon Ray</a>
+            <div class="flex flex-wrap justify-center space-x-2 md:space-x-6">
+                <a href="#home" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">HOME</a>
+                <a href="#about" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">ABOUT</a>
+				<a href="#project" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">PROJECTS</a>
+                <a href="#research" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">RESEARCH</a>
+				 <a href="#extra" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">EXPERIENCE</a>
+                <a href="#gallery" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">GALLERY</a>
+                <a href="#blog" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">Blogs</a>
+				 <a href="#contact" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">CONTACT</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 p-4">
+
+        <!-- Home Section -->
+        <section id="home" class="h-screen flex items-center justify-center text-center">
+            <div class="max-w-3xl">
+                <h1 class="text-5xl md:text-8xl font-bold text-white mb-4 leading-tight tracking-tighter animate-fade-in-up">
+                    <span class="text-neon">Hi,</span> I'm Sumon Ray
+                </h1>
+                <p class="text-lg md:text-xl text-gray-400 mb-8 animate-fade-in-up delay-200">
+                    Semiconductor Chip Design & AI Enthusiast
+                </p>
+                <a href="#about" class="inline-block px-8 py-4 bg-purple-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-purple-500 transition-all duration-300 transform hover:scale-105 animate-fade-in-up delay-400">
+                    BEGIN THE JOURNEY
+                </a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 bg-gray-900">
+  <div class="section-container max-w-6xl mx-auto px-6">
+    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">About Me</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      
+      <div class="flex justify-center">
+        <img src="assets/images/portfolio/p1.jpg" alt="Sumon Ray" class="rounded-2xl shadow-lg w-72 h-72 object-cover border-4 border-gray-700">
+      </div>
+
+      <div class="relative">
+        <p class="text-md text-gray-300 leading-relaxed mb-6">
+         Hello, I'm Sumon Ray. I am a nature lover who finds peace in the greenery of trees, the vastness of the sky, the rhythm of rivers, and the expanse of the sea.
+
+Philosophy inspires me, and I love to think deeply as it helps me discover new perspectives and the deeper meaning of life. By nature, I am quiet and feel most alive when surrounded by my closest and dearest ones.
+
+I earned my B.Sc. in Electronics and Communication Engineering from Khulna University. My academic and professional interests lie in data science and VLSI.
+
+One of the most meaningful experiences of my life was participating in the Sakura Science Exchange Program in Japan.
+
+I truly believe that education, nature, and research together shape a complete human being.
+        </p>
+
+		  <p> Email: raay.sumon@gmail.com</p>
+		  <p>WhatsApp: 01567854902</p>
+		  <p>Mobile: 01771482099</p>
+        
+
+        <div class="flex justify-center md:justify-end mt-4">
+          <a href="#" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="LinkedIn Profile">
+            <i class="fab fa-linkedin fa-2x"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="GitHub Profile">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="X Profile">
+            <i class="fab fa-x fa-2x"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="Facebook Profile">
+            <i class="fab fa-facebook fa-2x"></i>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+<article class="mt-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Education</h3>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                       1. B.Sc Engg. in Electronics and Communication Engineering at
+                       Khulna University - Sher-E-Bangla Rd, Khulna 9208
+                    </p>
+                    <p class="text-sm text-gray-400 mb-4">Marks: (55-60)% | Passing Year:2025-03 </p>
+                         <p class="text-md text-gray-300 leading-relaxed">
+                        2. Higher Secondary Certificate in Scienc at Govt. Sundarban Adarsha College - Khulna
+                    </p>
+                    <p class="text-sm text-gray-400 mb-4">Marks: (70-75)% | Passing Year: 2019-06 </p>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                        3. Secondary School Certificate in Science at Khona K.B Secondary High School - Dacope, Khulna
+                    </p>
+                    <p class="text-sm text-gray-400 mb-4">Marks: (80-100)% | Passing Year: 2017-03 </p>
+	<p class="text-md text-gray-300 leading-relaxed">
+                        4. Junior School Certificate at Tildanga Junior High School - Dacope, Khulna
+                    </p>
+                    <p class="text-sm text-gray-400 mb-4">Marks: (80-100)% | Passing Year: 2014-12 </p>
+	<p class="text-md text-gray-300 leading-relaxed">
+                        5. Primary School Certificate at Govt. North Tildanga Primary School - Dacope, Khulna
+                    </p>
+                    <p class="text-sm text-gray-400 mb-4">Marks: (80-100)% | Passing Year: 2011-12</p>
+                </article>
+ <article class="mt-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                <div class="flex">
+            <div class="w-2/3">
+                <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Skills</h3>
+                <ul class="text-md leading-relaxed list-disc list-inside">
+                    <li>
+                        <strong>Programming Languages:</strong> 
+                        <span class="blue-skill">C/C++</span>, 
+                        <span class="green-skill">Python</span>, 
+                        <span class="green-skill">Java</span>
+                    </li>
+                    <li>
+                        <strong>Data Science:</strong>
+                        <span class="blue-skill">NumPy</span>, 
+                        <span class="blue-skill">Pandas</span>, 
+                        <span class="blue-skill">Matplotlib</span>, 
+                        <span class="blue-skill">Seaborn</span>, 
+                        <span class="blue-skill">Scikit-Learn</span>
+                    </li>
+                    <li>
+                        <strong>Soft Skills:</strong> 
+                        <span class="blue-skill">Excellent Communication</span>, 
+                        <span class="blue-skill">Independent Work Proficiency</span>, 
+                        <span class="blue-skill">Deadline-Driven Effectiveness</span>
+                    </li>
+                    <li>
+                        <strong>Other:</strong>
+                        <span class="green-skill">Android App Development (Java)</span>, 
+                        <span class="green-skill">Website Development (HTML, CSS, Javascript)</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="w-1/5 pl-6 border-l border-gray-700 ml-6">
+                <h4 class="font-semibold text-white mb-2">Skill Colour Indicator</h4>
+                <div class="flex items-center mb-2">
+                    <span class="glow-yellow text-xl mr-2">●</span>
+                    <span class="text-gray-300">Beginner</span>
+                </div>
+                <div class="flex items-center mb-2">
+                    <span class="glow-green text-xl mr-2">●</span>
+                    <span class="text-gray-300">Basic</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="glow-blue text-xl mr-2">●</span>
+                    <span class="text-gray-300">Advanced</span>
+                </div>
+            </div>
+        </div>
+ </article>              
+  </div>
+</section>
+
+        <!-- Projects Section -->
+        <section id="project" class="py-20">
+            <div class="section-container">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">CORE PROJECTS</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project Card 1 -->
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
+                        <h3 class="text-xl font-semibold mb-2 text-purple-400">Smart Shopping Trolley System Using Android Application</h3>
+                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
+                    </div>
+                    <!-- Project Card 2 -->
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
+                        <h3 class="text-xl font-semibold mb-2 text-purple-400">IoT Based Smart Watering Device Using Android Application</h3>
+                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
+                    </div>
+                    <!-- Project Card 3 -->
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
+                        <h3 class="text-xl font-semibold mb-2 text-purple-400">Remote Health Monitoring Devices Using Android Application</h3>
+                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
+                    </div>
+					<!-- Project Card 4 -->
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
+                        <h3 class="text-xl font-semibold mb-2 text-purple-400">RF Module and Smart Phone App Based Child Safety & Tracking System</h3>
+                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Research Section -->
+        <section id="research" class="py-20">
+            <div class="section-container">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">RESEARCH</h2>
+		
+                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Conferrence Paper</h3>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                        1. Machine Learning Approach for Photonic Crystal Fiber Based Breast Cancer Glucose Sensor
+                    </p>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                        2. RF Module and Smart Phone App Based Child Safety & Tracking System
+                    </p>
+
+                    <p class="text-md text-gray-300 leading-relaxed">
+                        3. RF Module and Smart Phone App Based Women Safety & Tracking System
+                    </p>
+                </article>
+                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Journal Paper</h3>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                        Running..............
+                    </p>
+                </article>
+            </div>
+        </section>
+		
+		 <!-- Extra Curriculam & Experince Section -->
+        <section id="extra" class="py-20">
+            <div class="section-container">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Work Experience & Extra Curriculam Activities</h2>
+                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">International Experience</h3>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                    Invited from Sakura Science Exchange Program, Japan
+University of Yamanashi, 4 Chome-4-37 Takeda, Kofu, Yamanashi 400-0016, Japan
+Administered by Japan Science and Technology Agency.
+<p class="text-sm text-gray-400 mb-4">DATE:January 28 to February 3 in 2024</p>
+                    </p>
+                </article>
+                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Internship</h3>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                        1. 2025 Aspire Leaders Program,Aspire Institute (Remote)
+						<p class="text-sm text-gray-400 mb-4">DATE: 29 May to August 01 in 2025</p>
+                    </p>
+					<p class="text-md text-gray-300 leading-relaxed">
+                        2. Bangladesh Cable Shilpa Limited, Shiromoni,Khulna,Bangladesh
+						<p class="text-sm text-gray-400 mb-4">DATE: 1 December to December 14 in 2023</p>
+                    </p>
+                </article>
+                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Research Assistanship</h3>
+                    <p class="text-md text-gray-300 leading-relaxed">
+                      Research Assistantship, Research and innovation centre, khulna university; Supervised by Professor Dr. Md Mahbub Hossain, Professor, Khulna University, Khulna, ECE Discipline
+<p class="text-sm text-gray-400 mb-4">DATE:January 28 to February 3 in 2024</p>
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="py-20">
+            <div class="section-container">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Sakura Science Exchange Program, Japan</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
+                        </div>
+                    </div>
+					<div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/portfolio/p3.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Japan</span>
+                        </div>
+                    </div>
+					<div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/portfolio/p4.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Japan</span>
+                        </div>
+                    </div>
+                    <div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/portfolio/p5.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Japan</span>
+                        </div>
+                    </div>
+				<div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/portfolio/p2.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Japan</span>
+                        </div>
+                    </div>
+                    <div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/portfolio/p9.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Japan</span>
+                        </div>
+                    </div>
+                    
+                    </div>
+                </div>
+            </div>
+			
+			<div class="section-container">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">University Life</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
+                        </div>
+                    </div>
+					<div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
+                        </div>
+                    </div>
+					<div class="relative group aspect-square rounded-lg overflow-hidden">
+                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
+                        </div>
+                    </div>
+				
+                    
+                    </div>
+                </div>
+            </div>
+        </section>
+         <!-- Blog Section -->
+          <!-- Contact Section -->
+      <section id="blog" class="py-20 mb-20">
+    <div class="section-container text-center">
+        <p> Under Developing</p>
+    </div>
+</section>
+
+        <!-- Contact Section -->
+      <section id="contact" class="py-20 mb-20">
+    <div class="section-container text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-8 text-white">REACH ME</h2>
+        <p class="text-md text-gray-400 mb-6">
+            Interested in a Research collaboration or just want to chat with me? Send a message.
+        </p>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=raay.sumon@gmail.com&su=Research%20Collaboration&body=Hi%20Sumon%2C%0A%0AI%20am%20interested%20in%20collaborating%20with%20you..."
+           target="_blank"
+           class="inline-block px-8 py-4 bg-purple-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-purple-500 transition-all duration-300 transform hover:scale-105">
+            SEND MESSAGE
+        </a>
+    </div>
+</section>
+<!-- autowrite -->
+
+    </script>
+    <!-- Scroll to Top Button -->
+    <div id="scrollToTopBtn" class="scroll-to-top hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-gray-400">
+        <p class="text-sm">© 2025 sumon Ray. All rights reserved.</p>
+        <p class="text-xs mt-2">Last Updated: Tuesday, September 23, 2025 at 6:37 PM +06</p>
+    </footer>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Scroll to Top button logic
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                scrollToTopBtn.classList.remove('hidden');
+            } else {
+                scrollToTopBtn.classList.add('hidden');
+            }
+        };
+
+        scrollToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Three.js Background
+        window.onload = function() {
+            const canvas = document.getElementById('bg-canvas');
+            const sizes = { width: window.innerWidth, height: window.innerHeight };
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
+            camera.position.z = 500;
+
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(sizes.width, sizes.height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create stars
+            const starsGeometry = new THREE.BufferGeometry();
+            const starCount = 15000;
+            const starPositions = new Float32Array(starCount * 3);
+            for (let i = 0; i < starCount; i++) {
+                starPositions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
+                starPositions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+                starPositions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+            }
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+
+            const starsMaterial = new THREE.PointsMaterial({
+                size: 1,
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+
+            // Animate loop
+            const animate = () => {
+                const elapsedTime = Date.now() * 0.0001;
+                stars.rotation.y = elapsedTime * 0.1;
+                stars.rotation.x = elapsedTime * 0.05;
+
+                renderer.render(scene, camera);
+                window.requestAnimationFrame(animate);
+            };
+
+            animate();
+
+            // Handle resizing
+            window.addEventListener('resize', () => {
+                sizes.width = window.innerWidth;
+                sizes.height = window.innerHeight;
+                camera.aspect = sizes.width / sizes.height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(sizes.width, sizes.height);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            });
+        };
+    
+        
+    </script>
+    
+</body>
+</html>
+
+
+
+
+
+
+
+
+
