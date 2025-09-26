@@ -3,96 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>মা দুর্গা বনাম মহিষাসুর</title>
+<title>মা দুর্গা গেম</title>
 <style>
-  body{margin:0;padding:20px;font-family:"Noto Sans Bengali",sans-serif;background:#f7f2ec;color:#222;}
-  .stage{position:relative;width:100%;max-width:900px;height:360px;margin:8px auto;border-radius:12px;background:linear-gradient(180deg,#e9f7ef,#fff);overflow:hidden;padding:12px;}
-  .character{position:absolute;bottom:20px;width:120px;text-align:center;transition:transform 0.2s linear;}
-  .character svg{width:100px;height:100px;margin:0 auto;display:block;}
-  #durga{left:28px;}
-  #mahish{right:28px;}
-  .head{fill:#d9534f;} .body{fill:#b33;}
-  .trident{fill:#8b5a2b;} .trident-tip{fill:#f0ad4e;}
-  .mh-head{fill:#6c757d;} .mh-body{fill:#495057;} .mh-horn{fill:#333;opacity:0.9;}
-  .label{margin-top:6px;font-weight:600;font-size:14px;}
-  .effect{position:absolute;width:120px;height:120px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);transition:transform 350ms cubic-bezier(.2,.9,.2,1),opacity 300ms;opacity:0;left:50%;top:50%;}
-  .effect.boom{background:radial-gradient(circle at 30% 30%, #ffd966 0%, #ff7b7b 30%, rgba(255,0,0,0) 60%);transform:translate(-50%,-50%) scale(1);opacity:1;}
-  .message{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;padding:8px 14px;border-radius:999px;font-weight:700;display:none;}
-  .message.show{display:block;animation:fadeOut 2s ease forwards 0.8s;}
-  @keyframes fadeOut{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}100%{opacity:0;transform:translateX(-50%) translateY(-18px) scale(0.9);}}
-  .controls{max-width:900px;margin:12px auto;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;}
-  button{padding:8px 12px;border-radius:8px;border:0;background:#2b6cb0;color:#fff;cursor:pointer;}
-  button:active{transform:translateY(1px);}
+body{margin:0;font-family:sans-serif;text-align:center;background:#f7f2ec;}
+#stage{position:relative;margin:20px auto;width:90%;max-width:600px;height:300px;background:#e9f7ef;border-radius:12px;overflow:hidden;}
+.character{position:absolute;width:60px;bottom:20px;}
+#durga{left:0;}
+.collectible{position:absolute;width:30px;height:30px;background:yellow;border-radius:50%;}
+.score{font-size:18px;font-weight:bold;margin:10px;}
+button{padding:10px 16px;margin:5px;border:none;background:#2b6cb0;color:white;border-radius:8px;font-size:16px;}
 </style>
 </head>
 <body>
-<div class="stage">
+
+<div class="score">স্কোর: <span id="score">0</span></div>
+<div id="stage">
   <div id="durga" class="character">
-    <svg viewBox="0 0 100 100">
-      <circle cx="50" cy="40" r="18" class="head"/>
-      <rect x="42" y="58" width="16" height="22" rx="3" class="body"/>
-      <rect x="74" y="8" width="3" height="50" rx="1" class="trident"/>
-      <polygon points="74,8 76,8 75,2" class="trident-tip"/>
+    <svg viewBox="0 0 50 50">
+      <circle cx="25" cy="15" r="10" fill="#d9534f"/>
+      <rect x="20" y="25" width="10" height="20" fill="#b33"/>
     </svg>
-    <div class="label">মা দুর্গা</div>
   </div>
-  <div id="mahish" class="character">
-    <svg viewBox="0 0 100 100">
-      <rect x="35" y="30" width="30" height="30" rx="6" class="mh-head"/>
-      <rect x="40" y="62" width="20" height="16" rx="3" class="mh-body"/>
-      <path d="M30 36 Q50 10 70 36" class="mh-horn"/>
-    </svg>
-    <div class="label">মহিষাসুর</div>
-  </div>
-  <div id="effect" class="effect"></div>
-  <div id="message" class="message"></div>
 </div>
-<div class="controls">
-  <button id="startBtn">শুরু</button>
-  <button id="stopBtn">থামাও</button>
-  <label><input type="checkbox" id="autoLoop" checked> নিজে নিজে লুপ করুক</label>
+<div>
+  <button id="left">← বাম</button>
+  <button id="right">ডান →</button>
 </div>
 
 <script>
+const stage=document.getElementById('stage');
 const durga=document.getElementById('durga');
-const mahish=document.getElementById('mahish');
-const effect=document.getElementById('effect');
-const message=document.getElementById('message');
-const startBtn=document.getElementById('startBtn');
-const stopBtn=document.getElementById('stopBtn');
-const autoLoop=document.getElementById('autoLoop');
-let running=false,pos=0,speed=2,frameId=null;
+const scoreDisplay=document.getElementById('score');
+let stageW=stage.clientWidth, durgaX=0, score=0;
+let collectibles=[];
 
-function getStageBounds(){return document.querySelector('.stage').getBoundingClientRect();}
-function resetPositions(){durga.style.transform='translateX(0px)';pos=0;effect.classList.remove('boom');message.classList.remove('show');}
-function showEffect(x,y){effect.style.left=x+'px';effect.style.top=y+'px';effect.classList.remove('boom');void effect.offsetWidth;effect.classList.add('boom');message.textContent='মহিষাসুর বধ!';message.classList.add('show');document.querySelector('.stage').animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:350,iterations:1});}
-
-function animate(){
-  const stageRect=getStageBounds();
-  const mahishRect=mahish.getBoundingClientRect();
-  pos+=speed;
-  const maxMove=stageRect.width-160;
-  if(pos>maxMove) pos=maxMove;
-  durga.style.transform=`translateX(${pos}px)`;
-  const dRect=durga.getBoundingClientRect();
-  if(dRect.right>=mahishRect.left+18){
-    const centerX=(mahishRect.left+mahishRect.right)/2-stageRect.left;
-    const centerY=(mahishRect.top+mahishRect.bottom)/2-stageRect.top;
-    showEffect(centerX,centerY);
-    cancelAnimationFrame(frameId);
-    running=false;
-    setTimeout(()=>{if(autoLoop.checked){resetPositions();startAnimation();}},1100);
-    return;
-  }
-  frameId=requestAnimationFrame(animate);
+// Move Durga
+function moveDurga(dx){
+  durgaX=Math.min(Math.max(0,durgaX+dx),stageW-60);
+  durga.style.left=durgaX+'px';
 }
 
-function startAnimation(){if(running)return;running=true;frameId=requestAnimationFrame(animate);}
-function stopAnimation(){running=false;if(frameId) cancelAnimationFrame(frameId);}
-startBtn.addEventListener('click',()=>{resetPositions();startAnimation();});
-stopBtn.addEventListener('click',()=>{stopAnimation();resetPositions();});
-resetPositions();if(autoLoop.checked) startAnimation();
+// Generate collectible
+function spawnCollectible(){
+  const c=document.createElement('div');
+  c.classList.add('collectible');
+  c.style.left=Math.random()*(stageW-30)+'px';
+  c.style.top='0px';
+  stage.appendChild(c);
+  collectibles.push(c);
+}
+
+// Update collectibles
+function updateCollectibles(){
+  collectibles.forEach((c,i)=>{
+    let y=parseFloat(c.style.top);
+    y+=3; // speed
+    c.style.top=y+'px';
+    let dRect=durga.getBoundingClientRect();
+    let cRect=c.getBoundingClientRect();
+    if(!(cRect.bottom<dRect.top || cRect.top>dRect.bottom || cRect.right<dRect.left || cRect.left>dRect.right)){
+      score++; scoreDisplay.textContent=score;
+      c.remove();
+      collectibles.splice(i,1);
+    } else if(y>stage.clientHeight){
+      c.remove();
+      collectibles.splice(i,1);
+    }
+  });
+}
+
+// Game loop
+function loop(){
+  updateCollectibles();
+  requestAnimationFrame(loop);
+}
+
+// Spawn interval
+setInterval(spawnCollectible,1000);
+loop();
+
+// Buttons
+document.getElementById('left').addEventListener('click',()=>moveDurga(-20));
+document.getElementById('right').addEventListener('click',()=>moveDurga(20));
+
+// Keyboard
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='ArrowLeft') moveDurga(-20);
+  if(e.key==='ArrowRight') moveDurga(20);
+});
 </script>
+
 </body>
 </html>
-
