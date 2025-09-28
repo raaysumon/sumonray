@@ -3,289 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to Word Converter</title>
+    <title>Professional QR Code Customizer</title>
+    
+    <!-- START: Professional Meta Tags for SEO and Social Sharing -->
+    
+    <!-- Standard SEO Tags -->
+    <meta name="description" content="Create professional, custom-designed QR codes instantly. Customize color, size, and content for production-ready downloads in PNG format.">
+    <meta name="keywords" content="QR code generator, custom QR, professional QR, QR color, QR size, download PNG, fast, easy">
+    <link rel="canonical" href="[PLACEHOLDER_CANONICAL_URL]">
+    
+    <!-- Open Graph Tags (for Facebook, LinkedIn, etc.) -->
+    <meta property="og:title" content="Pro QR Code Customizer & Generator">
+    <meta property="og:description" content="Create professional, custom-designed QR codes instantly. Customize color, size, and content for production-ready downloads in PNG format.">
+    <meta property="og:type" content="website">
+    <!-- To fully utilize OG tags, replace [PLACEHOLDER_IMAGE_URL] with a URL to a 1200x630 image (e.g., a sample QR code) -->
+    <!-- <meta property="og:image" content="[PLACEHOLDER_IMAGE_URL]"> -->
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Pro QR Code Customizer & Generator">
+    <meta name="twitter:description" content="Create professional, custom-designed QR codes instantly. Customize color, size, and content for production-ready downloads in PNG format.">
+    
+    <!-- END: Professional Meta Tags -->
+
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configure Tailwind to use the Inter font -->
+    <!-- Load QRCode.js library for generating QR codes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
+        /* Configure Tailwind to use 'Inter' font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
+        :root {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f9fb;
         }
-        /* Custom drag-and-drop styling */
-        .drop-zone {
-            border: 4px dashed #93c5fd; /* Blue-300 */
-            transition: all 0.3s ease;
+        /* Custom styles for the QR container */
+        #qrcode-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            min-height: 240px; /* Ensure space before generation */
         }
-        .drop-zone.drag-over {
-            border-color: #3b82f6; /* Blue-500 */
-            background-color: #eff6ff; /* Blue-50 */
+        /* Style the generated QR code canvas/img */
+        #qrcode-container img, #qrcode-container canvas {
+            border: 4px solid #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Deeper shadow */
+            border-radius: 0.75rem; /* Slightly more rounded */
+            transition: transform 0.3s ease-in-out;
+        }
+        #qrcode-container img:hover, #qrcode-container canvas:hover {
+            transform: scale(1.05);
+        }
+        /* Style for color inputs to show the color */
+        .color-input {
+            appearance: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            background: none;
+            border: none;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            cursor: pointer;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #ccc;
+        }
+        .color-input::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-4xl bg-white shadow-2xl rounded-xl p-6 sm:p-10 my-10">
-
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6 md:p-10 border border-slate-200">
         <!-- Header -->
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">
-                PDF <span class="text-red-600">to</span> Word Converter
-            </h1>
-            <p class="text-lg text-gray-500">
-                Instantly convert your PDF documents to editable DOCX format.
-            </p>
-        </header>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2 text-center">
+            <span class="text-teal-600">Pro</span> QR Code Customizer
+        </h1>
+        <p class="text-center text-gray-500 mb-8">
+            Define your data and design for a production-ready QR code.
+        </p>
 
-        <!-- Main Conversion Area -->
-        <div id="drop-zone" class="drop-zone flex flex-col items-center justify-center p-8 sm:p-12 h-64 rounded-xl cursor-pointer">
-            <input type="file" id="pdf-file-input" accept=".pdf" class="hidden">
-
-            <div id="upload-state" class="text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-blue-500 mx-auto mb-3" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM11 15H9v-2H8v-1h1v-2h2v2h1v1h-1v2z"/>
-                </svg>
-                <p class="text-xl font-semibold text-gray-700 mb-2">
-                    Drag & Drop your PDF file here
-                </p>
-                <p class="text-sm text-gray-500 mb-4">
-                    or click to select file (Max 50MB)
-                </p>
-                <button onclick="document.getElementById('pdf-file-input').click()"
-                        class="bg-blue-600 text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-150 transform hover:scale-105">
-                    Select PDF File
-                </button>
-            </div>
-
-            <!-- Conversion Status (Hidden initially) -->
-            <div id="status-state" class="hidden w-full text-center">
-                <p id="file-name-display" class="text-lg font-medium text-gray-800 mb-4 truncate"></p>
-
-                <!-- Progress Bar -->
-                <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
-                    <div id="progress-bar" class="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-in-out" style="width: 0%"></div>
+        <!-- Input Area -->
+        <div class="mb-6">
+            <label for="qr-data" class="block text-base font-semibold text-gray-800 mb-2">
+                1. Content (URL, Text, Contact, etc.)
+            </label>
+            <input
+                type="text"
+                id="qr-data"
+                placeholder="e.g., https://yourwebsite.com or custom text"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
+                value="https://google.com"
+            >
+        </div>
+        
+        <!-- Customization Options -->
+        <div class="mb-8 p-4 border border-slate-200 rounded-xl bg-slate-50">
+            <h3 class="text-base font-semibold text-gray-800 mb-4">
+                2. Appearance Settings
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Size -->
+                <div>
+                    <label for="qr-size" class="block text-sm font-medium text-gray-600 mb-1">Size (Pixels)</label>
+                    <input
+                        type="number"
+                        id="qr-size"
+                        value="250"
+                        min="100"
+                        max="500"
+                        class="w-full p-2 border border-gray-300 rounded-lg text-center"
+                    >
+                </div>
+                
+                <!-- Dark Color -->
+                <div>
+                    <label for="qr-dark-color" class="block text-sm font-medium text-gray-600 mb-1">Dark Color</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="color" id="qr-dark-color" value="#14B8A6" class="color-input">
+                        <input type="text" id="qr-dark-color-hex" value="#14B8A6" 
+                               class="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                               onchange="document.getElementById('qr-dark-color').value = this.value">
+                    </div>
                 </div>
 
-                <p id="status-message" class="text-sm text-blue-600 font-medium"></p>
-
-                <!-- Download Button (Hidden initially) -->
-                <button id="download-button" onclick="simulateDownload()"
-                        class="hidden mt-6 bg-green-600 text-white font-medium py-3 px-8 rounded-lg shadow-lg hover:bg-green-700 transition duration-150 transform hover:scale-105">
-                    Download Converted DOCX
-                </button>
+                <!-- Light Color -->
+                <div>
+                    <label for="qr-light-color" class="block text-sm font-medium text-gray-600 mb-1">Light Color</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="color" id="qr-light-color" value="#FFFFFF" class="color-input">
+                        <input type="text" id="qr-light-color-hex" value="#FFFFFF" 
+                               class="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                               onchange="document.getElementById('qr-light-color').value = this.value">
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Conversion Message Box (for alerts) -->
-        <div id="message-box" class="mt-6 p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-lg hidden" role="alert">
-            <!-- Message content will be placed here -->
+        <!-- Generation Button -->
+        <button
+            id="generate-btn"
+            class="w-full mb-6 py-3 px-4 bg-teal-600 text-white text-lg font-bold rounded-lg shadow-lg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-[1.005] active:scale-[0.99]"
+            onclick="generateQrCode()"
+        >
+            3. Generate Customized QR Code
+        </button>
+
+        <div class="border-t border-slate-200 pt-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                Generated Code
+            </h2>
+
+            <!-- QR Code Display Area -->
+            <div id="qrcode-container" class="bg-white rounded-lg mb-6 flex-col shadow-inner">
+                <p id="initial-message" class="text-gray-400 text-sm hidden">Click "Generate" to create your code.</p>
+            </div>
+
+            <!-- Download Button -->
+            <button
+                id="download-btn"
+                class="w-full py-3 px-4 bg-indigo-500 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-[1.005] active:scale-[0.99] disabled:bg-gray-400"
+                onclick="downloadQrCode()"
+                disabled
+            >
+                Download PNG
+            </button>
         </div>
 
-        <!-- Footer / Instructions -->
-        <footer class="mt-10 text-center text-sm text-gray-500">
-            <p>This is a front-end simulation. The actual conversion functionality requires a server-side process.</p>
-            <p>Your file security is our priority. Files are processed securely (in a real-world application).</p>
-        </footer>
+        <!-- Notification Bar (Custom Alert) -->
+        <div id="notification" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 p-3 bg-red-600 text-white rounded-lg shadow-xl hidden transition-opacity duration-300">
+            <!-- Message goes here -->
+        </div>
 
     </div>
 
     <script>
-        // Global variables for Firebase setup (required but not used in this simulation)
-        const __app_id = 'pdf-converter-app';
-        const __firebase_config = '{}';
-        const __initial_auth_token = '';
+        // Global instance for the QR code object
+        let qrcodeInstance = null;
+        const qrContainer = document.getElementById('qrcode-container');
+        const dataInput = document.getElementById('qr-data');
+        const sizeInput = document.getElementById('qr-size');
+        const darkColorInput = document.getElementById('qr-dark-color');
+        const lightColorInput = document.getElementById('qr-light-color');
+        const darkColorHexInput = document.getElementById('qr-dark-color-hex');
+        const lightColorHexInput = document.getElementById('qr-light-color-hex');
+        const downloadBtn = document.getElementById('download-btn');
+        const notificationBar = document.getElementById('notification');
 
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('pdf-file-input');
-        const uploadState = document.getElementById('upload-state');
-        const statusState = document.getElementById('status-state');
-        const fileNameDisplay = document.getElementById('file-name-display');
-        const progressBar = document.getElementById('progress-bar');
-        const statusMessage = document.getElementById('status-message');
-        const downloadButton = document.getElementById('download-button');
-        const messageBox = document.getElementById('message-box');
-
-        let isConverting = false;
-
-        // --- Utility Functions ---
+        // Sync hex input with color picker
+        darkColorInput.oninput = () => darkColorHexInput.value = darkColorInput.value.toUpperCase();
+        lightColorInput.oninput = () => lightColorHexInput.value = lightColorInput.value.toUpperCase();
 
         /**
-         * Displays a temporary message in the message box.
+         * Shows a temporary notification message.
          * @param {string} message - The message to display.
-         * @param {string} type - 'success', 'error', or 'warning'
+         * @param {string} bgColor - Tailwind background color class (e.g., 'bg-red-600').
          */
-        function showMessage(message, type = 'warning') {
-            const colors = {
-                warning: { bg: 'bg-yellow-100', border: 'border-yellow-300', text: 'text-yellow-800' },
-                error: { bg: 'bg-red-100', border: 'border-red-300', text: 'text-red-800' },
-                success: { bg: 'bg-green-100', border: 'border-green-300', text: 'text-green-800' }
-            };
-
-            const selectedColor = colors[type] || colors.warning;
-
-            messageBox.className = `mt-6 p-4 border rounded-lg ${selectedColor.bg} ${selectedColor.border} ${selectedColor.text}`;
-            messageBox.innerHTML = message;
-            messageBox.classList.remove('hidden');
-
+        function showNotification(message, bgColor = 'bg-red-600') {
+            notificationBar.textContent = message;
+            notificationBar.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 p-3 text-white rounded-lg shadow-xl transition-opacity duration-300 ${bgColor}`;
+            notificationBar.classList.remove('hidden');
             setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 5000); // Hide message after 5 seconds
+                notificationBar.classList.add('hidden');
+            }, 3000);
         }
 
         /**
-         * Simulates the conversion process with a progress bar.
-         * @param {string} fileName - Name of the file being "converted".
+         * Clears the previous QR code and generates a new one using custom settings.
          */
-        function startConversionSimulation(fileName) {
-            isConverting = true;
-            uploadState.classList.add('hidden');
-            statusState.classList.remove('hidden');
-            downloadButton.classList.add('hidden');
+        function generateQrCode() {
+            const data = dataInput.value.trim();
+            
+            if (!data) {
+                showNotification("Please enter content (URL or text) to generate a QR code.", 'bg-yellow-500');
+                return;
+            }
 
-            fileNameDisplay.textContent = fileName;
-            let progress = 0;
-            progressBar.style.width = '0%';
+            // Read customization values
+            const size = parseInt(sizeInput.value) || 250;
+            const colorDark = darkColorInput.value || darkColorHexInput.value || "#14B8A6";
+            const colorLight = lightColorInput.value || lightColorHexInput.value || "#FFFFFF";
 
-            const interval = setInterval(() => {
-                if (progress < 95) {
-                    // Smoothly increase progress
-                    const increment = Math.random() * 5 + 1; // Increase by 1-6%
-                    progress = Math.min(progress + increment, 95);
-                    progressBar.style.width = `${progress.toFixed(0)}%`;
+            // 1. Clean up previous content
+            qrContainer.innerHTML = '';
+            downloadBtn.disabled = true;
 
-                    if (progress < 50) {
-                        statusMessage.textContent = 'Uploading and Initializing Conversion...';
-                    } else if (progress < 85) {
-                        statusMessage.textContent = 'Converting PDF structure to DOCX format...';
-                    } else {
-                        statusMessage.textContent = 'Finalizing document layout...';
-                    }
+            // 2. Generate the QR Code
+            try {
+                // qrcode.js appends the generated element (canvas or img) to the container.
+                qrcodeInstance = new QRCode(qrContainer, {
+                    text: data,
+                    width: size,
+                    height: size,
+                    colorDark : colorDark,
+                    colorLight : colorLight,
+                    correctLevel : QRCode.CorrectLevel.H // High correction level for reliability
+                });
 
-                } else if (progress >= 95 && progress < 100) {
-                    // Keep progress near 95% for a few seconds
-                    progress = 95;
-                    progressBar.style.width = '95%';
-                } else if (progress === 100) {
-                     // Completion state
-                    clearInterval(interval);
-                    statusMessage.textContent = 'Conversion Complete!';
-                    progressBar.style.width = '100%';
-                    progressBar.classList.remove('bg-blue-600');
-                    progressBar.classList.add('bg-green-600');
-                    downloadButton.classList.remove('hidden');
-                    isConverting = false;
-                }
-            }, 500); // Update every 0.5 seconds
+                // Wait a moment for the canvas to be rendered, then enable download
+                setTimeout(() => {
+                    downloadBtn.disabled = false;
+                    showNotification("Custom QR Code generated successfully!", 'bg-green-500');
+                }, 100);
 
-            // Force completion after a set time (e.g., 5 seconds total)
-            setTimeout(() => {
-                if (isConverting) {
-                    progress = 100;
-                }
-            }, 5000);
+            } catch (error) {
+                console.error("QR Code generation failed:", error);
+                showNotification("An error occurred during QR code generation.", 'bg-red-600');
+            }
         }
 
         /**
-         * Creates a placeholder file and triggers a download.
+         * Locates the generated canvas, converts it to a PNG file, and triggers a download.
          */
-        function simulateDownload() {
-            // Revert state for next upload
-            progressBar.classList.remove('bg-green-600');
-            progressBar.classList.add('bg-blue-600');
-            uploadState.classList.remove('hidden');
-            statusState.classList.add('hidden');
+        function downloadQrCode() {
+            const canvas = qrContainer.querySelector('canvas');
 
-            const fileName = fileNameDisplay.textContent.replace(/\.pdf$/i, '.docx');
-            showMessage(`Success! Downloading "${fileName}"`, 'success');
-
-            // Create a dummy DOCX file content (plain text in a blob)
-            const content = 'This is the simulated content of your converted Word document. In a real application, this would contain the parsed and formatted text from your PDF.';
-            const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-
-            // Trigger the download
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url); // Clean up
-        }
-
-
-        // --- Event Handlers ---
-
-        /**
-         * Handles the files selected from the input or dropped.
-         * @param {FileList} files
-         */
-        function handleFiles(files) {
-            if (isConverting) {
-                showMessage('Conversion is already in progress. Please wait.');
+            if (!canvas) {
+                showNotification("No QR code found to download. Please generate one first.", 'bg-red-600');
                 return;
             }
 
-            if (files.length === 0) return;
+            // Convert canvas content to a data URL (PNG format)
+            const dataURL = canvas.toDataURL("image/png");
 
-            const file = files[0];
+            // Create a temporary link element to trigger the download
+            const link = document.createElement('a');
+            link.href = dataURL;
+            
+            // Generate a professional filename
+            let filenameSlug = dataInput.value.substring(0, 30).trim().toLowerCase();
+            filenameSlug = filenameSlug.replace(/[^a-z0-9]/gi, '_').replace(/_{2,}/g, '_'); // Clean up non-alphanumeric chars
+            const filename = `qrcode_${filenameSlug || 'custom'}.png`;
 
-            // Basic validation
-            if (file.type !== 'application/pdf') {
-                showMessage(`Error: Please select a valid PDF file. You uploaded a file of type: ${file.type}`, 'error');
-                return;
-            }
+            link.download = filename;
+            
+            // Append to body, click, and remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
 
-            // Simulate size limit (50MB = 50 * 1024 * 1024 bytes)
-            const MAX_SIZE = 50 * 1024 * 1024;
-            if (file.size > MAX_SIZE) {
-                showMessage('Error: The file size exceeds the 50MB limit.', 'error');
-                return;
-            }
-
-            // Start the simulated process
-            startConversionSimulation(file.name);
+            showNotification("Download initiated!", 'bg-indigo-600');
         }
 
-        // File input change event
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
+        // Initial call to generate a placeholder on load
+        window.onload = generateQrCode;
 
-        // Drag and Drop Events
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        // Highlight drop zone when item is dragged over
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => {
-                if (!isConverting) dropZone.classList.add('drag-over');
-            }, false);
-        });
-
-        // Unhighlight drop zone when item leaves
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => {
-                dropZone.classList.remove('drag-over');
-            }, false);
-        });
-
-        // Handle dropped files
-        dropZone.addEventListener('drop', (e) => {
-            if (!isConverting) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            }
-        }, false);
     </script>
-
 </body>
 </html>
