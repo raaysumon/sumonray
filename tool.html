@@ -5,30 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional QR Code Customizer</title>
     
-    <!-- START: Professional Meta Tags for SEO and Social Sharing -->
-    
-    <!-- Standard SEO Tags -->
     <meta name="description" content="Create professional, custom-designed QR codes instantly. Customize color, size, and content for production-ready downloads in PNG format.">
     <meta name="keywords" content="QR code generator, custom QR, professional QR, QR color, QR size, download PNG, fast, easy">
     <link rel="canonical" href="[PLACEHOLDER_CANONICAL_URL]">
-    
-    <!-- Open Graph Tags (for Facebook, LinkedIn, etc.) -->
     <meta property="og:title" content="Pro QR Code Customizer & Generator">
     <meta property="og:description" content="Create professional, custom-designed QR codes instantly. Customize color, size, and content for production-ready downloads in PNG format.">
     <meta property="og:type" content="website">
-    <!-- To fully utilize OG tags, replace [PLACEHOLDER_IMAGE_URL] with a URL to a 1200x630 image (e.g., a sample QR code) -->
-    <!-- <meta property="og:image" content="[PLACEHOLDER_IMAGE_URL]"> -->
-
-    <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Pro QR Code Customizer & Generator">
     <meta name="twitter:description" content="Create professional, custom-designed QR codes instantly. Customize color, size, and content for production-ready downloads in PNG format.">
-    
-    <!-- END: Professional Meta Tags -->
-
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load QRCode.js library for generating QR codes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         /* Configure Tailwind to use 'Inter' font */
@@ -36,25 +22,22 @@
         :root {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom styles for the QR container */
         #qrcode-container {
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 2rem;
-            min-height: 240px; /* Ensure space before generation */
+            min-height: 240px; 
         }
-        /* Style the generated QR code canvas/img */
         #qrcode-container img, #qrcode-container canvas {
             border: 4px solid #fff;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Deeper shadow */
-            border-radius: 0.75rem; /* Slightly more rounded */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+            border-radius: 0.75rem; 
             transition: transform 0.3s ease-in-out;
         }
         #qrcode-container img:hover, #qrcode-container canvas:hover {
             transform: scale(1.05);
         }
-        /* Style for color inputs to show the color */
         .color-input {
             appearance: none;
             -moz-appearance: none;
@@ -69,28 +52,28 @@
             overflow: hidden;
             border: 2px solid #ccc;
         }
-        .color-input::-webkit-color-swatch-wrapper {
-            padding: 0;
+        .color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-input::-webkit-color-swatch { border: none; border-radius: 50%; }
+        /* Style for hidden input containers */
+        .input-group {
+            display: none;
         }
-        .color-input::-webkit-color-swatch {
-            border: none;
-            border-radius: 50%;
+        .input-group.active {
+            display: block;
         }
     </style>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MJV8RKP7JK"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MJV8RKP7JK"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-  gtag('config', 'G-MJV8RKP7JK');
+    gtag('config', 'G-MJV8RKP7JK');
 </script>
 </head>
 <body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6 md:p-10 border border-slate-200">
-        <!-- Header -->
         <h1 class="text-3xl font-bold text-gray-900 mb-2 text-center">
             <span class="text-teal-600">Pro</span> QR Code Customizer
         </h1>
@@ -98,28 +81,77 @@
             Define your data and design for a production-ready QR code.
         </p>
 
-        <!-- Input Area -->
         <div class="mb-6">
-            <label for="qr-data" class="block text-base font-semibold text-gray-800 mb-2">
-                1. Content (URL, Text, Contact, etc.)
+            <label for="qr-type" class="block text-base font-semibold text-gray-800 mb-2">
+                1. Select Content Type
             </label>
-            <input
-                type="text"
-                id="qr-data"
-                placeholder="e.g., https://yourwebsite.com or custom text"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
-                value="https://google.com"
-            >
+            <select id="qr-type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner">
+                <option value="link">Link / Text (Multi-line)</option>
+                <option value="email">Email</option>
+                <option value="wifi">WiFi Network</option>
+                <option value="vcard" disabled>VCard (Coming Soon)</option>
+            </select>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-base font-semibold text-gray-800 mb-2">
+                2. Enter Data
+            </label>
+            
+            <div id="input-group-link" class="input-group active">
+                <textarea
+                    id="qr-data-link"
+                    placeholder="Enter URL, multi-line text, or any custom content."
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
+                    rows="4"
+                >https://google.com</textarea>
+            </div>
+
+            <div id="input-group-email" class="input-group">
+                <input
+                    type="email"
+                    id="qr-data-email-address"
+                    placeholder="Recipient Email Address (Required)"
+                    class="w-full p-3 mb-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
+                >
+                <input
+                    type="text"
+                    id="qr-data-email-subject"
+                    placeholder="Subject (Optional)"
+                    class="w-full p-3 mb-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
+                >
+                <textarea
+                    id="qr-data-email-body"
+                    placeholder="Body Content (Optional)"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
+                    rows="2"
+                ></textarea>
+            </div>
+
+            <div id="input-group-wifi" class="input-group">
+                <input
+                    type="text"
+                    id="qr-data-wifi-ssid"
+                    placeholder="Network Name (SSID) (Required)"
+                    class="w-full p-3 mb-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
+                >
+                <input
+                    type="password"
+                    id="qr-data-wifi-password"
+                    placeholder="Password (P)"
+                    class="w-full p-3 mb-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150 ease-in-out shadow-inner"
+                >
+                <p class="text-sm text-gray-500 mt-2">Default security is set to WPA. Leave password empty for unsecured networks.</p>
+            </div>
+            
         </div>
         
-        <!-- Customization Options -->
         <div class="mb-8 p-4 border border-slate-200 rounded-xl bg-slate-50">
             <h3 class="text-base font-semibold text-gray-800 mb-4">
-                2. Appearance Settings
+                3. Appearance Settings
             </h3>
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <!-- Size -->
                 <div>
                     <label for="qr-size" class="block text-sm font-medium text-gray-600 mb-1">Size (Pixels)</label>
                     <input
@@ -132,22 +164,20 @@
                     >
                 </div>
                 
-                <!-- Dark Color -->
                 <div>
                     <label for="qr-dark-color" class="block text-sm font-medium text-gray-600 mb-1">Dark Color</label>
                     <div class="flex items-center space-x-2">
-                        <input type="color" id="qr-dark-color" value="#14B8A6" class="color-input">
+                        <input type="color" id="qr-dark-color" value="#14B8A6" class="color-input" aria-label="QR Code Dark Module Color">
                         <input type="text" id="qr-dark-color-hex" value="#14B8A6" 
                                class="w-full p-2 border border-gray-300 rounded-lg text-sm"
                                onchange="document.getElementById('qr-dark-color').value = this.value">
                     </div>
                 </div>
 
-                <!-- Light Color -->
                 <div>
                     <label for="qr-light-color" class="block text-sm font-medium text-gray-600 mb-1">Light Color</label>
                     <div class="flex items-center space-x-2">
-                        <input type="color" id="qr-light-color" value="#FFFFFF" class="color-input">
+                        <input type="color" id="qr-light-color" value="#FFFFFF" class="color-input" aria-label="QR Code Light Background Color">
                         <input type="text" id="qr-light-color-hex" value="#FFFFFF" 
                                class="w-full p-2 border border-gray-300 rounded-lg text-sm"
                                onchange="document.getElementById('qr-light-color').value = this.value">
@@ -156,13 +186,11 @@
             </div>
         </div>
 
-        <!-- Generation Button -->
         <button
             id="generate-btn"
             class="w-full mb-6 py-3 px-4 bg-teal-600 text-white text-lg font-bold rounded-lg shadow-lg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-[1.005] active:scale-[0.99]"
-            onclick="generateQrCode()"
         >
-            3. Generate Customized QR Code
+            4. Generate Customized QR Code
         </button>
 
         <div class="border-t border-slate-200 pt-6">
@@ -170,12 +198,10 @@
                 Generated Code
             </h2>
 
-            <!-- QR Code Display Area -->
             <div id="qrcode-container" class="bg-white rounded-lg mb-6 flex-col shadow-inner">
-                <p id="initial-message" class="text-gray-400 text-sm hidden">Click "Generate" to create your code.</p>
+                <p id="initial-message" class="text-gray-400 text-sm">Select content type and enter data to generate your code.</p>
             </div>
 
-            <!-- Download Button -->
             <button
                 id="download-btn"
                 class="w-full py-3 px-4 bg-indigo-500 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-[1.005] active:scale-[0.99] disabled:bg-gray-400"
@@ -186,10 +212,8 @@
             </button>
         </div>
 
-        <!-- Notification Bar (Custom Alert) -->
         <div id="notification" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 p-3 bg-red-600 text-white rounded-lg shadow-xl hidden transition-opacity duration-300">
-            <!-- Message goes here -->
-        </div>
+            </div>
 
     </div>
 
@@ -197,23 +221,52 @@
         // Global instance for the QR code object
         let qrcodeInstance = null;
         const qrContainer = document.getElementById('qrcode-container');
-        const dataInput = document.getElementById('qr-data');
+        const downloadBtn = document.getElementById('download-btn');
+        const generateBtn = document.getElementById('generate-btn');
+        const notificationBar = document.getElementById('notification');
+        const initialMessage = document.getElementById('initial-message');
+        
+        // New elements
+        const typeSelect = document.getElementById('qr-type');
+        const linkInput = document.getElementById('qr-data-link'); // Textarea for multi-line
+        const emailAddressInput = document.getElementById('qr-data-email-address');
+        const emailSubjectInput = document.getElementById('qr-data-email-subject');
+        const emailBodyInput = document.getElementById('qr-data-email-body');
+        const wifiSSIDInput = document.getElementById('qr-data-wifi-ssid');
+        const wifiPasswordInput = document.getElementById('qr-data-wifi-password');
+        
+        // Appearance elements
         const sizeInput = document.getElementById('qr-size');
         const darkColorInput = document.getElementById('qr-dark-color');
         const lightColorInput = document.getElementById('qr-light-color');
         const darkColorHexInput = document.getElementById('qr-dark-color-hex');
         const lightColorHexInput = document.getElementById('qr-light-color-hex');
-        const downloadBtn = document.getElementById('download-btn');
-        const notificationBar = document.getElementById('notification');
+        
+        const MIN_SIZE = 100;
+        const MAX_SIZE = 500;
 
         // Sync hex input with color picker
         darkColorInput.oninput = () => darkColorHexInput.value = darkColorInput.value.toUpperCase();
         lightColorInput.oninput = () => lightColorHexInput.value = lightColorInput.value.toUpperCase();
+        darkColorHexInput.oninput = () => darkColorInput.value = darkColorHexInput.value;
+        lightColorHexInput.oninput = () => lightColorInput.value = lightColorHexInput.value;
+
+
+        /**
+         * Debounce function to limit how often a function is called
+         */
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
 
         /**
          * Shows a temporary notification message.
-         * @param {string} message - The message to display.
-         * @param {string} bgColor - Tailwind background color class (e.g., 'bg-red-600').
          */
         function showNotification(message, bgColor = 'bg-red-600') {
             notificationBar.textContent = message;
@@ -225,45 +278,153 @@
         }
 
         /**
+         * Switches the active input group based on the selected type.
+         */
+        function switchInputGroup() {
+            const selectedType = typeSelect.value;
+            document.querySelectorAll('.input-group').forEach(group => {
+                group.classList.remove('active');
+            });
+            const activeGroup = document.getElementById(`input-group-${selectedType}`);
+            if (activeGroup) {
+                activeGroup.classList.add('active');
+            }
+
+            // Immediately re-generate with the new inputs
+            debouncedGenerateQrCode();
+        }
+
+        /**
+         * Collects and formats the data based on the selected content type.
+         * Returns the raw QR data string or null if validation fails.
+         */
+        function getFormattedData() {
+            const type = typeSelect.value;
+            let data = null;
+
+            switch (type) {
+                case 'link':
+                    // Link/Text (handles both standard URL and plain text, including multiple lines)
+                    data = linkInput.value.trim();
+                    break;
+                
+                case 'email':
+                    // Email (using the mailto: standard format)
+                    const address = emailAddressInput.value.trim();
+                    const subject = emailSubjectInput.value.trim();
+                    const body = emailBodyInput.value.trim();
+
+                    if (!address) {
+                        showNotification("Email address is required.", 'bg-yellow-600');
+                        return null; 
+                    }
+                    
+                    let mailto = `mailto:${address}`;
+                    const params = [];
+
+                    if (subject) {
+                        params.push(`subject=${encodeURIComponent(subject)}`);
+                    }
+                    if (body) {
+                        params.push(`body=${encodeURIComponent(body)}`);
+                    }
+
+                    if (params.length > 0) {
+                        mailto += `?${params.join('&')}`;
+                    }
+                    data = mailto;
+                    break;
+                    
+                case 'wifi':
+                    // WiFi (WIFI:T:<Security>;S:<SSID>;P:<Password>;;)
+                    const ssid = wifiSSIDInput.value.trim();
+                    const password = wifiPasswordInput.value; // Password is not trimmed for accuracy
+                    let security = 'WPA'; // Default to WPA/WPA2
+
+                    if (!ssid) {
+                        showNotification("WiFi Network Name (SSID) is required.", 'bg-yellow-600');
+                        return null; 
+                    }
+                    
+                    if (!password) {
+                        security = 'nopass'; // Use 'nopass' for open networks
+                    }
+                    
+                    // Note: SSID and Password must be escaped (e.g., semicolons, backslashes)
+                    const escapedSSID = ssid.replace(/([;,\\])/g, '\\$1');
+                    const escapedPassword = password.replace(/([;,\\])/g, '\\$1');
+
+                    // Format: WIFI:T:<Security>;S:<SSID>;P:<Password>;;
+                    data = `WIFI:T:${security};S:${escapedSSID};P:${escapedPassword};;`;
+                    break;
+
+                default:
+                    showNotification(`Content type "${type}" is not yet supported.`, 'bg-red-500');
+                    return null;
+            }
+
+            return data;
+        }
+
+
+        /**
          * Clears the previous QR code and generates a new one using custom settings.
          */
         function generateQrCode() {
-            const data = dataInput.value.trim();
+            const data = getFormattedData();
             
             if (!data) {
-                showNotification("Please enter content (URL or text) to generate a QR code.", 'bg-yellow-500');
-                return;
+                qrContainer.innerHTML = '';
+                initialMessage.classList.remove('hidden');
+                downloadBtn.disabled = true;
+                return; // Exit if data is invalid (validation handled in getFormattedData)
             }
 
-            // Read customization values
-            const size = parseInt(sizeInput.value) || 250;
+            // Read customization values and perform size validation
+            let size = parseInt(sizeInput.value);
+            let sizeCorrected = false;
+
+            if (isNaN(size) || size < MIN_SIZE || size > MAX_SIZE) {
+                size = Math.min(Math.max(size, MIN_SIZE), MAX_SIZE);
+                sizeInput.value = size; 
+                sizeCorrected = true;
+            }
+
             const colorDark = darkColorInput.value || darkColorHexInput.value || "#14B8A6";
             const colorLight = lightColorInput.value || lightColorHexInput.value || "#FFFFFF";
 
-            // 1. Clean up previous content
+            // 1. Clean up previous content and hide initial message
             qrContainer.innerHTML = '';
+            initialMessage.classList.add('hidden');
             downloadBtn.disabled = true;
 
             // 2. Generate the QR Code
             try {
-                // qrcode.js appends the generated element (canvas or img) to the container.
                 qrcodeInstance = new QRCode(qrContainer, {
                     text: data,
                     width: size,
                     height: size,
                     colorDark : colorDark,
                     colorLight : colorLight,
-                    correctLevel : QRCode.CorrectLevel.H // High correction level for reliability
+                    correctLevel : QRCode.CorrectLevel.H
                 });
 
                 // Wait a moment for the canvas to be rendered, then enable download
                 setTimeout(() => {
                     downloadBtn.disabled = false;
-                    showNotification("Custom QR Code generated successfully!", 'bg-green-500');
+                    if (sizeCorrected) {
+                         showNotification(`Size corrected to ${size}px. QR Code generated successfully!`, 'bg-orange-500');
+                    } else {
+                        // Only show success message if not overridden by size correction
+                        if (notificationBar.classList.contains('hidden')) {
+                            showNotification("Custom QR Code generated successfully!", 'bg-green-500');
+                        }
+                    }
                 }, 100);
 
             } catch (error) {
                 console.error("QR Code generation failed:", error);
+                initialMessage.classList.remove('hidden');
                 showNotification("An error occurred during QR code generation.", 'bg-red-600');
             }
         }
@@ -279,21 +440,18 @@
                 return;
             }
 
-            // Convert canvas content to a data URL (PNG format)
             const dataURL = canvas.toDataURL("image/png");
-
-            // Create a temporary link element to trigger the download
             const link = document.createElement('a');
             link.href = dataURL;
             
-            // Generate a professional filename
-            let filenameSlug = dataInput.value.substring(0, 30).trim().toLowerCase();
-            filenameSlug = filenameSlug.replace(/[^a-z0-9]/gi, '_').replace(/_{2,}/g, '_'); // Clean up non-alphanumeric chars
-            const filename = `qrcode_${filenameSlug || 'custom'}.png`;
+            // Generate a professional, unique filename with a timestamp
+            const now = new Date();
+            const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+
+            const filename = `qrcode_${typeSelect.value}_${timestamp}.png`;
 
             link.download = filename;
             
-            // Append to body, click, and remove
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -301,8 +459,39 @@
             showNotification("Download initiated!", 'bg-indigo-600');
         }
 
-        // Initial call to generate a placeholder on load
-        window.onload = generateQrCode;
+        // ------------------------------------------------------------------
+        // Event Listeners for Real-time (Debounced) Generation
+        // ------------------------------------------------------------------
+        const debouncedGenerateQrCode = debounce(generateQrCode, 300);
+
+        // Listen for changes on content type
+        typeSelect.addEventListener('change', switchInputGroup);
+
+        // Listen for input changes on all relevant fields to trigger debounced generation
+        linkInput.addEventListener('input', debouncedGenerateQrCode);
+        
+        emailAddressInput.addEventListener('input', debouncedGenerateQrCode);
+        emailSubjectInput.addEventListener('input', debouncedGenerateQrCode);
+        emailBodyInput.addEventListener('input', debouncedGenerateQrCode);
+        
+        wifiSSIDInput.addEventListener('input', debouncedGenerateQrCode);
+        wifiPasswordInput.addEventListener('input', debouncedGenerateQrCode);
+        
+        // Appearance inputs
+        sizeInput.addEventListener('input', debouncedGenerateQrCode);
+        darkColorInput.addEventListener('input', debouncedGenerateQrCode);
+        lightColorInput.addEventListener('input', debouncedGenerateQrCode);
+        darkColorHexInput.addEventListener('input', debouncedGenerateQrCode);
+        lightColorHexInput.addEventListener('input', debouncedGenerateQrCode);
+
+        // Explicit click handler for the Generate button
+        generateBtn.addEventListener('click', generateQrCode);
+
+        // Initial setup and generation
+        window.onload = () => {
+            switchInputGroup(); // Set up the initial input form
+            generateQrCode(); // Generate the initial default QR code
+        };
 
     </script>
 </body>
