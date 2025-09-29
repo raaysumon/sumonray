@@ -124,13 +124,12 @@
 
 <script>
     // ---------------------------------------------------------------------
-    // !!! CRITICAL SECURITY WARNING !!!
-    // The API key MUST be secured on a backend server in a production app.
-    // Exposing it in client-side code (like here) is a major security risk.
-    // This is for demonstration purposes ONLY.
+    // !!! CRITICAL STEP: FIXING THE 401 ERROR !!!
+    // 1. Get your valid ConvertAPI Secret Key from your account dashboard.
+    // 2. REPLACE the placeholder value below with your actual key.
     // ---------------------------------------------------------------------
-    const CONVERTAPI_SECRET = 'yFTnoGYVlMNJVJplaUAkmsKzOZGEO7sP'; // Placeholder Key
-
+    const CONVERTAPI_SECRET = 'yFTnoGYVlMNJVJplaUAkmsKzOZGEO7sP'; // <--- *** REPLACE THIS VALUE ***
+    
     const API_URL = 'https://v2.convertapi.com/convert/pdf/to/docx';
     
     // DOM Elements
@@ -191,6 +190,16 @@
      */
     async function startConversion() {
         const file = fileInput.files[0];
+        
+        // --- API Key Validation Check ---
+        if (CONVERTAPI_SECRET === 'yFTnoGYVlMNJVJplaUAkmsKzOZGEO7sP' || !CONVERTAPI_SECRET) {
+            statusMessage.textContent = 'Error: API Key is missing or is the placeholder. Please update CONVERTAPI_SECRET.';
+            statusMessage.classList.remove('text-yellow-400', 'text-green-400');
+            statusMessage.classList.add('text-red-400');
+            return;
+        }
+        // --------------------------------
+
         if (!file) {
             statusMessage.textContent = 'Please select a PDF file first.';
             statusMessage.classList.remove('text-yellow-400', 'text-green-400');
@@ -210,7 +219,7 @@
         const formData = new FormData();
         
         // Append required parameters for the API call
-        formData.append('Apikey', CONVERTAPI_SECRET);
+        formData.append('Apikey', CONVERTAPI_SECRET); // THIS is the parameter the API uses for authentication
         formData.append('File', file);
         
         // Include advanced settings
@@ -244,7 +253,7 @@
                             throw new Error('Rate limit exceeded after all retries.');
                         }
                     } else {
-                        // Other non-retryable errors
+                         // Throw the specific error status for better debugging
                         throw new Error(`API error: ${response.status} ${response.statusText}`);
                     }
                 } catch (error) {
@@ -253,6 +262,10 @@
             }
             
             if (!response || !response.ok) {
+                // Check specifically for 401 again if the loop exited without success
+                if (response && response.status === 401) {
+                    throw new Error('401 Unauthorized: Your API Key is invalid or has expired.');
+                }
                 throw new Error('Conversion request failed after multiple attempts.');
             }
 
