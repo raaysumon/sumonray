@@ -1,97 +1,293 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game</title>
-<style>
-body{margin:0;font-family:sans-serif;text-align:center;background:#f7f2ec;}
-#stage{position:relative;margin:20px auto;width:90%;max-width:600px;height:300px;background:#e9f7ef;border-radius:12px;overflow:hidden;}
-.character{position:absolute;width:60px;bottom:20px;}
-#durga{left:0;}
-.collectible{position:absolute;width:30px;height:30px;background:yellow;border-radius:50%;}
-.score{font-size:18px;font-weight:bold;margin:10px;}
-button{padding:10px 16px;margin:5px;border:none;background:#2b6cb0;color:white;border-radius:8px;font-size:16px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional PDF to Word Converter</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a polished, dark-mode look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e; /* Deep purple/blue background */
+            color: #e4e4e7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container-card {
+            max-width: 600px;
+            width: 100%;
+            background-color: #2c2c54; /* Lighter purple for card */
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+        .upload-area {
+            border: 3px dashed #6a4c93;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .upload-area:hover {
+            background-color: #3f3170;
+        }
+        #pdfFile {
+            display: none; /* Hide native file input */
+        }
+        /* Custom file selector button styling */
+        .custom-file-select {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            background-color: #8338ec; /* Vibrant purple */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 4px #6a1a9a;
+            user-select: none;
+        }
+        .custom-file-select:hover {
+            background-color: #7227d8;
+            box-shadow: 0 2px #6a1a9a;
+            transform: translateY(2px);
+        }
+        .custom-file-select:active {
+            background-color: #6a1a9a;
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+    </style>
 </head>
 <body>
 
-<div class="score">স্কোর: <span id="score">0</span></div>
-<div id="stage">
-  <div id="durga" class="character">
-    <svg viewBox="0 0 50 50">
-      <circle cx="25" cy="15" r="10" fill="#d9534f"/>
-      <rect x="20" y="25" width="10" height="20" fill="#b33"/>
-    </svg>
-  </div>
-</div>
-<div>
-  <button id="left">← বাম</button>
-  <button id="right">ডান →</button>
+<div class="container-card">
+    <h1 class="text-4xl font-extrabold mb-2 text-white text-center">PDF to DOCX</h1>
+    <p class="text-lg mb-8 text-indigo-300 text-center">Transform your non-editable PDFs into fully editable Word documents.</p>
+
+    <!-- File Selection Area -->
+    <div id="uploadArea" class="upload-area mb-6">
+        <label for="pdfFile" class="custom-file-select">
+            <!-- Icon for file upload (using SVG) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span id="fileLabel">Select PDF File</span>
+        </label>
+        <input type="file" id="pdfFile" accept="application/pdf">
+        <p id="fileNameDisplay" class="mt-4 text-sm font-medium text-purple-300 h-5">No file selected.</p>
+    </div>
+
+    <!-- Conversion Button -->
+    <button id="convertBtn" 
+            onclick="startConversion()"
+            class="w-full flex justify-center items-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span id="buttonText">Convert to Word</span>
+        <svg id="loader" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    </button>
+
+    <!-- Status and Download Area -->
+    <div class="mt-6">
+        <p id="statusMessage" class="text-center text-sm font-medium text-yellow-400 min-h-[1.5rem]"></p>
+        <a id="downloadLink" 
+           href="#" 
+           target="_blank"
+           class="hidden mt-4 w-full justify-center items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 text-center shadow-lg hover:shadow-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Click to Download DOCX
+        </a>
+    </div>
+
+    <!-- Conversion Settings -->
+    <div class="mt-8 pt-4 border-t border-purple-500/50">
+        <h2 class="text-xl font-semibold mb-3 text-purple-300">Advanced Settings</h2>
+        <div class="flex items-center space-x-3">
+            <input type="checkbox" id="ocrEnabled" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 bg-gray-700 border-gray-600" checked>
+            <label for="ocrEnabled" class="text-sm text-gray-300">Enable OCR (for scanned PDFs)</label>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">Highly recommended for preserving text from image-based or poorly structured PDFs.</p>
+    </div>
+
 </div>
 
 <script>
-const stage=document.getElementById('stage');
-const durga=document.getElementById('durga');
-const scoreDisplay=document.getElementById('score');
-let stageW=stage.clientWidth, durgaX=0, score=0;
-let collectibles=[];
+    // ---------------------------------------------------------------------
+    // !!! CRITICAL SECURITY WARNING !!!
+    // The API key MUST be secured on a backend server in a production app.
+    // Exposing it in client-side code (like here) is a major security risk.
+    // This is for demonstration purposes ONLY.
+    // ---------------------------------------------------------------------
+    const CONVERTAPI_SECRET = 'yFTnoGYVlMNJVJplaUAkmsKzOZGEO7sP'; // Placeholder Key
 
-// Move Durga
-function moveDurga(dx){
-  durgaX=Math.min(Math.max(0,durgaX+dx),stageW-60);
-  durga.style.left=durgaX+'px';
-}
+    const API_URL = 'https://v2.convertapi.com/convert/pdf/to/docx';
+    
+    // DOM Elements
+    const fileInput = document.getElementById('pdfFile');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const fileLabel = document.getElementById('fileLabel');
+    const convertBtn = document.getElementById('convertBtn');
+    const buttonText = document.getElementById('buttonText');
+    const loader = document.getElementById('loader');
+    const statusMessage = document.getElementById('statusMessage');
+    const downloadLink = document.getElementById('downloadLink');
+    const ocrEnabled = document.getElementById('ocrEnabled');
+    
+    // Event Listener for file selection update
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = `File Selected: ${file.name}`;
+            fileLabel.textContent = "Change File";
+            convertBtn.disabled = false;
+        } else {
+            fileNameDisplay.textContent = 'No file selected.';
+            fileLabel.textContent = "Select PDF File";
+            convertBtn.disabled = true;
+        }
+        // Reset conversion state
+        statusMessage.textContent = '';
+        downloadLink.classList.add('hidden');
+    });
 
-// Generate collectible
-function spawnCollectible(){
-  const c=document.createElement('div');
-  c.classList.add('collectible');
-  c.style.left=Math.random()*(stageW-30)+'px';
-  c.style.top='0px';
-  stage.appendChild(c);
-  collectibles.push(c);
-}
+    // Disable button on load until a file is selected
+    window.onload = () => {
+        convertBtn.disabled = true;
+    };
 
-// Update collectibles
-function updateCollectibles(){
-  collectibles.forEach((c,i)=>{
-    let y=parseFloat(c.style.top);
-    y+=3; // speed
-    c.style.top=y+'px';
-    let dRect=durga.getBoundingClientRect();
-    let cRect=c.getBoundingClientRect();
-    if(!(cRect.bottom<dRect.top || cRect.top>dRect.bottom || cRect.right<dRect.left || cRect.left>dRect.right)){
-      score++; scoreDisplay.textContent=score;
-      c.remove();
-      collectibles.splice(i,1);
-    } else if(y>stage.clientHeight){
-      c.remove();
-      collectibles.splice(i,1);
+    /**
+     * Toggles the loading state of the application interface.
+     * @param {boolean} isLoading - true to enable loading state, false to disable.
+     */
+    function setLoadingState(isLoading) {
+        convertBtn.disabled = isLoading;
+        fileInput.disabled = isLoading;
+        if (isLoading) {
+            buttonText.textContent = 'Converting...';
+            loader.classList.remove('hidden');
+            statusMessage.textContent = 'Uploading file and starting conversion...';
+            statusMessage.classList.remove('text-red-400', 'text-green-400');
+            statusMessage.classList.add('text-yellow-400');
+            downloadLink.classList.add('hidden');
+        } else {
+            buttonText.textContent = 'Convert to Word';
+            loader.classList.add('hidden');
+        }
     }
-  });
-}
 
-// Game loop
-function loop(){
-  updateCollectibles();
-  requestAnimationFrame(loop);
-}
+    /**
+     * Handles the entire conversion process: file upload, API call, and download link generation.
+     */
+    async function startConversion() {
+        const file = fileInput.files[0];
+        if (!file) {
+            statusMessage.textContent = 'Please select a PDF file first.';
+            statusMessage.classList.remove('text-yellow-400', 'text-green-400');
+            statusMessage.classList.add('text-red-400');
+            return;
+        }
 
-// Spawn interval
-setInterval(spawnCollectible,1000);
-loop();
+        if (file.size > 50 * 1024 * 1024) { // Limit to 50MB for client-side demo
+             statusMessage.textContent = 'File size limit exceeded (50MB).';
+             statusMessage.classList.remove('text-yellow-400', 'text-green-400');
+             statusMessage.classList.add('text-red-400');
+             return;
+        }
 
-// Buttons
-document.getElementById('left').addEventListener('click',()=>moveDurga(-20));
-document.getElementById('right').addEventListener('click',()=>moveDurga(20));
+        setLoadingState(true);
 
-// Keyboard
-document.addEventListener('keydown',(e)=>{
-  if(e.key==='ArrowLeft') moveDurga(-20);
-  if(e.key==='ArrowRight') moveDurga(20);
-});
+        const formData = new FormData();
+        
+        // Append required parameters for the API call
+        formData.append('Apikey', CONVERTAPI_SECRET);
+        formData.append('File', file);
+        
+        // Include advanced settings
+        formData.append('ConversionQuality', 'High');
+        if (ocrEnabled.checked) {
+            formData.append('PdfForceOCR', 'true');
+            formData.append('OcrMode', 'auto');
+        }
+
+        try {
+            // Using exponential backoff for robust network handling
+            const maxRetries = 3;
+            let response = null;
+
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    statusMessage.textContent = `Conversion in progress (Attempt ${i + 1}/${maxRetries})...`;
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        break; // Success, exit retry loop
+                    } else if (response.status === 429) {
+                        // Too Many Requests, wait and retry
+                        const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s
+                        if (i < maxRetries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        } else {
+                            throw new Error('Rate limit exceeded after all retries.');
+                        }
+                    } else {
+                        // Other non-retryable errors
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error; // Re-throw on final failure
+                }
+            }
+            
+            if (!response || !response.ok) {
+                throw new Error('Conversion request failed after multiple attempts.');
+            }
+
+            const result = await response.json();
+            
+            if (result.Files && result.Files.length > 0) {
+                const convertedFile = result.Files[0];
+                
+                downloadLink.href = convertedFile.Url;
+                // Set the download attribute to force download and set the filename
+                downloadLink.setAttribute('download', convertedFile.FileName);
+                downloadLink.classList.remove('hidden');
+
+                statusMessage.textContent = `Conversion successful! File size: ${(convertedFile.FileSize / (1024 * 1024)).toFixed(2)} MB.`;
+                statusMessage.classList.remove('text-yellow-400', 'text-red-400');
+                statusMessage.classList.add('text-green-400');
+                
+                // Clear file input state after successful conversion
+                fileInput.value = ''; 
+                fileNameDisplay.textContent = 'No file selected.';
+                fileLabel.textContent = "Select PDF File";
+            } else {
+                throw new Error('API returned successfully but no output file was found.');
+            }
+
+        } catch (error) {
+            console.error('Conversion Error:', error);
+            statusMessage.textContent = `Conversion failed: ${error.message}`;
+            statusMessage.classList.remove('text-yellow-400', 'text-green-400');
+            statusMessage.classList.add('text-red-400');
+        } finally {
+            setLoadingState(false);
+            convertBtn.disabled = true; // Re-disable until a new file is selected
+        }
+    }
 </script>
-
 </body>
 </html>
