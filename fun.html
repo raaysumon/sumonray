@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional PDF to Word Converter</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom styles for a polished, dark-mode look */
@@ -72,10 +71,8 @@
     <h1 class="text-4xl font-extrabold mb-2 text-white text-center">PDF to DOCX</h1>
     <p class="text-lg mb-8 text-indigo-300 text-center">Transform your non-editable PDFs into fully editable Word documents.</p>
 
-    <!-- File Selection Area -->
     <div id="uploadArea" class="upload-area mb-6">
         <label for="pdfFile" class="custom-file-select">
-            <!-- Icon for file upload (using SVG) -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
@@ -85,7 +82,6 @@
         <p id="fileNameDisplay" class="mt-4 text-sm font-medium text-purple-300 h-5">No file selected.</p>
     </div>
 
-    <!-- Conversion Button -->
     <button id="convertBtn" 
             onclick="startConversion()"
             class="w-full flex justify-center items-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -96,13 +92,12 @@
         </svg>
     </button>
 
-    <!-- Status and Download Area -->
     <div class="mt-6">
         <p id="statusMessage" class="text-center text-sm font-medium text-yellow-400 min-h-[1.5rem]"></p>
         <a id="downloadLink" 
-           href="#" 
-           target="_blank"
-           class="hidden mt-4 w-full justify-center items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 text-center shadow-lg hover:shadow-xl">
+            href="#" 
+            target="_blank"
+            class="hidden mt-4 w-full justify-center items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 text-center shadow-lg hover:shadow-xl">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
@@ -110,7 +105,6 @@
         </a>
     </div>
 
-    <!-- Conversion Settings -->
     <div class="mt-8 pt-4 border-t border-purple-500/50">
         <h2 class="text-xl font-semibold mb-3 text-purple-300">Advanced Settings</h2>
         <div class="flex items-center space-x-3">
@@ -129,6 +123,7 @@
     // 2. REPLACE the placeholder value below with your actual key.
     // ---------------------------------------------------------------------
     const CONVERTAPI_SECRET = 'IAUjdloMWAV06Ciz5sf8iQQ4GfVf3fBO'; // <--- *** REPLACE THIS VALUE ***
+    const PLACEHOLDER_KEY = 'IAUjdloMWAV06Ciz5sf8iQQ4GfVf3fBO'; // <-- Correct placeholder value for validation
     
     const API_URL = 'https://v2.convertapi.com/convert/pdf/to/docx';
     
@@ -191,11 +186,13 @@
     async function startConversion() {
         const file = fileInput.files[0];
         
-        // --- API Key Validation Check ---
-        if (CONVERTAPI_SECRET === 'yFTnoGYVlMNJVJplaUAkmsKzOZGEO7sP' || !CONVERTAPI_SECRET) {
+        // --- API Key Validation Check (FIXED) ---
+        if (CONVERTAPI_SECRET === PLACEHOLDER_KEY || !CONVERTAPI_SECRET) {
             statusMessage.textContent = 'Error: API Key is missing or is the placeholder. Please update CONVERTAPI_SECRET.';
             statusMessage.classList.remove('text-yellow-400', 'text-green-400');
             statusMessage.classList.add('text-red-400');
+            setLoadingState(false); // Ensure loader is off
+            convertBtn.disabled = true;
             return;
         }
         // --------------------------------
@@ -253,7 +250,7 @@
                             throw new Error('Rate limit exceeded after all retries.');
                         }
                     } else {
-                         // Throw the specific error status for better debugging
+                        // Throw the specific error status for better debugging
                         throw new Error(`API error: ${response.status} ${response.statusText}`);
                     }
                 } catch (error) {
