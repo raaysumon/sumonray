@@ -3,302 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional PDF to Word Converter</title>
+    <title>My Age Tracker</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for a polished, dark-mode look */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1a1a2e; /* Deep purple/blue background */
-            color: #e4e4e7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
+            background-color: #f4f7f9; /* Light background for professionalism */
         }
-        .container-card {
-            max-width: 600px;
-            width: 100%;
-            background-color: #2c2c54; /* Lighter purple for card */
-            padding: 2.5rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        .card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease-in-out;
         }
-        .upload-area {
-            border: 3px dashed #6a4c93;
-            border-radius: 1rem;
-            padding: 2rem;
-            text-align: center;
-            transition: background-color 0.3s ease;
+        .card:hover {
+            transform: translateY(-2px);
         }
-        .upload-area:hover {
-            background-color: #3f3170;
+        .stat-value {
+            font-size: 2.5rem;
+            line-height: 1;
+            font-weight: 700;
         }
-        #pdfFile {
-            display: none; /* Hide native file input */
+        /* Custom scrollbar style for a clean look */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        /* Custom file selector button styling */
-        .custom-file-select {
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-            background-color: #8338ec; /* Vibrant purple */
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            box-shadow: 0 4px #6a1a9a;
-            user-select: none;
-        }
-        .custom-file-select:hover {
-            background-color: #7227d8;
-            box-shadow: 0 2px #6a1a9a;
-            transform: translateY(2px);
-        }
-        .custom-file-select:active {
-            background-color: #6a1a9a;
-            box-shadow: none;
-            transform: translateY(4px);
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-<div class="container-card">
-    <h1 class="text-4xl font-extrabold mb-2 text-white text-center">PDF to DOCX</h1>
-    <p class="text-lg mb-8 text-indigo-300 text-center">Transform your non-editable PDFs into fully editable Word documents.</p>
-
-    <div id="uploadArea" class="upload-area mb-6">
-        <label for="pdfFile" class="custom-file-select">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            <span id="fileLabel">Select PDF File</span>
-        </label>
-        <input type="file" id="pdfFile" accept="application/pdf">
-        <p id="fileNameDisplay" class="mt-4 text-sm font-medium text-purple-300 h-5">No file selected.</p>
-    </div>
-
-    <button id="convertBtn" 
-            onclick="startConversion()"
-            class="w-full flex justify-center items-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
-        <span id="buttonText">Convert to Word</span>
-        <svg id="loader" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-    </button>
-
-    <div class="mt-6">
-        <p id="statusMessage" class="text-center text-sm font-medium text-yellow-400 min-h-[1.5rem]"></p>
-        <a id="downloadLink" 
-            href="#" 
-            target="_blank"
-            class="hidden mt-4 w-full justify-center items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 text-center shadow-lg hover:shadow-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Click to Download DOCX
-        </a>
-    </div>
-
-    <div class="mt-8 pt-4 border-t border-purple-500/50">
-        <h2 class="text-xl font-semibold mb-3 text-purple-300">Advanced Settings</h2>
-        <div class="flex items-center space-x-3">
-            <input type="checkbox" id="ocrEnabled" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 bg-gray-700 border-gray-600" checked>
-            <label for="ocrEnabled" class="text-sm text-gray-300">Enable OCR (for scanned PDFs)</label>
+    <!-- 1. PIN ENTRY OVERLAY (Initial Screen) -->
+    <div id="pin-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-sm text-center card">
+            <h2 class="text-3xl font-extrabold text-indigo-700 mb-4">
+                Access Required
+            </h2>
+            <p class="text-gray-600 mb-6">
+                Please enter the security PIN to view the Chronological Age Tracker.
+            </p>
+            
+            <input 
+                type="password" 
+                id="pin-input" 
+                maxlength="4" 
+                class="w-full text-center text-2xl tracking-widest p-3 mb-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 transition duration-150"
+                placeholder="****"
+                inputmode="numeric"
+                onkeypress="if(event.key === 'Enter') checkPin()"
+            >
+            
+            <button 
+                id="submit-pin" 
+                onclick="checkPin()"
+                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-md hover:shadow-lg"
+            >
+                UNLOCK
+            </button>
+            
+            <p id="pin-error" class="text-red-500 font-medium mt-3 hidden">
+                Incorrect PIN. Please try again.
+            </p>
         </div>
-        <p class="text-xs text-gray-400 mt-2">Highly recommended for preserving text from image-based or poorly structured PDFs.</p>
     </div>
 
-</div>
+    <!-- 2. MAIN CONTENT (Initially Hidden) -->
+    <div id="main-content" class="hidden w-full max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-gray-800 mb-2">
+                Real-Time Life Clock
+            </h1>
+            <p class="text-gray-500 text-lg">
+                Tracking elapsed time since your birth moment.
+            </p>
+        </header>
 
-<script>
-    // ---------------------------------------------------------------------
-    // !!! CRITICAL STEP: FIXING THE 401 ERROR !!!
-    // 1. Get your valid ConvertAPI Secret Key from your account dashboard.
-    // 2. REPLACE the placeholder value below with your actual key.
-    // ---------------------------------------------------------------------
-    const CONVERTAPI_SECRET = 'IAUjdloMWAV06Ciz5sf8iQQ4GfVf3fBO'; // <--- *** REPLACE THIS VALUE ***
-    // FIXED: Using the same constant for both placeholder and validation
-    const PLACEHOLDER_KEY = 'IAUjdloMWAV06Ciz5sf8iQQ4GfVf3fBO'; 
-    
-    const API_URL = 'https://v2.convertapi.com/convert/pdf/to/docx';
-    
-    // DOM Elements
-    const fileInput = document.getElementById('pdfFile');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const fileLabel = document.getElementById('fileLabel');
-    const convertBtn = document.getElementById('convertBtn');
-    const buttonText = document.getElementById('buttonText');
-    const loader = document.getElementById('loader');
-    const statusMessage = document.getElementById('statusMessage');
-    const downloadLink = document.getElementById('downloadLink');
-    const ocrEnabled = document.getElementById('ocrEnabled');
-    
-    // Event Listener for file selection update
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            fileNameDisplay.textContent = `File Selected: ${file.name}`;
-            fileLabel.textContent = "Change File";
-            convertBtn.disabled = false;
-        } else {
-            fileNameDisplay.textContent = 'No file selected.';
-            fileLabel.textContent = "Select PDF File";
-            convertBtn.disabled = true;
-        }
-        // Reset conversion state
-        statusMessage.textContent = '';
-        downloadLink.classList.add('hidden');
-    });
+        <!-- Birth Moment Display -->
+        <div class="bg-indigo-50 p-6 rounded-xl mb-8 text-center border border-indigo-200">
+            <p class="text-lg font-semibold text-indigo-700">
+                Registered Birth Moment:
+            </p>
+            <p class="text-2xl font-bold text-indigo-900 mt-1" id="birth-moment-display">
+                April 6, 2000, 04:05:00 AM
+            </p>
+        </div>
 
-    // Disable button on load until a file is selected
-    window.onload = () => {
-        convertBtn.disabled = true;
-    };
+        <!-- Age Display Card -->
+        <div class="card bg-white p-8 rounded-2xl border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-700 mb-6 border-b pb-3">
+                Current Chronological Age
+            </h2>
 
-    /**
-     * Toggles the loading state of the application interface.
-     * @param {boolean} isLoading - true to enable loading state, false to disable.
-     */
-    function setLoadingState(isLoading) {
-        convertBtn.disabled = isLoading;
-        fileInput.disabled = isLoading;
-        if (isLoading) {
-            buttonText.textContent = 'Converting...';
-            loader.classList.remove('hidden');
-            statusMessage.textContent = 'Uploading file and starting conversion...';
-            statusMessage.classList.remove('text-red-400', 'text-green-400');
-            statusMessage.classList.add('text-yellow-400');
-            downloadLink.classList.add('hidden');
-        } else {
-            buttonText.textContent = 'Convert to Word';
-            loader.classList.add('hidden');
-        }
-    }
+            <!-- Grid for detailed time stats (5 items) -->
+            <!-- Using a 3-column layout on medium screens and up to space out the 5 items neatly -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
 
-    /**
-     * Handles the entire conversion process: file upload, API call, and download link generation.
-     */
-    async function startConversion() {
-        const file = fileInput.files[0];
-        
-        // --- API Key Validation Check (FIXED) ---
-        if (CONVERTAPI_SECRET === PLACEHOLDER_KEY || !CONVERTAPI_SECRET) {
-            statusMessage.textContent = 'Error: API Key is missing or is the placeholder. Please update CONVERTAPI_SECRET.';
-            statusMessage.classList.remove('text-yellow-400', 'text-green-400');
-            statusMessage.classList.add('text-red-400');
-            setLoadingState(false); // Ensure loader is off
-            convertBtn.disabled = true;
-            return;
-        }
-        // --------------------------------
+                <!-- Years -->
+                <div class="text-center p-3">
+                    <div id="age-years" class="stat-value text-indigo-600">0</div>
+                    <div class="text-sm font-medium text-gray-500">Years</div>
+                </div>
 
-        if (!file) {
-            statusMessage.textContent = 'Please select a PDF file first.';
-            statusMessage.classList.remove('text-yellow-400', 'text-green-400');
-            statusMessage.classList.add('text-red-400');
-            return;
-        }
+                <!-- Months -->
+                <div class="text-center p-3">
+                    <div id="age-months" class="stat-value text-indigo-600">0</div>
+                    <div class="text-sm font-medium text-gray-500">Months</div>
+                </div>
 
-        if (file.size > 50 * 1024 * 1024) { // Limit to 50MB for client-side demo
-             statusMessage.textContent = 'File size limit exceeded (50MB).';
-             statusMessage.classList.remove('text-yellow-400', 'text-green-400');
-             statusMessage.classList.add('text-red-400');
-             return;
-        }
+                <!-- Days -->
+                <div class="text-center p-3">
+                    <div id="age-days" class="stat-value text-indigo-600">0</div>
+                    <div class="text-sm font-medium text-gray-500">Days</div>
+                </div>
 
-        setLoadingState(true);
+                <!-- Hours -->
+                <div class="text-center p-3">
+                    <div id="age-hours" class="stat-value text-indigo-600">0</div>
+                    <div class="text-sm font-medium text-gray-500">Hours</div>
+                </div>
 
-        const formData = new FormData();
-        
-        // Append required parameters for the API call
-        formData.append('Apikey', CONVERTAPI_SECRET); // THIS is the parameter the API uses for authentication
-        formData.append('File', file);
-        
-        // Include advanced settings
-        formData.append('ConversionQuality', 'High');
-        if (ocrEnabled.checked) {
-            formData.append('PdfForceOCR', 'true');
-            formData.append('OcrMode', 'auto');
-        }
-
-        try {
-            // Using exponential backoff for robust network handling
-            const maxRetries = 3;
-            let response = null;
-
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    statusMessage.textContent = `Conversion in progress (Attempt ${i + 1}/${maxRetries})...`;
-                    response = await fetch(API_URL, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        break; // Success, exit retry loop
-                    } else if (response.status === 429) {
-                        // Too Many Requests, wait and retry
-                        const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, delay));
-                        } else {
-                            throw new Error('Rate limit exceeded after all retries.');
-                        }
-                    } else {
-                        // Throw the specific error status for better debugging
-                        throw new Error(`API error: ${response.status} ${response.statusText}`);
-                    }
-                } catch (error) {
-                    if (i === maxRetries - 1) throw error; // Re-throw on final failure
-                }
-            }
+                <!-- Minutes -->
+                <div class="text-center p-3">
+                    <div id="age-minutes" class="stat-value text-indigo-600">0</div>
+                    <div class="text-sm font-medium text-gray-500">Minutes</div>
+                </div>
+                
+            </div>
             
-            if (!response || !response.ok) {
-                // Check specifically for 401 again if the loop exited without success
-                if (response && response.status === 401) {
-                    throw new Error('401 Unauthorized: Your API Key is invalid or has expired.');
-                }
-                throw new Error('Conversion request failed after multiple attempts.');
+            <!-- Real-time running total -->
+            <div class="mt-8 pt-4 border-t text-center">
+                 <p class="text-xl font-semibold text-gray-600 mb-2">Total Time Elapsed (High Precision)</p>
+                 <!-- This still updates every 0.1 seconds to show the passage of time -->
+                 <p id="total-elapsed-time" class="text-3xl font-mono text-red-600"></p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-400 text-sm">
+            Current time displayed in local browser time.
+        </footer>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        // The user's birth date and time: April 6, 2000, 04:05 AM
+        const BIRTH_MOMENT = new Date("2000-04-06T04:05:00");
+        const CORRECT_PIN = "2209"; // Required PIN for access
+
+        // --- DOM Elements ---
+        const DURATION_ELEMENTS = {
+            years: document.getElementById('age-years'),
+            months: document.getElementById('age-months'),
+            days: document.getElementById('age-days'),
+            hours: document.getElementById('age-hours'),
+            minutes: document.getElementById('age-minutes'),
+            totalElapsed: document.getElementById('total-elapsed-time')
+        };
+
+        // Function to calculate and display age
+        function updateAge() {
+            const now = new Date();
+            const msElapsed = now.getTime() - BIRTH_MOMENT.getTime();
+
+            // 1. Calculate the difference in date components (accurate Y/M/D/H/M)
+            let birth = new Date(BIRTH_MOMENT);
+            let ageYears = now.getFullYear() - birth.getFullYear();
+            let ageMonths = now.getMonth() - birth.getMonth();
+            let ageDays = now.getDate() - birth.getDate();
+            let ageHours = now.getHours() - birth.getHours();
+            let ageMinutes = now.getMinutes() - birth.getMinutes();
+
+            // Adjust backwards if necessary
+            if (ageMinutes < 0) {
+                ageMinutes += 60;
+                ageHours--;
+            }
+            if (ageHours < 0) {
+                ageHours += 24;
+                ageDays--;
+            }
+            if (ageDays < 0) {
+                // Calculate the number of days in the previous month
+                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                ageDays += prevMonth.getDate();
+                ageMonths--;
+            }
+            if (ageMonths < 0) {
+                ageMonths += 12;
+                ageYears--;
             }
 
-            const result = await response.json();
+            // 2. Display the calculated duration
+            DURATION_ELEMENTS.years.textContent = ageYears.toLocaleString();
+            DURATION_ELEMENTS.months.textContent = ageMonths.toLocaleString();
+            DURATION_ELEMENTS.days.textContent = ageDays.toLocaleString();
+            DURATION_ELEMENTS.hours.textContent = ageHours.toLocaleString();
+            DURATION_ELEMENTS.minutes.textContent = ageMinutes.toLocaleString();
             
-            if (result.Files && result.Files.length > 0) {
-                const convertedFile = result.Files[0];
-                
-                downloadLink.href = convertedFile.Url;
-                // Set the download attribute to force download and set the filename
-                downloadLink.setAttribute('download', convertedFile.FileName);
-                downloadLink.classList.remove('hidden');
+            // 3. Display the total elapsed time in a readable format (using high precision years)
+            const totalElapsedYears = msElapsed / (1000 * 60 * 60 * 24 * 365.25);
+            const totalYearsFormatted = totalElapsedYears.toFixed(12); // Displaying high precision
+            
+            DURATION_ELEMENTS.totalElapsed.textContent = `${totalYearsFormatted} Years`;
+        }
+        
+        // Function to start the tracker (called after successful PIN entry)
+        function startTracker() {
+            // Display the exact birth moment for clarity
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            document.getElementById('birth-moment-display').textContent = BIRTH_MOMENT.toLocaleString(undefined, options);
 
-                statusMessage.textContent = `Conversion successful! File size: ${(convertedFile.FileSize / (1024 * 1024)).toFixed(2)} MB.`;
-                statusMessage.classList.remove('text-yellow-400', 'text-red-400');
-                statusMessage.classList.add('text-green-400');
-                
-                // Clear file input state after successful conversion
-                fileInput.value = ''; 
-                fileNameDisplay.textContent = 'No file selected.';
-                fileLabel.textContent = "Select PDF File";
+            // Run updateAge immediately and then every 100ms for a near real-time effect
+            updateAge();
+            // Updated to 100ms refresh for the smooth 'Total Elapsed Time' update
+            setInterval(updateAge, 100); 
+        }
+
+        // Function to check the PIN (linked to button and Enter key)
+        function checkPin() {
+            const pinInput = document.getElementById('pin-input');
+            const pinError = document.getElementById('pin-error');
+            const mainContent = document.getElementById('main-content');
+            const pinOverlay = document.getElementById('pin-overlay');
+
+            if (pinInput.value.trim() === CORRECT_PIN) {
+                // Success: Hide overlay, show content, start clock
+                pinOverlay.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                pinError.classList.add('hidden');
+                startTracker();
             } else {
-                throw new Error('API returned successfully but no output file was found.');
+                // Failure: Show error, clear input, focus input
+                pinError.classList.remove('hidden');
+                pinInput.value = '';
+                pinInput.focus();
             }
-
-        } catch (error) {
-            console.error('Conversion Error:', error);
-            statusMessage.textContent = `Conversion failed: ${error.message}`;
-            statusMessage.classList.remove('text-yellow-400', 'text-green-400');
-            statusMessage.classList.add('text-red-400');
-        } finally {
-            setLoadingState(false);
-            convertBtn.disabled = true; // Re-disable until a new file is selected
         }
-    }
-</script>
+
+        // Setup on initial load
+        window.onload = function() {
+            // Focus the input field when the page loads
+            document.getElementById('pin-input').focus();
+        };
+    </script>
 </body>
 </html>
