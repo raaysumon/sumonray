@@ -1,159 +1,549 @@
-     <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Life Tracker</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Real-Time Life Clock — Animated</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent-1: #6366f1;
+      --accent-2: #a855f7;
+      --accent-3: #ec4899;
+      --muted: #6b7280;
+      --bg-start: #0f172a; /* for particle canvas gradient */
+      --bg-end: #0b1220;
+    }
+
+    html,body { height:100%; }
     body {
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(to right, #eef2f3, #dfe9f3);
+      font-family: 'Inter', sans-serif;
+      margin:0;
+      min-height:100%;
+      background: linear-gradient(180deg,#eef2ff 0%, #f7f9fb 55%);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
-    .card {
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+
+    /* Particle canvas sits behind content */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.14;
+      background: radial-gradient(circle at 10% 10%, rgba(99,102,241,0.04), transparent 8%),
+                  radial-gradient(circle at 90% 80%, rgba(236,72,153,0.03), transparent 8%);
     }
-    .card:hover {
-        transform: translateY(-2px);
+
+    .app-shell { position: relative; z-index: 10; }
+
+    .card { box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07); border-radius: 16px; background:white; }
+
+    .stat-value { font-size: 2.25rem; font-weight:700; letter-spacing: -0.02em; }
+
+    /* Animated gradient progress bar */
+    .progress-track {
+      background: linear-gradient(90deg, rgba(15,23,42,0.06), rgba(15,23,42,0.02));
+      border-radius: 9999px;
+      height: 18px;
+      overflow: hidden;
     }
-    .progress-bar {
-        height: 24px;
-        border-radius: 9999px;
-        background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
-        transition: width 1s ease-in-out;
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      background-size: 200% 100%;
+      animation: move-gradient 3.8s linear infinite, progress-grow 1s cubic-bezier(.2,.9,.2,1) forwards;
+      box-shadow: 0 6px 20px rgba(99,102,241,0.12) inset;
+      position: relative;
     }
-</style>
+
+    /* a small sheen moving across */
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      left: -30%;
+      top: -30%;
+      width: 30%;
+      height: 160%;
+      transform: skewX(-15deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02));
+      animation: sheen 2.8s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes move-gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes sheen {
+      0% { left: -40%; opacity: 0; }
+      10% { opacity: 1; }
+      60% { left: 120%; opacity: 0.15; }
+      100% { left: 120%; opacity: 0; }
+    }
+
+    /* slow grow when width updates */
+    @keyframes progress-grow {
+      from { transform: scaleX(0.98); }
+      to { transform: scaleX(1); }
+    }
+
+    /* subtle fade-in on cards */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp .6s ease-out forwards;
+    }
+    .fade-in.delay-1 { animation-delay: .08s; }
+    .fade-in.delay-2 { animation-delay: .14s; }
+    .fade-in.delay-3 { animation-delay: .22s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* small pulse for percent */
+    .pulse {
+      display: inline-block;
+      animation: pulseScale 2s ease-in-out infinite;
+    }
+    @keyframes pulseScale {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 0.95; }
+    }
+
+    /* responsive */
+    @media (max-width:640px){
+      .stat-value { font-size: 1.6rem; }
+      .card { border-radius: 12px; }
+    }
+  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body>
+  <!-- Particle canvas -->
+  <canvas id="particle-canvas"></canvas>
 
-<!-- PIN Overlay -->
-<div id="pin-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
-    <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center card">
-        <h2 class="text-3xl font-extrabold text-indigo-700 mb-3">Access Required</h2>
-        <p class="text-gray-600 mb-6">Enter your 4-digit PIN to view Life Tracker.</p>
-        <input type="password" id="pin-input" maxlength="4" class="w-full text-center text-2xl tracking-widest p-3 mb-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="****" onkeypress="if(event.key==='Enter') checkPin()">
-        <button onclick="checkPin()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition">UNLOCK</button>
-        <p id="pin-error" class="text-red-500 font-medium mt-3 hidden">Incorrect PIN. Try again.</p>
+  <div class="app-shell min-h-screen flex items-center justify-center p-6">
+    <!-- PIN overlay -->
+    <div id="pin-overlay" class="fixed inset-0 bg-gray-900/95 z-50 flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-sm rounded-2xl p-8 card text-center">
+        <h2 class="text-2xl font-extrabold text-indigo-700 mb-2">Access Required</h2>
+        <p class="text-sm text-gray-600 mb-5">Enter your 4-digit PIN to view your Chronological Life Tracker.</p>
+
+        <input id="pin-input" maxlength="4" placeholder="• • • •"
+               class="w-full text-center text-2xl p-3 rounded-lg border border-gray-200 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-300" 
+               inputmode="numeric" onkeypress="if(event.key==='Enter') checkPin()">
+
+        <button id="submit-pin" onclick="checkPin()"
+                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition shadow">
+          UNLOCK
+        </button>
+
+        <p id="pin-error" class="mt-3 text-sm text-red-500 hidden">Incorrect PIN. Please try again.</p>
+        <p class="mt-3 text-xs text-gray-400">PIN hint: same as earlier project (if you forgot)</p>
+      </div>
     </div>
-</div>
 
-<!-- Main Content -->
-<div id="main-content" class="hidden w-full max-w-5xl">
-    <header class="text-center mb-6">
-        <h1 class="text-4xl font-extrabold text-gray-800 mb-2">🌌 Life Journey Tracker</h1>
-        <p class="text-gray-500 text-lg">From birth to the final horizon (2065)</p>
-    </header>
+    <!-- Main content -->
+    <div id="main-content" class="hidden w-full max-w-6xl space-y-6">
+      <header class="text-center">
+        <h1 class="text-4xl font-extrabold text-slate-800">Real-Time Life Clock</h1>
+        <p class="text-gray-500 mt-1">Tracking elapsed time since your birth moment — animated & fancy ✨</p>
+      </header>
 
-    <!-- Life Progress -->
-    <div class="card bg-white p-6 rounded-2xl border mb-6">
-        <h2 class="text-2xl font-semibold text-indigo-700 mb-3 text-center">Life Progress Overview</h2>
-        <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden mb-3">
-            <div id="life-progress-bar" class="progress-bar w-0"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left column -->
+        <div class="col-span-1 space-y-6">
+          <div class="card p-5 fade-in delay-1">
+            <p class="text-sm font-semibold text-indigo-700">Current Time in Bangladesh (BST)</p>
+            <p id="bst-clock" class="text-3xl font-mono font-bold text-indigo-900 mt-2">--:--:--</p>
+            <p class="text-xs text-gray-400 mt-2">Timezone: Asia/Dhaka</p>
+          </div>
+
+          <div class="card p-5 fade-in delay-2">
+            <p class="text-sm font-semibold text-indigo-700">Registered Birth Moment</p>
+            <p id="birth-moment-display" class="text-lg font-semibold text-slate-800 mt-2">April 6, 2000, 04:05:00 AM</p>
+            <p class="text-xs text-gray-400 mt-2">Calculated using your browser timezone</p>
+          </div>
+
+          <div class="card p-5 fade-in delay-3">
+            <p class="text-sm font-semibold text-indigo-700">Estimate: Final Year</p>
+            <p id="death-display" class="text-lg font-semibold text-rose-600 mt-2">April 6, 2065, 04:05:00 AM</p>
+            <p class="text-xs text-gray-400 mt-2">You requested 2065 as final year</p>
+          </div>
         </div>
-        <p id="life-progress-text" class="text-center text-lg font-medium text-gray-600"></p>
+
+        <!-- Middle and right combined -->
+        <div class="col-span-1 lg:col-span-2 card p-6 fade-in">
+          <h2 class="text-2xl font-bold text-slate-700 mb-4">Current Chronological Age</h2>
+
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="text-center p-3">
+              <div id="age-years" class="stat-value text-indigo-600">0</div>
+              <div class="text-sm font-medium text-gray-500">Years</div>
+            </div>
+
+            <div class="text-center p-3">
+              <div id="age-months" class="stat-value text-indigo-600">0</div>
+              <div class="text-sm font-medium text-gray-500">Months</div>
+            </div>
+
+            <div class="text-center p-3">
+              <div id="age-days" class="stat-value text-indigo-600">0</div>
+              <div class="text-sm font-medium text-gray-500">Days</div>
+            </div>
+
+            <div class="text-center p-3">
+              <div id="age-hours" class="stat-value text-indigo-600">0</div>
+              <div class="text-sm font-medium text-gray-500">Hours</div>
+            </div>
+
+            <div class="text-center p-3">
+              <div id="age-minutes" class="stat-value text-indigo-600">0</div>
+              <div class="text-sm font-medium text-gray-500">Minutes</div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t">
+            <p class="text-lg font-semibold text-gray-600 mb-2">Total Time Elapsed (High Precision)</p>
+            <p id="total-elapsed-time" class="text-2xl font-mono text-rose-600">-- Years</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress + chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card p-6 fade-in">
+          <h3 class="text-xl font-semibold text-slate-700 mb-3">Life Progress</h3>
+          <div class="mb-3 text-sm text-gray-600">Progress from birth → estimated end (2065)</div>
+
+          <div class="progress-track">
+            <div id="life-progress-bar" class="progress-fill" style="width:0%"></div>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between">
+            <p id="life-progress-text" class="text-sm text-gray-700">You have completed 0.0000% of your estimated life span.</p>
+            <p id="life-percent" class="text-sm font-semibold text-slate-800 pulse">0.00%</p>
+          </div>
+
+          <div class="mt-5 pt-4 border-t">
+            <p class="text-sm text-gray-500">Remaining time until 2065:</p>
+            <p id="remaining-time" class="text-lg font-semibold text-indigo-700 mt-1">-- years</p>
+          </div>
+        </div>
+
+        <div class="card p-6 fade-in">
+          <h3 class="text-xl font-semibold text-slate-700 mb-4">📈 Life Progress Chart (animated)</h3>
+          <canvas id="lifeChart" height="140"></canvas>
+          <p class="text-xs text-gray-400 mt-3">Chart shows the short-term history of the % progress (updates live).</p>
+        </div>
+      </div>
+
+      <footer class="text-center text-gray-400 text-xs">Age calculations are computed in your browser. Visualizations are illustrative.</footer>
     </div>
+  </div>
 
-    <!-- Age Display -->
-    <div class="card bg-white p-8 rounded-2xl border border-gray-200 mb-8 text-center">
-        <h2 class="text-2xl font-bold text-gray-700 mb-4">Current Age</h2>
-        <p id="current-age" class="text-4xl font-mono text-indigo-600 mb-3">-- Years</p>
-        <p id="remaining-time" class="text-lg text-gray-500">Remaining time till 2065: -- years</p>
-    </div>
+  <!-- SCRIPT -->
+  <script>
+    // -----------------------
+    // Configuration
+    // -----------------------
+    const BIRTH_MOMENT = new Date("2000-04-06T04:05:00"); // user's birth moment
+    const DEATH_ESTIMATE = new Date("2065-04-06T04:05:00"); // user's requested final year
+    const CORRECT_PIN = "2209";
+    const BST_TIMEZONE = 'Asia/Dhaka';
 
-    <!-- Life Timeline Chart -->
-    <div class="card bg-white p-6 rounded-2xl border">
-        <h2 class="text-2xl font-bold text-gray-700 mb-6 text-center">📈 Life Progress Chart</h2>
-        <canvas id="lifeChart" height="100"></canvas>
-    </div>
-</div>
+    // DOM refs
+    const D = {
+      pinInput: document.getElementById('pin-input'),
+      pinError: document.getElementById('pin-error'),
+      pinOverlay: document.getElementById('pin-overlay'),
+      mainContent: document.getElementById('main-content'),
+      bstClock: document.getElementById('bst-clock'),
+      birthDisplay: document.getElementById('birth-moment-display'),
+      deathDisplay: document.getElementById('death-display'),
+      years: document.getElementById('age-years'),
+      months: document.getElementById('age-months'),
+      days: document.getElementById('age-days'),
+      hours: document.getElementById('age-hours'),
+      minutes: document.getElementById('age-minutes'),
+      totalElapsed: document.getElementById('total-elapsed-time'),
+      progressBar: document.getElementById('life-progress-bar'),
+      progressText: document.getElementById('life-progress-text'),
+      progressPercent: document.getElementById('life-percent'),
+      remainingTime: document.getElementById('remaining-time'),
+      deathDisplay: document.getElementById('death-display')
+    };
 
-<script>
-const BIRTH = new Date("2000-04-06T04:05:00");
-const DEATH = new Date("2065-04-06T04:05:00");
-const CORRECT_PIN = "2209";
+    // -----------------------
+    // Particle system (canvas)
+    // -----------------------
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let w = canvas.width = innerWidth;
+    let h = canvas.height = innerHeight;
 
-let chart;
-
-function checkPin(){
-    const pin = document.getElementById("pin-input").value.trim();
-    const error = document.getElementById("pin-error");
-    if(pin === CORRECT_PIN){
-        document.getElementById("pin-overlay").classList.add("hidden");
-        document.getElementById("main-content").classList.remove("hidden");
-        startLifeTracker();
-    } else {
-        error.classList.remove("hidden");
+    function onResize(){
+      w = canvas.width = innerWidth;
+      h = canvas.height = innerHeight;
     }
-}
+    window.addEventListener('resize', onResize);
 
-function startLifeTracker(){
-    updateLifeData();
-    setInterval(updateLifeData, 1000);
-    drawLifeChart();
-}
-
-function updateLifeData(){
-    const now = new Date();
-    const total = DEATH - BIRTH;
-    const elapsed = now - BIRTH;
-    const percent = Math.min((elapsed / total) * 100, 100);
-    const yearsLived = (elapsed / (1000*60*60*24*365.25)).toFixed(2);
-    const yearsLeft = ((DEATH - now) / (1000*60*60*24*365.25)).toFixed(2);
-
-    document.getElementById("current-age").textContent = `${yearsLived} Years`;
-    document.getElementById("remaining-time").textContent = `Remaining time till 2065: ${yearsLeft} years`;
-    document.getElementById("life-progress-text").textContent = `You have completed ${percent.toFixed(4)}% of your estimated life span.`;
-
-    const bar = document.getElementById("life-progress-bar");
-    bar.style.width = `${percent}%`;
-
-    if(chart){
-        chart.data.datasets[0].data.push(percent);
-        chart.data.labels.push('');
-        if(chart.data.datasets[0].data.length > 60) chart.data.datasets[0].data.shift();
-        chart.update();
+    function initParticles(count = Math.max(24, Math.floor((w*h)/120000))){
+      particles = [];
+      for (let i=0;i<count;i++){
+        const size = Math.random()*2.4 + 0.6;
+        particles.push({
+          x: Math.random()*w,
+          y: Math.random()*h,
+          vx: (Math.random()-0.5) * 0.25,
+          vy: (Math.random()-0.5) * 0.25,
+          size,
+          hue: 220 + Math.random()*120, // bluish-pinkish range
+          alpha: 0.12 + Math.random()*0.18,
+          phase: Math.random()*Math.PI*2
+        });
+      }
     }
-}
 
-function drawLifeChart(){
-    const ctx = document.getElementById('lifeChart').getContext('2d');
-    chart = new Chart(ctx, {
+    function drawParticles(ts){
+      ctx.clearRect(0,0,w,h);
+      for (let p of particles){
+        p.x += p.vx + Math.sin((ts/1000)+p.phase)*0.06;
+        p.y += p.vy + Math.cos((ts/1000)+p.phase)*0.04;
+
+        // wrap
+        if (p.x < -50) p.x = w+50;
+        if (p.x > w+50) p.x = -50;
+        if (p.y < -50) p.y = h+50;
+        if (p.y > h+50) p.y = -50;
+
+        // glow
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size*12);
+        gradient.addColorStop(0, `hsla(${p.hue}, 90%, 65%, ${p.alpha})`);
+        gradient.addColorStop(0.4, `hsla(${p.hue}, 85%, 55%, ${p.alpha*0.5})`);
+        gradient.addColorStop(1, `hsla(${p.hue}, 80%, 40%, 0)`);
+        ctx.beginPath();
+        ctx.fillStyle = gradient;
+        ctx.arc(p.x, p.y, p.size*6, 0, Math.PI*2);
+        ctx.fill();
+      }
+      requestAnimationFrame(drawParticles);
+    }
+
+    // -----------------------
+    // BST Clock (Asia/Dhaka)
+    // -----------------------
+    function updateBSTClock(){
+      const now = new Date();
+      const opts = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true, timeZone: BST_TIMEZONE };
+      D.bstClock.textContent = now.toLocaleTimeString('en-US', opts);
+    }
+
+    // -----------------------
+    // Age calculation (accurate Y M D H M)
+    // -----------------------
+    function updateAgeDisplay(){
+      const now = new Date();
+      let birth = new Date(BIRTH_MOMENT);
+
+      // component differences
+      let years = now.getFullYear() - birth.getFullYear();
+      let months = now.getMonth() - birth.getMonth();
+      let days = now.getDate() - birth.getDate();
+      let hours = now.getHours() - birth.getHours();
+      let minutes = now.getMinutes() - birth.getMinutes();
+
+      // adjust negatives
+      if (minutes < 0) { minutes += 60; hours--; }
+      if (hours < 0) { hours += 24; days--; }
+      if (days < 0) {
+        const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += prevMonth.getDate();
+        months--;
+      }
+      if (months < 0) { months += 12; years--; }
+
+      D.years.textContent = years.toLocaleString();
+      D.months.textContent = months.toLocaleString();
+      D.days.textContent = days.toLocaleString();
+      D.hours.textContent = hours.toLocaleString();
+      D.minutes.textContent = minutes.toLocaleString();
+
+      // high precision total elapsed (years with 12 decimal places)
+      const msElapsed = now.getTime() - BIRTH_MOMENT.getTime();
+      const totalYears = msElapsed / (1000 * 60 * 60 * 24 * 365.25);
+      D.totalElapsed.textContent = `${totalYears.toFixed(12)} Years`;
+    }
+
+    // -----------------------
+    // Progress toward DEATH_ESTIMATE
+    // -----------------------
+    function updateProgressAndRemaining(){
+      const now = new Date();
+      const totalSpan = DEATH_ESTIMATE.getTime() - BIRTH_MOMENT.getTime();
+      const elapsed = now.getTime() - BIRTH_MOMENT.getTime();
+      let percent = (elapsed / totalSpan) * 100;
+      if (!isFinite(percent) || percent < 0) percent = 0;
+      if (percent > 100) percent = 100;
+
+      // animate progress bar width smoothly via style
+      D.progressBar.style.width = `${percent}%`;
+
+      const pctStr = percent.toFixed(4);
+      D.progressText.textContent = `You have completed ${pctStr}% of your estimated life span.`;
+      D.progressPercent.textContent = `${Number(percent).toFixed(4)}%`;
+
+      // remaining time breakdown
+      let msLeft = DEATH_ESTIMATE.getTime() - now.getTime();
+      if (msLeft < 0) msLeft = 0;
+      const daysLeft = Math.floor(msLeft / (1000*60*60*24));
+      const yearsLeftDecimal = msLeft / (1000 * 60 * 60 * 24 * 365.25);
+      const yearsLeft = yearsLeftDecimal.toFixed(4);
+      D.remainingTime.innerHTML = `${yearsLeft} years (${daysLeft.toLocaleString()} days)`;
+
+      // death display (localized)
+      D.deathDisplay.textContent = formatLocalDate(DEATH_ESTIMATE);
+    }
+
+    // -----------------------
+    // PIN check & startup
+    // -----------------------
+    function checkPin(){
+      const val = D.pinInput.value.trim();
+      if (val === CORRECT_PIN){
+        D.pinOverlay.classList.add('hidden');
+        D.mainContent.classList.remove('hidden');
+        D.pinError.classList.add('hidden');
+        startTracker();
+      } else {
+        D.pinError.classList.remove('hidden');
+        D.pinInput.value = '';
+        D.pinInput.focus();
+      }
+    }
+    window.checkPin = checkPin;
+
+    // -----------------------
+    // Chart.js: live animated line
+    // -----------------------
+    let lifeChart;
+    function initChart(){
+      const ctxChart = document.getElementById('lifeChart').getContext('2d');
+      lifeChart = new Chart(ctxChart, {
         type: 'line',
         data: {
-            labels: [],
-            datasets: [{
-                label: 'Life Progress (%)',
-                data: [],
-                borderColor: '#6366f1',
-                tension: 0.4,
-                borderWidth: 3,
-                fill: {
-                    target: 'origin',
-                    above: 'rgba(99,102,241,0.15)'
-                },
-                pointRadius: 0
-            }]
+          labels: [],
+          datasets: [{
+            label: 'Progress % (live)',
+            data: [],
+            borderWidth: 2.5,
+            borderColor: 'rgba(99,102,241,1)',
+            tension: 0.35,
+            pointRadius: 0,
+            fill: { target: 'origin', above: 'rgba(99,102,241,0.12)' },
+            segment: {
+              borderColor: ctx => {
+                // subtle color gradient along the line
+                return 'rgba(99,102,241,1)';
+              }
+            }
+          }]
         },
         options: {
-            animation: false,
-            scales: {
-                y: { 
-                    min: 0, max: 100,
-                    ticks: { color: '#4b5563', callback: v => v + '%' }
-                },
-                x: { display: false }
-            },
-            plugins: {
-                legend: { display: false }
+          animation: {
+            duration: 900,
+            easing: 'easeOutCubic'
+          },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { display: false },
+            y: { min: 0, max: 100, ticks: { callback: v => v + '%' } }
+          },
+          elements: {
+            line: {
+              borderJoinStyle: 'round'
             }
+          }
         }
-    });
-}
-</script>
+      });
+    }
+
+    function pushChartPoint(value){
+      if (!lifeChart) return;
+      const d = lifeChart.data;
+      d.labels.push('');
+      d.datasets[0].data.push(Number(value.toFixed(6)));
+      if (d.labels.length > 80) { d.labels.shift(); d.datasets[0].data.shift(); }
+      lifeChart.update();
+    }
+
+    // -----------------------
+    // Helpers
+    // -----------------------
+    function formatLocalDate(d){
+      const options = { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true };
+      return d.toLocaleString(undefined, options);
+    }
+
+    // -----------------------
+    // Start the tracker
+    // -----------------------
+    function startTracker(){
+      // prepare particles
+      onResize();
+      initParticles();
+      requestAnimationFrame(drawParticles);
+
+      // show formatted birth + death
+      D.birthDisplay.textContent = formatLocalDate(BIRTH_MOMENT);
+      D.deathDisplay.textContent = formatLocalDate(DEATH_ESTIMATE);
+
+      // init chart
+      initChart();
+
+      // initial updates
+      updateBSTClock();
+      updateAgeDisplay();
+      updateProgressAndRemaining();
+
+      // intervals
+      setInterval(updateBSTClock, 1000);
+      setInterval(() => { updateAgeDisplay(); updateProgressAndRemaining(); }, 120); // smooth
+      setInterval(() => {
+        const now = new Date();
+        const totalSpan = DEATH_ESTIMATE.getTime() - BIRTH_MOMENT.getTime();
+        const elapsed = now.getTime() - BIRTH_MOMENT.getTime();
+        let percent = (elapsed / totalSpan) * 100;
+        if (!isFinite(percent) || percent < 0) percent = 0;
+        if (percent > 100) percent = 100;
+        pushChartPoint(percent);
+      }, 1000);
+    }
+
+    // initial focus + handlers
+    window.onload = function(){
+      D.pinInput.focus();
+      D.pinInput.addEventListener('keydown', (e)=> { if(e.key==='Escape') D.pinInput.value=''; });
+    };
+
+  </script>
 </body>
-</html>      
-        
-                
+</html>
