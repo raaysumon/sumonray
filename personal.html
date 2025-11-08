@@ -1,270 +1,159 @@
-           
-        <!DOCTYPE html>
+     <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Age Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9; /* Light background for professionalism */
-        }
-        .card {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0px 10px -5px rgba(0, 0, 0, 0.04);
-            transition: transform 0.3s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-        }
-        .stat-value {
-            font-size: 2.5rem;
-            line-height: 1;
-            font-weight: 700;
-        }
-        /* Custom scrollbar style for a clean look */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #9ca3af;
-            border-radius: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Life Tracker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(to right, #eef2f3, #dfe9f3);
+    }
+    .card {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .progress-bar {
+        height: 24px;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+        transition: width 1s ease-in-out;
+    }
+</style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div id="pin-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-sm text-center card">
-            <h2 class="text-3xl font-extrabold text-indigo-700 mb-4">
-                Access Required
-            </h2>
-            <p class="text-gray-600 mb-6">
-                Please enter the security PIN to view the Chronological Age Tracker.
-            </p>
-            
-            <input 
-                type="password" 
-                id="pin-input" 
-                maxlength="4" 
-                class="w-full text-center text-2xl tracking-widest p-3 mb-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 transition duration-150"
-                placeholder="****"
-                inputmode="numeric"
-                onkeypress="if(event.key === 'Enter') checkPin()"
-            >
-            
-            <button 
-                id="submit-pin" 
-                onclick="checkPin()"
-                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-md hover:shadow-lg"
-            >
-                UNLOCK
-            </button>
-            
-            <p id="pin-error" class="text-red-500 font-medium mt-3 hidden">
-                Incorrect PIN. Please try again.
-            </p>
+<!-- PIN Overlay -->
+<div id="pin-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center card">
+        <h2 class="text-3xl font-extrabold text-indigo-700 mb-3">Access Required</h2>
+        <p class="text-gray-600 mb-6">Enter your 4-digit PIN to view Life Tracker.</p>
+        <input type="password" id="pin-input" maxlength="4" class="w-full text-center text-2xl tracking-widest p-3 mb-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="****" onkeypress="if(event.key==='Enter') checkPin()">
+        <button onclick="checkPin()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition">UNLOCK</button>
+        <p id="pin-error" class="text-red-500 font-medium mt-3 hidden">Incorrect PIN. Try again.</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div id="main-content" class="hidden w-full max-w-5xl">
+    <header class="text-center mb-6">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-2">🌌 Life Journey Tracker</h1>
+        <p class="text-gray-500 text-lg">From birth to the final horizon (2065)</p>
+    </header>
+
+    <!-- Life Progress -->
+    <div class="card bg-white p-6 rounded-2xl border mb-6">
+        <h2 class="text-2xl font-semibold text-indigo-700 mb-3 text-center">Life Progress Overview</h2>
+        <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden mb-3">
+            <div id="life-progress-bar" class="progress-bar w-0"></div>
         </div>
+        <p id="life-progress-text" class="text-center text-lg font-medium text-gray-600"></p>
     </div>
 
-    <div id="main-content" class="hidden w-full max-w-4xl">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold text-gray-800 mb-2">
-                Real-Time Life Clock
-            </h1>
-            <p class="text-gray-500 text-lg">
-                Tracking elapsed time since your birth moment.
-            </p>
-        </header>
-        
-        <div class="card bg-white p-6 rounded-2xl border border-blue-200 mb-6 text-center">
-            <p class="text-xl font-semibold text-blue-700 mb-2">
-                Current Time in Bangladesh (BST)
-            </p>
-            <p id="bst-clock" class="text-4xl font-mono text-blue-900 font-bold">
-                --:--:--
-            </p>
-        </div>
-
-        <div class="bg-indigo-50 p-6 rounded-xl mb-8 text-center border border-indigo-200">
-            <p class="text-lg font-semibold text-indigo-700">
-                Registered Birth Moment:
-            </p>
-            <p class="text-2xl font-bold text-indigo-900 mt-1" id="birth-moment-display">
-                April 6, 2000, 04:05:00 AM
-            </p>
-        </div>
-
-        <div class="card bg-white p-8 rounded-2xl border border-gray-200">
-            <h2 class="text-2xl font-bold text-gray-700 mb-6 border-b pb-3">
-                Current Chronological Age
-            </h2>
-
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-
-                <div class="text-center p-3">
-                    <div id="age-years" class="stat-value text-indigo-600">0</div>
-                    <div class="text-sm font-medium text-gray-500">Years</div>
-                </div>
-
-                <div class="text-center p-3">
-                    <div id="age-months" class="stat-value text-indigo-600">0</div>
-                    <div class="text-sm font-medium text-gray-500">Months</div>
-                </div>
-
-                <div class="text-center p-3">
-                    <div id="age-days" class="stat-value text-indigo-600">0</div>
-                    <div class="text-sm font-medium text-gray-500">Days</div>
-                </div>
-
-                <div class="text-center p-3">
-                    <div id="age-hours" class="stat-value text-indigo-600">0</div>
-                    <div class="text-sm font-medium text-gray-500">Hours</div>
-                </div>
-
-                <div class="text-center p-3">
-                    <div id="age-minutes" class="stat-value text-indigo-600">0</div>
-                    <div class="text-sm font-medium text-gray-500">Minutes</div>
-                </div>
-                
-            </div>
-            
-            <div class="mt-8 pt-4 border-t text-center">
-                 <p class="text-xl font-semibold text-gray-600 mb-2">Total Time Elapsed (High Precision)</p>
-                 <p id="total-elapsed-time" class="text-3xl font-mono text-red-600"></p>
-            </div>
-        </div>
-        
-        <footer class="mt-8 text-center text-gray-400 text-sm">
-            Age calculations are based on your local browser's timezone setting.
-        </footer>
+    <!-- Age Display -->
+    <div class="card bg-white p-8 rounded-2xl border border-gray-200 mb-8 text-center">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Current Age</h2>
+        <p id="current-age" class="text-4xl font-mono text-indigo-600 mb-3">-- Years</p>
+        <p id="remaining-time" class="text-lg text-gray-500">Remaining time till 2065: -- years</p>
     </div>
 
-    <script>
-        // --- Configuration ---
-        // The user's birth date and time: April 6, 2000, 04:05 AM
-        const BIRTH_MOMENT = new Date("2000-04-06T04:05:00");
-        const CORRECT_PIN = "2209"; // Required PIN for access
-        const BST_TIMEZONE = 'Asia/Dhaka'; // Bangladesh Standard Time (BST)
-        
-        // --- DOM Elements ---
-        const DURATION_ELEMENTS = {
-            years: document.getElementById('age-years'),
-            months: document.getElementById('age-months'),
-            days: document.getElementById('age-days'),
-            hours: document.getElementById('age-hours'),
-            minutes: document.getElementById('age-minutes'),
-            totalElapsed: document.getElementById('total-elapsed-time'),
-            bstClock: document.getElementById('bst-clock') // NEW
-        };
+    <!-- Life Timeline Chart -->
+    <div class="card bg-white p-6 rounded-2xl border">
+        <h2 class="text-2xl font-bold text-gray-700 mb-6 text-center">📈 Life Progress Chart</h2>
+        <canvas id="lifeChart" height="100"></canvas>
+    </div>
+</div>
 
-        // NEW: Function to display the time in Bangladesh
-        function updateBSTClock() {
-            const now = new Date();
-            const options = { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit', 
-                hour12: true, 
-                timeZone: BST_TIMEZONE 
-            };
-            
-            // Format the time string
-            const bstTime = now.toLocaleTimeString('en-US', options);
-            
-            DURATION_ELEMENTS.bstClock.textContent = bstTime;
-        }
+<script>
+const BIRTH = new Date("2000-04-06T04:05:00");
+const DEATH = new Date("2065-04-06T04:05:00");
+const CORRECT_PIN = "2209";
 
-        // Function to calculate and display age
-        function updateAge() {
-            const now = new Date();
-            const msElapsed = now.getTime() - BIRTH_MOMENT.getTime();
+let chart;
 
-            // 1. Calculate the difference in date components (accurate Y/M/D/H/M)
-            let birth = new Date(BIRTH_MOMENT);
-            let ageYears = now.getFullYear() - birth.getFullYear();
-            let ageMonths = now.getMonth() - birth.getMonth();
-            let ageDays = now.getDate() - birth.getDate();
-            let ageHours = now.getHours() - birth.getHours();
-            let ageMinutes = now.getMinutes() - birth.getMinutes();
+function checkPin(){
+    const pin = document.getElementById("pin-input").value.trim();
+    const error = document.getElementById("pin-error");
+    if(pin === CORRECT_PIN){
+        document.getElementById("pin-overlay").classList.add("hidden");
+        document.getElementById("main-content").classList.remove("hidden");
+        startLifeTracker();
+    } else {
+        error.classList.remove("hidden");
+    }
+}
 
-            // Adjust backwards if necessary
-            if (ageMinutes < 0) {
-                ageMinutes += 60;
-                ageHours--;
-            }
-            if (ageHours < 0) {
-                ageHours += 24;
-                ageDays--;
-            }
-            if (ageDays < 0) {
-                // Calculate the number of days in the previous month
-                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-                ageDays += prevMonth.getDate();
-                ageMonths--;
-            }
-            if (ageMonths < 0) {
-                ageMonths += 12;
-                ageYears--;
-            }
+function startLifeTracker(){
+    updateLifeData();
+    setInterval(updateLifeData, 1000);
+    drawLifeChart();
+}
 
-            // 2. Display the calculated duration
-            DURATION_ELEMENTS.years.textContent = ageYears.toLocaleString();
-            DURATION_ELEMENTS.months.textContent = ageMonths.toLocaleString();
-            DURATION_ELEMENTS.days.textContent = ageDays.toLocaleString();
-            DURATION_ELEMENTS.hours.textContent = ageHours.toLocaleString();
-            DURATION_ELEMENTS.minutes.textContent = ageMinutes.toLocaleString();
-            
-            // 3. Display the total elapsed time in a readable format (using high precision years)
-            const totalElapsedYears = msElapsed / (1000 * 60 * 60 * 24 * 365.25);
-            const totalYearsFormatted = totalElapsedYears.toFixed(12); // Displaying high precision
-            
-            DURATION_ELEMENTS.totalElapsed.textContent = `${totalYearsFormatted} Years`;
-        }
-        
-        // Function to start the tracker (called after successful PIN entry)
-        function startTracker() {
-            // Display the exact birth moment for clarity
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-            document.getElementById('birth-moment-display').textContent = BIRTH_MOMENT.toLocaleString(undefined, options);
+function updateLifeData(){
+    const now = new Date();
+    const total = DEATH - BIRTH;
+    const elapsed = now - BIRTH;
+    const percent = Math.min((elapsed / total) * 100, 100);
+    const yearsLived = (elapsed / (1000*60*60*24*365.25)).toFixed(2);
+    const yearsLeft = ((DEATH - now) / (1000*60*60*24*365.25)).toFixed(2);
 
-            // Start the Age Tracker (100ms update for smooth years display)
-            updateAge();
-            setInterval(updateAge, 100); 
+    document.getElementById("current-age").textContent = `${yearsLived} Years`;
+    document.getElementById("remaining-time").textContent = `Remaining time till 2065: ${yearsLeft} years`;
+    document.getElementById("life-progress-text").textContent = `You have completed ${percent.toFixed(4)}% of your estimated life span.`;
 
-            // Start the Bangladesh Clock (1000ms update for real-time seconds)
-            updateBSTClock();
-            setInterval(updateBSTClock, 1000); 
-        }
+    const bar = document.getElementById("life-progress-bar");
+    bar.style.width = `${percent}%`;
 
-        // Function to check the PIN (linked to button and Enter key)
-        function checkPin() {
-            const pinInput = document.getElementById('pin-input');
-            const pinError = document.getElementById('pin-error');
-            const mainContent = document.getElementById('main-content');
-            const pinOverlay = document.getElementById('pin-overlay');
+    if(chart){
+        chart.data.datasets[0].data.push(percent);
+        chart.data.labels.push('');
+        if(chart.data.datasets[0].data.length > 60) chart.data.datasets[0].data.shift();
+        chart.update();
+    }
+}
 
-            if (pinInput.value.trim() === CORRECT_PIN) {
-                // Success: Hide overlay, show content, start clock
-                pinOverlay.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                pinError.classList.add('hidden');
-                startTracker();
-            } else {
-                // Failure: Show error, clear input, focus input
-                pinError.classList.remove('hidden');
-                pinInput.value = '';
-                pinInput.focus();
+function drawLifeChart(){
+    const ctx = document.getElementById('lifeChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Life Progress (%)',
+                data: [],
+                borderColor: '#6366f1',
+                tension: 0.4,
+                borderWidth: 3,
+                fill: {
+                    target: 'origin',
+                    above: 'rgba(99,102,241,0.15)'
+                },
+                pointRadius: 0
+            }]
+        },
+        options: {
+            animation: false,
+            scales: {
+                y: { 
+                    min: 0, max: 100,
+                    ticks: { color: '#4b5563', callback: v => v + '%' }
+                },
+                x: { display: false }
+            },
+            plugins: {
+                legend: { display: false }
             }
         }
-
-        // Setup on initial load
-        window.onload = function() {
-            // Focus the input field when the page loads
-            document.getElementById('pin-input').focus();
-        };
-    </script>
+    });
+}
+</script>
 </body>
-</html>
+</html>      
+        
+                
