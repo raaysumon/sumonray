@@ -28,6 +28,44 @@
             z-index: -1;
         }
 
+
+
+
+
+
+
+
+
+		/* 🎉 Happy New Year Text */
+#new-year-text {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    text-shadow:
+        0 0 10px #a78bfa,
+        0 0 25px #7c3aed,
+        0 0 50px #7c3aed;
+    z-index: 30;
+    display: none;
+    pointer-events: none;
+    animation: newYearGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes newYearGlow {
+    from { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+
+
+
+		
+
         .scroll-to-top {
             position: fixed;
             bottom: 2rem;
@@ -101,6 +139,8 @@
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
+    <div id="new-year-text"></div>
+
 
     <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-black py-4 transition-all duration-300 ease-in-out">
@@ -575,12 +615,34 @@ Administered by Japan Science and Technology Agency.
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             });
         };
-    
+
+
+
+/* ===============================
+   🎉 AUTO HAPPY NEW YEAR (THIS YEAR)
+================================ */
+const today = new Date();
+const currentYear = today.getFullYear();
+const month = today.getMonth(); // Jan = 0
+const day = today.getDate();
+
+if (month === 0 && day >= 1 && day <= 15) {
+    const ny = document.getElementById("new-year-text");
+    ny.innerHTML = `🎉 Happy New Year ${currentYear} 🎉`;
+    ny.style.display = "block";
+}
+
+/* Footer year */
+document.getElementById("year").textContent = currentYear;
+
+
+						   
         
     </script>
     
 </body>
 </html>
+
 
 
 
