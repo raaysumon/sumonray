@@ -28,14 +28,8 @@
             z-index: -1;
         }
 
-
-<div id="new-year-text">
-    🎉 Happy New Year 🎉
-</div>
-
-
-
-		#new-year-text {
+/* 🎉 Happy New Year Text */
+#new-year-text {
     position: fixed;
     top: 55%;
     left: 50%;
@@ -48,7 +42,7 @@
         0 0 10px #a78bfa,
         0 0 25px #7c3aed,
         0 0 50px #7c3aed;
-    z-index: 20;
+    z-index: 30;
     display: none;
     pointer-events: none;
     animation: newYearGlow 2s ease-in-out infinite alternate;
@@ -57,8 +51,6 @@
 @keyframes newYearGlow {
     from { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
     to   { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-}
-
 
 		
 
@@ -550,83 +542,87 @@ Administered by Japan Science and Technology Agency.
         });
 
         // Three.js Background
-        window.onload = function() {
-            const canvas = document.getElementById('bg-canvas');
-            const sizes = { width: window.innerWidth, height: window.innerHeight };
+     * ===============================
+   THREE.JS STAR BACKGROUND
+================================ */
+const canvas = document.getElementById("bg-canvas");
+const scene = new THREE.Scene();
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
-            camera.position.z = 500;
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+camera.position.z = 500;
 
-            const renderer = new THREE.WebGLRenderer({
-                canvas: canvas,
-                antialias: true,
-                alpha: true
-            });
-            renderer.setSize(sizes.width, sizes.height);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            // Create stars
-            const starsGeometry = new THREE.BufferGeometry();
-            const starCount = 15000;
-            const starPositions = new Float32Array(starCount * 3);
-            for (let i = 0; i < starCount; i++) {
-                starPositions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
-                starPositions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
-                starPositions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
-            }
-            starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+const starsGeometry = new THREE.BufferGeometry();
+const starCount = 15000;
+const positions = new Float32Array(starCount * 3);
 
-            const starsMaterial = new THREE.PointsMaterial({
-                size: 1,
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.8
-            });
+for (let i = 0; i < starCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 2000;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+}
 
-            const stars = new THREE.Points(starsGeometry, starsMaterial);
-            scene.add(stars);
+starsGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
-            // Animate loop
-            const animate = () => {
-                const elapsedTime = Date.now() * 0.0001;
-                stars.rotation.y = elapsedTime * 0.1;
-                stars.rotation.x = elapsedTime * 0.05;
+const starsMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 1,
+    transparent: true,
+    opacity: 0.8
+});
 
-                renderer.render(scene, camera);
-                window.requestAnimationFrame(animate);
-            };
+const stars = new THREE.Points(starsGeometry, starsMaterial);
+scene.add(stars);
 
-            animate();
+function animate() {
+    stars.rotation.y += 0.0005;
+    stars.rotation.x += 0.0003;
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+}
+animate();
 
-            // Handle resizing
-            window.addEventListener('resize', () => {
-                sizes.width = window.innerWidth;
-                sizes.height = window.innerHeight;
-                camera.aspect = sizes.width / sizes.height;
-                camera.updateProjectionMatrix();
-                renderer.setSize(sizes.width, sizes.height);
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            });
-        };
-    
-// 🎉 Happy New Year (Jan 1–15 every year)
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ===============================
+   🎉 AUTO HAPPY NEW YEAR (THIS YEAR)
+================================ */
 const today = new Date();
-const month = today.getMonth(); // January = 0
+const currentYear = today.getFullYear();
+const month = today.getMonth(); // Jan = 0
 const day = today.getDate();
 
 if (month === 0 && day >= 1 && day <= 15) {
-    const nyText = document.getElementById("new-year-text");
-    if (nyText) nyText.style.display = "block";
+    const ny = document.getElementById("new-year-text");
+    ny.innerHTML = `🎉 Happy New Year ${currentYear} 🎉`;
+    ny.style.display = "block";
 }
 
-
+/* Footer year */
+document.getElementById("year").textContent = currentYear;
 
 		
     </script>
     
 </body>
 </html>
+
 
 
 
