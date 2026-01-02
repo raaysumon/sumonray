@@ -28,6 +28,40 @@
             z-index: -1;
         }
 
+
+<div id="new-year-text">
+    🎉 Happy New Year 🎉
+</div>
+
+
+
+		#new-year-text {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    text-shadow:
+        0 0 10px #a78bfa,
+        0 0 25px #7c3aed,
+        0 0 50px #7c3aed;
+    z-index: 20;
+    display: none;
+    pointer-events: none;
+    animation: newYearGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes newYearGlow {
+    from { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+
+		
+
         .scroll-to-top {
             position: fixed;
             bottom: 2rem;
@@ -576,11 +610,24 @@ Administered by Japan Science and Technology Agency.
             });
         };
     
-        
+// 🎉 Happy New Year (Jan 1–15 every year)
+const today = new Date();
+const month = today.getMonth(); // January = 0
+const day = today.getDate();
+
+if (month === 0 && day >= 1 && day <= 15) {
+    const nyText = document.getElementById("new-year-text");
+    if (nyText) nyText.style.display = "block";
+}
+
+
+
+		
     </script>
     
 </body>
 </html>
+
 
 
 
