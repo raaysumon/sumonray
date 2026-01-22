@@ -3,264 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sumon Ray</title>
-  <meta name="description" content="Portfolio of Sumon Ray - Electronics and Communication Engineer from Khulna University. Passionate about semiconductor chip design, AI, VLSI, and photonic crystal fiber-based biosensors, Invited from Sakura Science Exchange Program,  Japan, Yamanashi University.">
-  <meta name="keywords" content="Sumon Ray, Electronics Engineer, AI, VLSI, Photonic Sensor, Ku, Semiconductor Design, Bangladesh, Sakura Science, Japan">
-  <meta name="author" content="Sumon Ray">
-	<meta name="google-adsense-account" content="ca-pub-9061730745765540">
+    <title>Sumon Ray | Electronics & AI Engineer</title>
+    <meta name="description" content="Portfolio of Sumon Ray - Electronics and Communication Engineer from Khulna University">
+    <meta name="keywords" content="Sumon Ray, Electronics Engineer, AI, VLSI, Photonic Sensor, Sakura Science, Japan">
+    <meta name="author" content="Sumon Ray">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+     
+
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', 'Times New Roman', Times, serif;
-            overflow-x: hidden;
-            background-color: #0d1117;
-            color: #e5e7eb;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
+   <!-- Your Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 
 
-
-
-
-
-
-
-		/* 🎉 Happy New Year Text */
-#new-year-text {
-    position: fixed;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 800;
-    color: #ffffff;
-    text-align: center;
-    text-shadow:
-        0 0 10px #a78bfa,
-        0 0 25px #7c3aed,
-        0 0 50px #7c3aed;
-    z-index: 30;
-    display: none;
-    pointer-events: none;
-    animation: newYearGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes newYearGlow {
-    from { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
-    to   { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-}
-
-
-
-
-		
-
-        .scroll-to-top {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background-color: rgba(31, 41, 55, 0.5);
-            color: #d1d5db;
-            padding: 0.75rem;
-            border-radius: 9999px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            z-index: 100;
-        }
-
-        .scroll-to-top:hover {
-            background-color: rgba(31, 41, 55, 0.7);
-            transform: translateY(-5px);
-        }
-
-        .section-container {
-            background-color: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(55, 65, 81, 0.5);
-            border-radius: 1rem;
-            padding: 2.5rem;
-            margin: 4rem auto;
-            max-width: 1200px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .text-neon {
-            text-shadow: 0 0 5px #7c3aed, 0 0 10px #7c3aed, 0 0 20px #7c3aed;
-            color: #a78bfa;
-        }
-        .yellow-skill { color: #facc15; } /* Tailwind's yellow-400 */
-        .green-skill { color: #4ade80; } /* Tailwind's green-400 */
-        .blue-skill { color: #3b82f6; } /* Tailwind's blue-500 */
-
-        /* Animation for glowing dots */
-        @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.4); opacity: 1; }
-        }
-
-        .glow-yellow {
-            animation: pulseGlow 2s infinite;
-            color: #facc15;
-        }
-        .glow-green {
-            animation: pulseGlow 2s infinite;
-            animation-delay: 0.4s;
-            color: #4ade80;
-        }
-        .glow-blue {
-            animation: pulseGlow 2s infinite;
-            animation-delay: 0.8s;
-            color: #3b82f6;
-        }
-    </style>
-	<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MJV8RKP7JK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-MJV8RKP7JK');
-</script>
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9061730745765540"
-     crossorigin="anonymous"></script>
 </head>
-<body>
-    <canvas id="bg-canvas"></canvas>
-    <div id="new-year-text"></div>
 
+<body class="relative">
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
 
+    
+    
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-black py-4 transition-all duration-300 ease-in-out">
-        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center">
-            <a href="#" class="text-3xl font-bold text-white transition-colors hover:text-purple-400 mb-4 md:mb-0">Sumon Ray</a>
-            <div class="flex flex-wrap justify-center space-x-2 md:space-x-6">
-                <a href="#home" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">HOME</a>
-                <a href="#about" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">ABOUT</a>
-				<a href="#project" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">PROJECTS</a>
-                <a href="#research" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">RESEARCH</a>
-				 <a href="#extra" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">EXPERIENCE</a>
+    <nav class="fixed top-0 w-full z-50 py-4 px-6 glass">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold gradient-text">SUMON RAY</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="hover:text-purple-300 transition-colors duration-300">Home</a>
+                <a href="#about" class="hover:text-cyan-300 transition-colors duration-300">About</a>
+                <a href="#projects" class="hover:text-emerald-300 transition-colors duration-300">Projects</a>
+                <a href="#research" class="hover:text-purple-300 transition-colors duration-300">Research</a>
+                <a href="#experience" class="hover:text-cyan-300 transition-colors duration-300">Experience</a>
                 <a href="#gallery" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">GALLERY</a>
-                <a href="blog.html" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">BLOGS</a>
-				<a href="tool.html" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">TOOL</a>
-				 <a href="#contact" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">CONTACT</a>
-				<a href="personal.html" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">Personal</a>
-				 
+                <a href="#contact" class="hover:text-emerald-300 transition-colors duration-300">Contact</a>
+                <a href="blog.html" class="hover:text-cyan-300 transition-colors duration-300">BLOGS</a>
+				<a href="tool.html" class="hover:text-emerald-300 transition-colors duration-300">TOOL</a>
+                <button id="modeToggle" class="hover:text-cyan-300 transition-colors duration-300">
+    <i class="fas fa-moon"></i>
+</button>
+
+            </div>
+            <button id="menuBtn" class="hover:text-purple-300 transition-colors duration-300">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden mt-4 glass p-4 rounded-lg">
+            <div class="flex flex-col space-y-4">
+                <a href="#home" class="hover:text-purple-300 transition-colors">Home</a>
+                <a href="#about" class="hover:text-cyan-300 transition-colors">About</a>
+                <a href="#projects" class="hover:text-emerald-300 transition-colors">Projects</a>
+                <a href="#research" class="hover:text-purple-300 transition-colors">Research</a>
+                <a href="#experience" class="hover:text-cyan-300 transition-colors">Experience</a>
+                <a href="#contact" class="hover:text-emerald-300 transition-colors">Contact</a>
+                <a href="blog.html" class="hover:text-purple-300 transition-colors">BLOGS</a>
+				<a href="tool.html" class="hover:text-emerald-300 transition-colors">TOOL</a>
+                <button id="modeToggle" class="hover:text-purple-300 transition-colors">
+    <i class="fas fa-moon"></i>
+</button>
+
+            </div>
+            <button id="menuBtn" class="hover:text-purple-300 transition-colors">
+                <i class="fas fa-bars"></i>
+            </button>
             </div>
         </div>
     </nav>
 
-    <main class="relative z-10 p-4">
-
-        <!-- Home Section -->
-        <section id="home" class="h-screen flex items-center justify-center text-center">
-            <div class="max-w-3xl">
-                <h1 class="text-5xl md:text-8xl font-bold text-white mb-4 leading-tight tracking-tighter animate-fade-in-up">
-                    <span class="text-neon">Hi,</span> I'm Sumon Ray
-                </h1>
-                <p class="text-lg md:text-xl text-gray-400 mb-8 animate-fade-in-up delay-200">
-                    Photonics & AI Enthusiast
-                </p>
-                <a href="#about" class="inline-block px-8 py-4 bg-purple-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-purple-500 transition-all duration-300 transform hover:scale-105 animate-fade-in-up delay-400">
-                    BEGIN THE JOURNEY
-                </a>
-				
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 py-20 text-center">
+            <div class="floating mb-8">
+                <img src="assets/images/portfolio/p1.jpg" 
+                     alt="Sumon Ray" 
+                     class="w-48 h-48 rounded-full mx-auto border-4 border-purple-500/30 shadow-2xl">
             </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="py-20 bg-gray-900">
-  <div class="section-container max-w-6xl mx-auto px-6">
-    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">About Me</h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-      
-      <div class="flex justify-center">
-        <img src="assets/images/portfolio/p1.jpg" alt="Sumon Ray" class="rounded-2xl shadow-lg w-72 h-72 object-cover border-4 border-gray-700">
-      </div>
-
-      <div class="relative">
-        <p class="text-md text-gray-300 leading-relaxed mb-6">
-         Hello, I'm Sumon Ray. I am a nature lover who finds peace in the greenery of trees, the vastness of the sky, the rhythm of rivers, and the expanse of the sea.
-
-Philosophy inspires me, and I love to think deeply as it helps me discover new perspectives and the deeper meaning of life. By nature, I am quiet and feel most alive when surrounded by my closest and dearest ones.
-
-I earned my B.Sc. in Electronics and Communication Engineering from Khulna University. My academic and professional interests lie in data science and VLSI.
-
-One of the most meaningful experiences of my life was participating in the Sakura Science Exchange Program in Japan.
-
-I truly believe that education, nature, and research together shape a complete human being.
-        </p>
-
-		  <p> Email: raay.sumon@gmail.com</p>
-		  <p>WhatsApp: 01567854902</p>
-		  <p>Mobile: 01771482099</p>
-        
-
-        <div class="flex justify-center md:justify-end mt-4">
-          <a href=" https://www.linkedin.com/in/raaysumon22?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="LinkedIn Profile">
-            <i class="fab fa-linkedin fa-2x">   </i>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="GitHub Profile">
-            <i class="fab fa-github fa-2x"></i>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="X Profile">
-            <i class="fab fa-x fa-2x"></i>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-white mx-2 transition-colors duration-300" aria-label="Facebook Profile">
-            <i class="fab fa-facebook fa-2x"></i>
-          </a>
+            
+            <h1 class="text-5xl md:text-7xl font-bold mb-4">
+                <span class="gradient-text">Sumon Ray</span>
+            </h1>
+            
+            <div class="typewriter text-2xl md:text-3xl mb-6 inline-block">
+                Researcher
+            </div>
+            
+            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Passionate about Artificial Intelligence in Biomedical and Healthcare Research, encompassing Machine Learning, Deep Learning, Predictive Modeling, Bioinformatics, Medical Imaging, Genomic Analysis, Disease Diagnosis and Prognosis, photonic crystal fiber-based biosensors and Intelligent Healthcare Systems.
+            </p>
+            
+            
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <div class="glass px-6 py-3 rounded-full flex items-center space-x-2">
+                    <i class="fas fa-graduation-cap text-purple-400"></i>
+                    <span>Khulna University</span>
+                </div>
+                
+                <div class="glass px-6 py-3 rounded-full flex items-center space-x-2">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <span>Sakura Science Exchange Program, Japan</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-center space-x-6">
+                <a href="#contact" class="gradient-bg px-8 py-3 rounded-full font-semibold text-white glow hover:scale-105 transition-transform duration-300">
+                    Get In Touch
+                </a>
+                <a href="#projects" class="glass px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-colors duration-300">
+                    View Projects
+                </a>
+            </div>
+            
+            <!-- Social Icons -->
+            <div class="mt-12 flex justify-center space-x-6 text-2xl">
+                <a href="#" class="hover:text-purple-400 transition-colors"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-gray-300 transition-colors"><i class="fab fa-github"></i></a>
+                <a href="#" class="hover:text-blue-400 transition-colors"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-red-400 transition-colors"><i class="fab fa-youtube"></i></a>
+            </div>
+            
+            <!-- Scroll indicator -->
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+                <a href="#about" class="animate-bounce">
+                    <i class="fas fa-chevron-down text-2xl text-gray-400"></i>
+                </a>
+            </div>
         </div>
+    </section>
 
-      </div>
-
-    </div>
-<article class="mt-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
-                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Education</h3>
-                    <p class="text-md text-gray-300 leading-relaxed">
-                       1. B.Sc Engg. in Electronics and Communication Engineering at
-                       Khulna University - Sher-E-Bangla Rd, Khulna 9208
-                    </p>
-                    <p class="text-sm text-gray-400 mb-4">Passing Year:2025-03 </p>
-                         <p class="text-md text-gray-300 leading-relaxed">
-                        2. Higher Secondary Certificate in Scienc at Govt. Sundarban Adarsha College - Khulna
-                    </p>
-                    <p class="text-sm text-gray-400 mb-4">Passing Year: 2019-06 </p>
-                    <p class="text-md text-gray-300 leading-relaxed">
-                        3. Secondary School Certificate in Science at Khona K.B Secondary High School - Dacope, Khulna
-                    </p>
-                    <p class="text-sm text-gray-400 mb-4">Passing Year: 2017-03 </p>
-	<p class="text-md text-gray-300 leading-relaxed">
-                        4. Junior School Certificate at Tildanga Junior High School - Dacope, Khulna
-                    </p>
-                    <p class="text-sm text-gray-400 mb-4">Passing Year: 2014-12 </p>
-	<p class="text-md text-gray-300 leading-relaxed">
-                        5. Primary School Certificate at Govt. North Tildanga Primary School - Dacope, Khulna
-                    </p>
-                    <p class="text-sm text-gray-400 mb-4">Passing Year: 2011-12</p>
-                </article>
- <article class="mt-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+    <!-- About Section -->
+    <section id="about" class="py-20 section-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
+                <span class="gradient-underline">About Me</span>
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="animated-border p-8">
+                        <p class="text-lg mb-6">
+                            Hello! I'm Sumon Ray, a nature lover who finds peace in greenery, sky, rivers, and sea. 
+                            Philosophy inspires me to think deeply and discover new perspectives on life.
+                        </p>
+                        <p class="text-lg mb-6">
+                            I earned my B.Sc in Electronics and Communication Engineering from Khulna University, 
+                            with academic focus on data science and VLSI. My experience includes the Sakura Science 
+                            Exchange Program in Japan.
+                        </p>
+                        <p class="text-lg">
+                            I believe education, nature, and research together shape a complete human being.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="space-y-8">
+                    <!-- Education Timeline -->
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="text-2xl font-bold mb-4 text-purple-300">Education</h3>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h4 class="font-bold">B.Sc Engg. in Electronics and Communication Engineering</h4>
+                                <p class="text-gray-400">
+                       Khulna University - Sher-E-Bangla Rd, Khulna 9208 • 2025</p>
+                            </div>
+                            <div class="border-l-4 border-cyan-500 pl-4">
+                                <h4 class="font-bold">Higher Secondary Certificate in Science</h4>
+                                <p class="text-gray-400">Govt. Sundarban Adarsha College - Khulna • 2019</p>
+                            </div>
+                            <div class="border-l-4 border-emerald-500 pl-4">
+                                <h4 class="font-bold">Secondary School Certificate in Science</h4>
+                                <p class="text-gray-400">Khona K.B Secondary High School - Dacope, Khulna • 2017</p>
+                            </div>
+                            <div class="border-l-4 border-emerald-500 pl-4">
+                                <h4 class="font-bold">Junior School Certificate</h4>
+                                <p class="text-gray-400">at Tildanga Junior High School - Dacope, Khulna • 2014</p>
+                            </div>
+                            <div class="border-l-4 border-emerald-500 pl-4">
+                                <h4 class="font-bold">Primary School Certificate </h4>
+                                <p class="text-gray-400"> Govt. South Tildanga Primary School - Dacope, Khulna • 2011</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Skills -->
+                    <article class="mt-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
                 <div class="flex">
             <div class="w-2/3">
-                <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Skills</h3>
+                <h3 class="text-2xl font-bold mb-4 text-purple-300">Skills</h3>
                 <ul class="text-md leading-relaxed list-disc list-inside">
                     <li>
                         <strong>Programming Languages:</strong> 
                         <span class="blue-skill">C/C++</span>, 
-                        <span class="green-skill">Python</span>, 
-                        <span class="green-skill">Java</span>
+                        <span class="blue-skill">Python</span>, 
+                        <span class="blue-skill">Java</span>
                     </li>
                     <li>
                         <strong>Data Science:</strong>
@@ -278,7 +223,7 @@ I truly believe that education, nature, and research together shape a complete h
                     </li>
                     <li>
                         <strong>Other:</strong>
-                        <span class="green-skill">Android App Development (Java)</span>, 
+                        <span class="blue-skill">Android App Development (Java)</span>, 
                         <span class="green-skill">Website Development (HTML, CSS, Javascript)</span>
                     </li>
                 </ul>
@@ -300,102 +245,189 @@ I truly believe that education, nature, and research together shape a complete h
                 </div>
             </div>
         </div>
- </article>              
-  </div>
-</section>
+ </article>          
 
-        <!-- Projects Section -->
-        <section id="project" class="py-20">
-            <div class="section-container">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">CORE PROJECTS</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Project Card 1 -->
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
-                        <h3 class="text-xl font-semibold mb-2 text-purple-400">Smart Shopping Trolley System Using Android Application</h3>
-                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
-						<a href="https://github.com/raaysumon/smarttrolley" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
+
+
+
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 section-hidden bg-gradient-to-b from-transparent to-slate-900/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
+                <span class="gradient-underline">Featured Projects</span>
+            </h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project 1 -->
+                <div class="glass rounded-xl overflow-hidden card-hover">
+                    <div class="p-6">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-shopping-cart text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Smart Shopping Trolley System Using Android Application</h3>
+                        
+                    
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
+                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm">Hardware</span>
+                        </div>
+                        <a href="https://github.com/raaysumon/smarttrolley" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
     Github Link
     </a>
-            			
-    </a>        </div>
-                    <!-- Project Card 2 -->
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
-                        <h3 class="text-xl font-semibold mb-2 text-purple-400">IoT Based Smart Watering Device Using Android Application</h3>
-                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
                     </div>
-                    <!-- Project Card 3 -->
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
-                        <h3 class="text-xl font-semibold mb-2 text-purple-400">Remote Health Monitoring Devices Using Android Application</h3>
-                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
-						<a href="https://github.com/raaysumon/aremotepatient" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
-    Github Link
-    </a>
-                    </div>
-					<!-- Project Card 4 -->
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
-                        <h3 class="text-xl font-semibold mb-2 text-purple-400">RF Module and Smart Phone App Based Child Safety & Tracking System</h3>
-                        <p class="text-gray-400 text-sm">I have work on android Application and Hardware</p>
-						<a href="https://drive.google.com/file/d/1o_kBgtRnIICMuczB7izfLM_FmGF4obvI/view?usp=drive_link" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
+                </div>
+                
+                <!-- Project 2 -->
+                <div class="glass rounded-xl overflow-hidden card-hover">
+                    <div class="p-6">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-child text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">RF Module and Smart Phone App Based Child Safety & Tracking System</h3>
+                
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">Child Safety</span>
+                        </div>
+                        			<a href="https://drive.google.com/file/d/1o_kBgtRnIICMuczB7izfLM_FmGF4obvI/view?usp=drive_link" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
     Video Link
     </a>
                     </div>
-					<!-- Project Card 5 -->
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
-                        <h3 class="text-xl font-semibold mb-2 text-purple-400"> TempCheck: Web-Based Weather App</h3>
-                        <p class="text-gray-400 text-sm">I have work on whole work</p>
-					<a href="https://raaysumon.github.io/weather/" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
+                </div>
+                
+                <!-- Project 3 -->
+                <div class="glass rounded-xl overflow-hidden card-hover">
+                    <div class="p-6">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-brain text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Machine Learning Based Thyroid Cancer Recurrence Prediction</h3>
+                        
+                         <p class="text-gray-400 text-sm"> This work is based on my Research Paper in thyroid cancer recurrence (May be published in IEEE Conference) </p>
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">ML</span>
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">Python</span>
+                        </div>
+                        <a href="https://thyroid-1-wm9x.onrender.com/" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
     Website Link
     </a>
                     </div>
+                </div>
 
-	<!-- Project Card 6 -->
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105">
-                        <h3 class="text-xl font-semibold mb-2 text-purple-400">Machine Learning Based Thyroid Cancer Recurrence Prediction </h3>
-                        <p class="text-gray-400 text-sm"> This work is based on my Research Paper in thyroid cancer recurrence (May be published in IEEE Conference) </p>
-						<a href="https://thyroid-1-wm9x.onrender.com/" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
+                <!-- Project 1 -->
+                <div class="glass rounded-xl overflow-hidden card-hover">
+                    <div class="p-6">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2"> Real-Time Temperature Monitoring Using Web-application</h3>
+                        
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Website</span>
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">API</span>
+
+                        </div>
+                        <a href="https://raaysumon.github.io/weather/" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
     Website Link
     </a>
                     </div>
+                </div>
+                
 
+                <!-- Project 2 -->
+                <div class="glass rounded-xl overflow-hidden card-hover">
+                    <div class="p-6">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Remote Health Monitoring System Using Android Application</h3>
+                        
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">IoT</span>
+                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm">Hardware</span>
+                        </div>
+                        <a href="https://github.com/raaysumon/aremotepatient" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
+    Github Link
+    </a>
+                    </div>
+                </div>
+                
 
+                <!-- Project 3 -->
+                <div class="glass rounded-xl overflow-hidden card-hover">
+                    <div class="p-6">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-water"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">IoT Based Smart Watering Device Using Android Application</h3>
+                        
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">IoT</span>
+                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm">Hardware</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
 
-
-					
+    <!-- Research Section -->
+    <section id="research" class="py-20 section-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
+                <span class="gradient-underline">Research</span>
+            </h2>
+            
+            <div class="max-w-4xl mx-auto glass p-8 rounded-2xl">
+                <div class="flex items-start space-x-4">
+                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-microscope text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">Undergraduate Thesis</h3>
+                        <h4 class="text-xl text-cyan-300 mb-4">Machine Learning Approach for Photonic Crystal Fiber Based Blood Glucose Sensor</h4>
+                        <p class="text-lg">
+                            Research focusing on developing advanced biosensors using photonic crystal fibers 
+                            combined with machine learning techniques for accurate blood glucose monitoring.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Research Section -->
-        <section id="research" class="py-20">
-            <div class="section-container">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">RESEARCH</h2>
-		
-                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
-                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Undergraduate Thesis</h3>
-					<p class="text-md text-gray-300 leading-relaxed">
-                   Machine Learning Approach for Photonic Crystal Fiber
-Based Blood Glucose Sensor
-                    </p>
-     
-            </div>
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 section-hidden bg-gradient-to-b from-transparent to-slate-900/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
+                <span class="gradient-underline">Experience</span>
+            </h2>
+            
+            <div class="max-w-4xl mx-auto">
+                <!-- Japan Experience -->
+                <div class="glass p-8 rounded-2xl mb-8">
+                    <div class="flex items-center mb-6">
+                        
+                        <div>
+                            <h3 class="text-2xl font-bold">International Experience</h3>
+                            
+                        </div>
+                    </div>
+                    <p class="text-lg">
+                       Invited from Sakura Science Exchange Program, Japan.
+University of Yamanashi, 4 Chome-4-37 Takeda, Kofu, Yamanashi 400-0016, Japan.
+Administered by Japan Science and Technology Agency. I was one of the ten students who were selected for the prestigious program to engage in cutting-edge research collaborations. </p>
 
-                  
-		
-        </section>
-		
-		 <!-- Extra Curriculam & Experince Section -->
-        <section id="extra" class="py-20">
-            <div class="section-container">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Work Experience & Extra Curriculam Activities</h2>
-                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
-                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">International Experience</h3>
-                    <p class="text-md text-gray-300 leading-relaxed">
-                    Invited from Sakura Science Exchange Program, Japan
-University of Yamanashi, 4 Chome-4-37 Takeda, Kofu, Yamanashi 400-0016, Japan
-Administered by Japan Science and Technology Agency.
-<p class="text-sm text-gray-400 mb-4">DATE:January 28 to February 3 in 2024</p>
-                    </p>
-                </article>
+<p class="text-gray-400 mb-4">DATE: January 28 to February 3 in 2024. 
+                    </p></p>
+                </div>
+                
+                <!-- Internships -->
                 <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
                     <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Internship</h3>
                     <p class="text-md text-gray-300 leading-relaxed">
@@ -407,18 +439,22 @@ Administered by Japan Science and Technology Agency.
 						<p class="text-sm text-gray-400 mb-4">DATE: 1 December to December 14 in 2023</p>
                     </p>
                 </article>
-                <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
+                    
+                     <article class="mb-8 p-6 rounded-lg bg-gray-800 shadow-lg border border-gray-700">
                     <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Research Assistanship</h3>
                     <p class="text-md text-gray-300 leading-relaxed">
                       Research Assistantship, Research and innovation centre, khulna university; Supervised by Professor Dr. Md Mahbub Hossain, Professor, Khulna University, Khulna, ECE Discipline
 <p class="text-sm text-gray-400 mb-4">DATE:January 28 to February 3 in 2024</p>
                     </p>
                 </article>
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Gallery Section -->
-        <section id="gallery" class="py-20">
+
+     <!-- Gallery Section -->
+        <section id="gallery" class="mt-24 mb-24 mr-24 ml-24">
             <div class="section-container">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Sakura Science Exchange Program, Japan</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -463,7 +499,7 @@ Administered by Japan Science and Technology Agency.
                 </div>
             </div>
 			
-			<div class="section-container">
+			<div class="section-container mt-24 mb-20">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">University Life</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="relative group aspect-square rounded-lg overflow-hidden">
@@ -490,200 +526,107 @@ Administered by Japan Science and Technology Agency.
                 </div>
             </div>
         </section>
-         <!-- Blog Section -->
-          <!-- Contact Section -->
-        <!-- Contact Section -->
-      <section id="contact" class="py-20 mb-20">
-    <div class="section-container text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-8 text-white">REACH ME</h2>
-        <p class="text-md text-gray-400 mb-6">
-            Interested in a Research collaboration or just want to chat with me? Send a message.
-        </p>
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=raay.sumon@gmail.com&su=Research%20Collaboration&body=Hi%20Sumon%2C%0A%0AI%20am%20interested%20in%20collaborating%20with%20you..."
-           target="_blank"
-           class="inline-block px-8 py-4 bg-purple-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-purple-500 transition-all duration-300 transform hover:scale-105">
-            SEND MESSAGE
-        </a>
+    <!-- Contact Section -->
+   <section id="contact" class="py-20 section-hidden">
+    <div class="max-w-4xl mx-auto px-6">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
+            <span class="gradient-underline">Get In Touch</span>
+        </h2>
+        
+        <div class="glass rounded-2xl p-8">
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Contact Info -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Let's Connect</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center">
+                                <i class="fas fa-envelope text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Email</h4>
+                                <p class="text-gray-400">raay.sumon@gmail.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center">
+                                <i class="fas fa-phone text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Phone</h4>
+                                <p class="text-gray-400">+880 17714 82099</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center">
+                                <i class="fab fa-whatsapp text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">WhatsApp</h4>
+                                <p class="text-gray-400">+880 15678 54902</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Send a Message</h3>
+                   <form id="contactForm" class="space-y-4">
+    <input type="text" name="name" placeholder="Your Name" required
+           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
+
+    <input type="email" name="email" placeholder="Your Email" required
+           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
+
+    <input type="text" name="subject" placeholder="Subject" required
+           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
+
+    <textarea name="message" rows="5" placeholder="Your Message" required
+              class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+
+    <button id="submitBtn" type="submit"
+            class="w-full py-3 gradient-bg text-white font-bold rounded-xl glow transition-transform duration-300">
+        Send Message
+    </button>
+
+    <p id="formStatus" class="text-center text-sm mt-3"></p>
+</form>
+
+
+                    
+                    <p class="text-center text-gray-400 mt-8">
+                        Open to research collaborations, internships, and interesting projects
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
-<!-- autowrite -->
 
-    </script>
-    <!-- Scroll to Top Button -->
-    <div id="scrollToTopBtn" class="scroll-to-top hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-        </svg>
-    </div>
 
     <!-- Footer -->
-    <footer class="py-8 text-center text-gray-400">
-        <p class="text-sm">© 2025 sumon Ray. All rights reserved.</p>
-        <p class="text-xs mt-2">Last Updated: Tuesday, September 23, 2025 at 6:37 PM +06</p>
-		<p>
-    <a href="legal.html" style="color:#4da6ff; text-decoration:none;">Privacy Policy, Terms & Disclaimer</a>
+    <footer class="py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h3 class="text-2xl font-bold gradient-text mb-4">Sumon Ray</h3>
+            <p class="text-gray-400 mb-8">Electronics Engineer • AI Researcher • Innovator</p>
+            
+            
+            
+         <a href="legal.html" style="color:#4da6ff; text-decoration:none;">Privacy Policy, Terms & Disclaimer</a>
   </p>
+        </div>
     </footer>
 
-    <!-- Three.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        // Smooth scrolling for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
+    <!-- Back to Top -->
+    <button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 gradient-bg rounded-full text-white shadow-lg hidden hover:scale-110 transition-transform">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
-        // Scroll to Top button logic
-        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-        window.onscroll = function() {
-            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-                scrollToTopBtn.classList.remove('hidden');
-            } else {
-                scrollToTopBtn.classList.add('hidden');
-            }
-        };
-
-        scrollToTopBtn.addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-
-        // Three.js Background
-        window.onload = function() {
-            const canvas = document.getElementById('bg-canvas');
-            const sizes = { width: window.innerWidth, height: window.innerHeight };
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
-            camera.position.z = 500;
-
-            const renderer = new THREE.WebGLRenderer({
-                canvas: canvas,
-                antialias: true,
-                alpha: true
-            });
-            renderer.setSize(sizes.width, sizes.height);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            // Create stars
-            const starsGeometry = new THREE.BufferGeometry();
-            const starCount = 15000;
-            const starPositions = new Float32Array(starCount * 3);
-            for (let i = 0; i < starCount; i++) {
-                starPositions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
-                starPositions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
-                starPositions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
-            }
-            starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-
-            const starsMaterial = new THREE.PointsMaterial({
-                size: 1,
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.8
-            });
-
-            const stars = new THREE.Points(starsGeometry, starsMaterial);
-            scene.add(stars);
-
-            // Animate loop
-            const animate = () => {
-                const elapsedTime = Date.now() * 0.0001;
-                stars.rotation.y = elapsedTime * 0.1;
-                stars.rotation.x = elapsedTime * 0.05;
-
-                renderer.render(scene, camera);
-                window.requestAnimationFrame(animate);
-            };
-
-            animate();
-
-            // Handle resizing
-            window.addEventListener('resize', () => {
-                sizes.width = window.innerWidth;
-                sizes.height = window.innerHeight;
-                camera.aspect = sizes.width / sizes.height;
-                camera.updateProjectionMatrix();
-                renderer.setSize(sizes.width, sizes.height);
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            });
-        };
-
-
-
-/* ===============================
-   🎉 AUTO HAPPY NEW YEAR (THIS YEAR)
-================================ */
-const today = new Date();
-const currentYear = today.getFullYear();
-const month = today.getMonth(); // Jan = 0
-const day = today.getDate();
-
-if (month === 0 && day >= 1 && day <= 2) {
-    const ny = document.getElementById("new-year-text");
-    ny.innerHTML = `🎉 Happy New Year ${currentYear} 🎉` ;
-}
-
-/* Footer year */
-document.getElementById("year").textContent = currentYear;
-
-
-						   
-        
-    </script>
     
 </body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <!-- Your JS -->
+    <script src="script.js"></script>
+</html> 
