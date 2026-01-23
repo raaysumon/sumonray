@@ -108,7 +108,7 @@ modeToggle.addEventListener('click', () => {
 
 
 (function () {
-    emailjs.init("S_qD4YqmZabiFvf73Orqj"); // EmailJS Public Key
+    emailjs.init("JQnIyfJwnIP3vDRbR"); // EmailJS Public Key
 })();
 
 
