@@ -4,33 +4,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sumon Ray | Electronics & AI Engineer</title>
+  <meta name="description" content="Portfolio of Sumon Ray - Electronics and Communication Engineer from Khulna University">
+  <meta name="keywords" content="Sumon Ray, Electronics Engineer, AI, VLSI, Photonic Sensor, Sakura Science, Japan">
+  <meta name="author" content="Sumon Ray">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .gradient-bg {
+      background: linear-gradient(45deg, #3b82f6, #06b6d4);
+    }
+    .gradient-underline {
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glow {
+      box-shadow: 0 0 10px #3b82f6, 0 0 20px #06b6d4;
+    }
+    textarea {
+      transition: all 0.3s;
+    }
+    textarea:focus {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #1e1e1e; color: #ffffff; margin:0; padding:0;">
+<body>
+  <section id="contact" class="py-20">
+    <div class="max-w-2xl mx-auto px-6">
+      <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
+        <span class="gradient-underline">Anonymous Message</span>
+      </h2>
 
-  <section id="contact" style="padding: 50px 20px; max-width: 600px; margin: 0 auto; background-color: #333; border-radius: 15px;">
-    <h2 style="text-align: center; font-size: 32px; margin-bottom: 30px;">Anonymous Message</h2>
-    
-    <div>
-      <h3 style="font-size: 24px; margin-bottom: 15px;">Send a Message</h3>
-      
-      <form action="mailto:your-email@example.com" method="post" enctype="text/plain" style="display: flex; flex-direction: column; gap: 15px;">
-        
-       
+      <div class="glass rounded-2xl p-8">
+        <form id="contactForm" class="space-y-4">
+          <textarea name="message" rows="5" placeholder="Your Message" required
+            class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
 
-        <textarea name="message" rows="5" placeholder="Your Message" required
-                  style="padding: 10px; border-radius: 8px; border: none; width: 100%; resize: vertical;"></textarea>
+          <button id="submitBtn" type="submit"
+            class="w-full py-3 gradient-bg text-white font-bold rounded-xl glow transition-transform duration-300">
+            Send Message
+          </button>
 
-        <button type="submit" style="padding: 12px; border-radius: 8px; border: none; background-color: #007bff; color: #fff; font-weight: bold; cursor: pointer;">
-          Send Message
-        </button>
+          <p id="formStatus" class="text-center text-sm mt-3"></p>
+        </form>
 
-      </form>
-
-      <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #bbb;">
-        You can send an anonymous message too.
-      </p>
+        <p class="text-center text-gray-400 mt-8">
+          
+        </p>
+      </div>
     </div>
   </section>
 
+  <script>
+    // Initialize EmailJS
+    (function () {
+      emailjs.init("JQnIyfJwnIP3vDRbR"); // Your public key
+    })();
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("contactForm");
+      const statusText = document.getElementById("formStatus");
+      const submitBtn = document.getElementById("submitBtn");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        submitBtn.textContent = "Sending...";
+        submitBtn.disabled = true;
+        statusText.textContent = "";
+
+        const params = {
+          message: form.message.value.trim(),
+        };
+
+        emailjs.send(
+          "service_94sts5a",     // Your EmailJS service ID
+          "template_rztfe9z",    // Your EmailJS template ID
+          params
+        )
+        .then(() => {
+          statusText.textContent = "✅ Message sent successfully!";
+          statusText.className = "text-green-400 text-center text-sm mt-3";
+          form.reset();
+        })
+        .catch((err) => {
+          console.error("EmailJS Error:", err);
+          statusText.textContent = "❌ Failed to send message. Please try again.";
+          statusText.className = "text-red-400 text-center text-sm mt-3";
+        })
+        .finally(() => {
+          submitBtn.textContent = "Send Message";
+          submitBtn.disabled = false;
+        });
+      });
+    });
+  </script>
 </body>
 </html>
