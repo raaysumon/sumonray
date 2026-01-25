@@ -3,86 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sumon Ray | Anonymous Message </title>
+  <title>Sumon Ray | Anonymous Message</title>
                 
-  
   <meta name="description" content="Portfolio of Sumon Ray - Electronics and Communication Engineer from Khulna University">
   <meta name="keywords" content="Sumon Ray, Electronics Engineer, AI, VLSI, Photonic Sensor, Sakura Science, Japan">
   <meta name="author" content="Sumon Ray">
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-  <!-- Font Awesome & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #fff;
-      margin: 0;
-      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #020617;
+      overflow-x: hidden;
     }
+
+    /* Animated Background Blobs */
+    .blob {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(6, 182, 212, 0.3));
+      filter: blur(80px);
+      border-radius: 50%;
+      z-index: -1;
+      animation: move 20s infinite alternate;
+    }
+
+    @keyframes move {
+      from { transform: translate(-10%, -10%); }
+      to { transform: translate(20%, 20%); }
+    }
+
     .glass {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gradient-bg:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .input-focus {
+      transition: all 0.3s ease;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .gradient-bg {
-      background: linear-gradient(45deg, #3b82f6, #06b6d4);
+
+    .input-focus:focus {
+      border-color: #3b82f6;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
     }
-    .gradient-underline {
-      background: linear-gradient(90deg, #3b82f6, #06b6d4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .glow {
-      box-shadow: 0 0 10px #3b82f6, 0 0 20px #06b6d4;
-    }
-    textarea {
-      transition: all 0.3s;
-    }
-    textarea:focus {
-      background: rgba(255, 255, 255, 0.15);
-    }
+
+    /* Modern scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
   </style>
 </head>
-<body>
-  <section id="contact" class="py-20">
-    <div class="max-w-2xl mx-auto px-6">
-      <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
-        <span class="gradient-underline">Anonymous Message</span>
-      </h2>
-     <img src="assets/images/portfolio/p1.jpg" 
-      <div class="glass rounded-2xl p-8">
-        <form id="contactForm" class="space-y-4">
-          <textarea name="message" rows="5" placeholder="Your Message" required
-            class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+<body class="min-h-screen flex items-center justify-center relative px-4 py-12">
+
+  <div class="blob top-0 left-0" style="animation-delay: 0s;"></div>
+  <div class="blob bottom-0 right-0" style="animation-delay: -5s; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));"></div>
+
+  <section id="contact" class="w-full max-w-xl">
+    <div data-aos="zoom-in" data-aos-duration="1000">
+      
+      <div class="text-center mb-10">
+        <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">
+            Send a Secret
+          </span>
+        </h2>
+        <p class="text-gray-400 font-medium">Your identity remains a mystery.</p>
+      </div>
+
+      <div class="glass rounded-3xl p-8 md:p-10 relative overflow-hidden">
+        <div class="flex justify-center mb-8">
+            <div class="p-1 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-lg">
+                <img src="assets/images/portfolio/p1.jpg" alt="Sumon Ray" 
+                     class="w-20 h-20 rounded-full object-cover border-2 border-slate-900"
+                     onerror="this.src='https://ui-avatars.com/api/?name=Sumon+Ray&background=0D8ABC&color=fff'">
+            </div>
+        </div>
+
+        <form id="contactForm" class="space-y-6">
+          <div class="relative">
+            <textarea name="message" rows="5" placeholder="Type your anonymous message here..." required
+              class="w-full p-4 rounded-2xl bg-white/5 text-white placeholder-gray-500 outline-none input-focus resize-none text-lg"></textarea>
+          </div>
 
           <button id="submitBtn" type="submit"
-            class="w-full py-3 gradient-bg text-white font-bold rounded-xl glow transition-transform duration-300">
-            Send Message
+            class="w-full py-4 gradient-bg text-white font-bold rounded-2xl flex items-center justify-center gap-2 group">
+            <span>Send Message</span>
+            <i class="fa-solid fa-paper-plane group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
           </button>
 
-          <p id="formStatus" class="text-center text-sm mt-3"></p>
+          <p id="formStatus" class="text-center font-medium"></p>
         </form>
 
-        <p class="text-center text-gray-400 mt-8">
-          
-        </p>
+        <div class="mt-10 pt-6 border-t border-white/5 text-center">
+            <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">
+                End-to-End Encrypted Communication
+            </p>
+        </div>
       </div>
     </div>
   </section>
 
   <script>
+    // Initialize AOS
+    AOS.init({
+        once: true,
+        easing: 'ease-out-quad',
+    });
+
     // Initialize EmailJS
     (function () {
-      emailjs.init("JQnIyfJwnIP3vDRbR"); // Your public key
+      emailjs.init("JQnIyfJwnIP3vDRbR"); 
     })();
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -93,7 +147,7 @@
       form.addEventListener("submit", (e) => {
         e.preventDefault();
 
-        submitBtn.textContent = "Sending...";
+        submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Processing...`;
         submitBtn.disabled = true;
         statusText.textContent = "";
 
@@ -101,24 +155,22 @@
           message: form.message.value.trim(),
         };
 
-        emailjs.send(
-          "service_94sts5a",     // Your EmailJS service ID
-          "template_rztfe9z",    // Your EmailJS template ID
-          params
-        )
+        emailjs.send("service_94sts5a", "template_rztfe9z", params)
         .then(() => {
-          statusText.textContent = "✅ Message sent successfully!";
-          statusText.className = "text-green-400 text-center text-sm mt-3";
+          statusText.textContent = "✨ Message teleported successfully!";
+          statusText.className = "text-cyan-400 text-center text-sm mt-4 animate-bounce";
           form.reset();
         })
         .catch((err) => {
           console.error("EmailJS Error:", err);
-          statusText.textContent = "❌ Failed to send message. Please try again.";
-          statusText.className = "text-red-400 text-center text-sm mt-3";
+          statusText.textContent = "❌ Connection failed. Try again.";
+          statusText.className = "text-red-400 text-center text-sm mt-4";
         })
         .finally(() => {
-          submitBtn.textContent = "Send Message";
-          submitBtn.disabled = false;
+          setTimeout(() => {
+            submitBtn.innerHTML = `<span>Send Message</span> <i class="fa-solid fa-paper-plane"></i>`;
+            submitBtn.disabled = false;
+          }, 2000);
         });
       });
     });
