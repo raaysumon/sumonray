@@ -1,2103 +1,754 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayvid - Free Video Sharing Platform | Upload & Share Your Videos</title>
-    <meta name="description" content="Rayvid is a free video sharing platform where anyone can upload and share videos using Google Drive links. Discover amazing videos across various categories.">
-    <meta name="keywords" content="video sharing, free videos, upload videos, video platform, Google Drive videos, entertainment, education, gaming">
-    <meta name="author" content="Rayvid">
-    <meta property="og:title" content="Rayvid - Free Video Sharing Platform">
-    <meta property="og:description" content="Upload and share videos for free. Powered by Google Drive.">
-    <meta property="og:type" content="website">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google AdSense Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID" crossorigin="anonymous"></script>
-    <style>
-        :root {
-            --primary: #ff4757;
-            --secondary: #3498db;
-            --success: #2ecc71;
-            --dark-bg: #1a1a2e;
-            --dark-card: #16213e;
-            --dark-text: #f1f1f1;
-            --light-bg: #f8f9fa;
-            --light-card: #ffffff;
-            --light-text: #333333;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: var(--transition);
-            line-height: 1.6;
-        }
-
-        body.light-mode {
-            background-color: var(--light-bg);
-            color: var(--light-text);
-        }
-
-        body.dark-mode {
-            background-color: var(--dark-bg);
-            color: var(--dark-text);
-        }
-
-        /* Header & Navigation */
-        header {
-            padding: 1.2rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .light-mode header {
-            background-color: var(--light-card);
-        }
-
-        .dark-mode header {
-            background-color: var(--dark-card);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .logo span {
-            color: var(--secondary);
-        }
-
-        .logo:hover {
-            opacity: 0.9;
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        nav a {
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .light-mode nav a {
-            color: var(--light-text);
-        }
-
-        .dark-mode nav a {
-            color: var(--dark-text);
-        }
-
-        nav a:hover {
-            color: var(--primary);
-        }
-
-        /* Search Bar */
-        .search-container {
-            position: relative;
-            min-width: 250px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            border-radius: 50px;
-            border: 2px solid #ddd;
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .light-mode .search-input {
-            background-color: white;
-            color: var(--light-text);
-        }
-
-        .dark-mode .search-input {
-            background-color: #2d3748;
-            color: var(--dark-text);
-            border-color: #4a5568;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-        }
-
-        /* Buttons */
-        .upload-btn {
-            background-color: var(--success);
-            color: white;
-            padding: 0.6rem 1.5rem;
-            border-radius: 50px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .upload-btn:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: inherit;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: flex;
-            gap: 2rem;
-        }
-
-        /* Categories Sidebar */
-        .categories-sidebar {
-            width: 250px;
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-        }
-
-        .categories-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .categories-list {
-            list-style: none;
-        }
-
-        .category-item {
-            padding: 0.8rem 1rem;
-            border-radius: var(--radius);
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .light-mode .category-item {
-            background-color: var(--light-card);
-        }
-
-        .dark-mode .category-item {
-            background-color: var(--dark-card);
-        }
-
-        .category-item:hover, .category-item.active {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .category-count {
-            font-size: 0.8rem;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 0.2rem 0.5rem;
-            border-radius: 10px;
-        }
-
-        /* AdSense Containers */
-        .adsense-container {
-            margin: 1.5rem 0;
-            text-align: center;
-            border-radius: var(--radius);
-            overflow: hidden;
-        }
-
-        .adsense-sidebar {
-            width: 100%;
-            margin-top: 2rem;
-            position: sticky;
-            top: 120px;
-            text-align: center;
-            border-radius: var(--radius);
-            overflow: hidden;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-        }
-
-        .adsense-leaderboard {
-            width: 100%;
-            text-align: center;
-            margin-top: 2rem;
-            padding: 1rem;
-            border-radius: var(--radius);
-            background-color: rgba(0, 0, 0, 0.05);
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Video Grid */
-        .video-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .video-card {
-            border-radius: var(--radius);
-            overflow: hidden;
-            transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-        }
-
-        .video-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .light-mode .video-card {
-            background-color: var(--light-card);
-        }
-
-        .dark-mode .video-card {
-            background-color: var(--dark-card);
-        }
-
-        .thumbnail {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            position: relative;
-        }
-
-        .duration {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
-
-        .video-info {
-            padding: 1rem;
-        }
-
-        .video-title {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .video-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: #888;
-            margin-bottom: 0.5rem;
-        }
-
-        .category-tag {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            padding: 0.2rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-        }
-
-        .uploader-info {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 0.5rem;
-        }
-
-        /* Search Results Info */
-        .search-results-info {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            border-radius: var(--radius);
-        }
-
-        .light-mode .search-results-info {
-            background-color: var(--light-card);
-        }
-
-        .dark-mode .search-results-info {
-            background-color: var(--dark-card);
-        }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-content {
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: var(--radius);
-            padding: 2rem;
-        }
-
-        .light-mode .modal-content {
-            background-color: var(--light-card);
-        }
-
-        .dark-mode .modal-content {
-            background-color: var(--dark-card);
-        }
-
-        /* Upload Form */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border-radius: var(--radius);
-            border: 1px solid #ddd;
-            font-family: inherit;
-            transition: var(--transition);
-        }
-
-        .light-mode .form-group input, 
-        .light-mode .form-group textarea, 
-        .light-mode .form-group select {
-            background-color: white;
-            color: var(--light-text);
-        }
-
-        .dark-mode .form-group input, 
-        .dark-mode .form-group textarea, 
-        .dark-mode .form-group select {
-            background-color: #2d3748;
-            color: var(--dark-text);
-            border-color: #4a5568;
-        }
-
-        .form-group input:focus, 
-        .form-group textarea:focus, 
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .thumbnail-preview {
-            width: 100%;
-            max-width: 300px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: var(--radius);
-            margin-top: 1rem;
-            display: none;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 0.8rem 1.8rem;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #ff2e43;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-        }
-
-        /* Video Player Page */
-        .video-player-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        .video-player-wrapper {
-            width: 100%;
-            position: relative;
-            background-color: #000;
-            border-radius: var(--radius);
-            overflow: hidden;
-        }
-
-        .drive-player {
-            width: 100%;
-            height: 600px;
-            border: none;
-        }
-
-        /* Admin Portal */
-        .admin-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-        }
-
-        .admin-panel {
-            width: 90%;
-            max-width: 1000px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: var(--radius);
-            padding: 2rem;
-        }
-
-        .light-mode .admin-panel {
-            background-color: var(--light-card);
-        }
-
-        .dark-mode .admin-panel {
-            background-color: var(--dark-card);
-        }
-
-        .admin-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 1rem;
-        }
-
-        .admin-tab {
-            padding: 0.8rem 1.5rem;
-            background: none;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: var(--radius);
-            transition: var(--transition);
-        }
-
-        .light-mode .admin-tab {
-            color: var(--light-text);
-        }
-
-        .dark-mode .admin-tab {
-            color: var(--dark-text);
-        }
-
-        .admin-tab.active {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .admin-section {
-            display: none;
-        }
-
-        .admin-section.active {
-            display: block;
-        }
-
-        /* Analytics Dashboard */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .analytics-card {
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            color: white;
-            text-align: center;
-        }
-
-        .analytics-card h4 {
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .analytics-card h2 {
-            font-size: 2rem;
-            margin: 0;
-        }
-
-        /* Video List in Admin */
-        .admin-video-item {
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
-        }
-
-        .light-mode .admin-video-item {
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-        }
-
-        .dark-mode .admin-video-item {
-            background-color: #2d3748;
-            border: 1px solid #4a5568;
-        }
-
-        .video-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .action-btn {
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .edit-btn {
-            background-color: var(--secondary);
-            color: white;
-        }
-
-        .delete-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-            background-color: var(--primary);
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(30px);
-        }
-
-        /* Password Prompt */
-        .password-prompt {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .password-input {
-            width: 100%;
-            padding: 0.8rem;
-            margin: 1rem 0;
-            border-radius: var(--radius);
-            border: 2px solid #ddd;
-            font-size: 1rem;
-        }
-
-        /* Footer */
-        footer {
-            padding: 3rem 2rem;
-            text-align: center;
-            margin-top: 3rem;
-        }
-
-        .light-mode footer {
-            background-color: #f1f1f1;
-            color: var(--light-text);
-        }
-
-        .dark-mode footer {
-            background-color: #0f0f1a;
-            color: var(--dark-text);
-        }
-
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-
-        .visible {
-            display: block;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-1 { margin-top: 1rem; }
-        .mt-2 { margin-top: 2rem; }
-        .mb-1 { margin-bottom: 1rem; }
-        .mb-2 { margin-bottom: 2rem; }
-        .d-flex { display: flex; }
-        .justify-between { justify-content: space-between; }
-        .align-center { align-items: center; }
-        .gap-1 { gap: 1rem; }
-        .flex-wrap { flex-wrap: wrap; }
-
-        /* Tags */
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .tag {
-            background-color: rgba(52, 152, 219, 0.2);
-            color: var(--secondary);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            grid-column: 1 / -1;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .categories-sidebar {
-                width: 100%;
-                position: static;
-            }
-            
-            .categories-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-            
-            .category-item {
-                margin-bottom: 0;
-            }
-            
-            .adsense-sidebar {
-                position: static;
-                margin-top: 1rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 1rem;
-                padding: 1rem;
-            }
-            
-            .nav-container {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .search-container {
-                order: 3;
-                width: 100%;
-                margin-top: 1rem;
-            }
-            
-            nav ul {
-                gap: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .video-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .admin-tabs {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body class="dark-mode">
-    <!-- Schema.org structured data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Rayvid",
-        "description": "Free video sharing platform where anyone can upload and share videos",
-        "url": "https://rayvid.example.com"
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whisper to Sumon | Anonymous Portal</title>
+                
+  <meta name="description" content="Send anonymous messages to Sumon Ray - Your identity remains protected">
+  <meta name="keywords" content="anonymous message, secret message, Sumon Ray">
+  <meta name="author" content="Sumon Ray">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --primary-glow: rgba(239, 68, 68, 0.4);
+      --secondary-glow: rgba(236, 72, 153, 0.3);
+      --accent-glow: rgba(244, 63, 94, 0.3);
     }
-    </script>
 
-    <!-- Header -->
-    <header>
-        <a href="#" class="logo" onclick="showHome(); return false;">Ray<span>vid</span></a>
-        
-        <div class="nav-container">
-            <!-- Search Bar -->
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" id="search-input" 
-                       placeholder="Search videos by title, tags, or keywords..."
-                       aria-label="Search videos">
-            </div>
-            
-            <nav>
-                <ul>
-                    <li><a href="#" onclick="showHome(); return false;">Home</a></li>
-                    <li><button class="upload-btn" onclick="showUploadModal(); return false;">
-                        <i class="fas fa-upload"></i> Upload Video
-                    </button></li>
-                    <li><a href="#" onclick="showAdminPortal(); return false;">Admin</a></li>
-                    <li><button class="theme-toggle" onclick="toggleTheme(); return false;" aria-label="Toggle theme">
-                        <i class="fas fa-moon"></i>
-                    </button></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    body {
+      font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #1a0a0a 0%, #2c0c1a 50%, #280a18 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #f1f5f9;
+      scroll-behavior: smooth;
+    }
 
-    <!-- Upload Modal for Everyone -->
-    <div class="modal-overlay" id="upload-modal">
-        <div class="modal-content">
-            <div class="d-flex justify-between align-center mb-2">
-                <h2>Upload Your Video</h2>
-                <button class="btn btn-secondary" onclick="closeUploadModal()" aria-label="Close upload modal">
-                    <i class="fas fa-times"></i> Close
-                </button>
-            </div>
-            
-            <form id="upload-form">
-                <div class="form-group">
-                    <label for="drive-link">Google Drive Video Link *</label>
-                    <input type="url" id="drive-link" required 
-                           placeholder="https://drive.google.com/file/d/VIDEO_ID/view"
-                           aria-required="true">
-                    <small>Make sure your Google Drive file is set to "Anyone with the link can view"</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-title-input">Video Title *</label>
-                    <input type="text" id="video-title-input" required
-                           placeholder="Enter an engaging title for your video"
-                           aria-required="true">
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-description-input">Description</label>
-                    <textarea id="video-description-input" rows="3"
-                              placeholder="Describe your video content..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-category-input">Category *</label>
-                    <select id="video-category-input" required aria-required="true">
-                        <option value="">Select a category</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Education">Education</option>
-                        <option value="Gaming">Gaming</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Music">Music</option>
-                        <option value="Sports">Sports</option>
-                        <option value="Comedy">Comedy</option>
-                        <option value="Tutorial">Tutorial</option>
-                        <option value="Other">Other (specify below)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group" id="custom-category-group" style="display: none;">
-                    <label for="custom-category">Custom Category Name *</label>
-                    <input type="text" id="custom-category" 
-                           placeholder="Enter your custom category name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="thumbnail-url">Thumbnail Image URL</label>
-                    <input type="url" id="thumbnail-url" 
-                           placeholder="https://example.com/thumbnail.jpg">
-                    <small>Upload your thumbnail to any image hosting service (like Imgur) and paste the direct link. If not provided, a default thumbnail will be used based on the category.</small>
-                </div>
-                
-                <div class="form-group">
-                    <img id="thumbnail-preview" class="thumbnail-preview" alt="Thumbnail Preview">
-                    <small id="default-thumbnail-info" style="display: none; color: var(--secondary);">Preview of default thumbnail for this category</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-tags">Tags (comma separated)</label>
-                    <input type="text" id="video-tags" 
-                           placeholder="funny, tutorial, gaming, vlog, music">
-                    <small>Add relevant tags to help users find your video (max 10 tags)</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="uploader-name">Your Name *</label>
-                    <input type="text" id="uploader-name" required 
-                           placeholder="Enter your name or channel name"
-                           aria-required="true">
-                </div>
-                
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-upload"></i> Upload Video
-                </button>
-            </form>
+    /* Navigation Bar Styles */
+    .navbar {
+      background: rgba(42, 15, 23, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 1000;
+    }
+
+    .nav-link {
+      position: relative;
+      padding: 0.5rem 1rem;
+      color: #cbd5e1;
+      transition: all 0.3s ease;
+      border-radius: 0.5rem;
+    }
+
+    .nav-link:hover { 
+      color: #ffffff; 
+      background: rgba(239, 68, 68, 0.15); 
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, #ec4899);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after { width: 80%; }
+
+    .neon-border {
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.15), inset 0 0 20px rgba(236, 72, 153, 0.1);
+    }
+
+    .glass-enhanced {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 182, 193, 0.03) 100%);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+    }
+
+    .text-gradient {
+      background: linear-gradient(90deg, #f87171 0%, #fb7185 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(236, 72, 153, 0.7);
+      border-radius: 50%;
+      animation: particle-float 20s infinite linear;
+    }
+
+    @keyframes particle-float {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(135deg, #ef4444, #ec4899);
+      font-size: 0.7rem;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(42, 15, 23, 0.6); }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, #ef4444, #ec4899); 
+      border-radius: 10px; 
+    }
+
+    /* New styles for red/pink theme */
+    .avatar-glow {
+      box-shadow: 0 0 30px rgba(236, 72, 153, 0.5), 0 0 60px rgba(239, 68, 68, 0.3);
+    }
+
+    .floating-hearts {
+      position: absolute;
+      font-size: 1.2rem;
+      color: #ec4899;
+      opacity: 0.7;
+      animation: float-heart 6s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float-heart {
+      0%, 100% { 
+        transform: translateY(0) rotate(0deg); 
+        opacity: 0.7; 
+      }
+      50% { 
+        transform: translateY(-20px) rotate(10deg); 
+        opacity: 1; 
+      }
+    }
+
+    .heartbeat {
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Super Fancy Counter Styles */
+    .counter-container {
+      position: relative;
+      perspective: 1000px;
+    }
+
+    .counter-card {
+      background: linear-gradient(145deg, 
+        rgba(239, 68, 68, 0.15) 0%,
+        rgba(236, 72, 153, 0.2) 50%,
+        rgba(244, 63, 94, 0.15) 100%);
+      backdrop-filter: blur(20px);
+      border: 2px solid transparent;
+      border-radius: 32px;
+      background-clip: padding-box;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .counter-card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        #ef4444, #ec4899, #f472b6, #fb7185, #f87171, #ef4444);
+      background-size: 400% 400%;
+      border-radius: 34px;
+      z-index: -1;
+      animation: border-glow 3s ease-in-out infinite alternate;
+      filter: blur(10px);
+    }
+
+    @keyframes border-glow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .counter-number {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      background: linear-gradient(135deg, 
+        #fecaca 0%,
+        #fca5a5 25%,
+        #f87171 50%,
+        #ef4444 75%,
+        #dc2626 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+      position: relative;
+      transform-style: preserve-3d;
+      animation: counter-float 4s ease-in-out infinite;
+    }
+
+    @keyframes counter-float {
+      0%, 100% { transform: translateY(0) rotateX(0deg); }
+      50% { transform: translateY(-10px) rotateX(10deg); }
+    }
+
+    .counter-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, 
+        rgba(239, 68, 68, 0.2) 0%,
+        rgba(236, 72, 153, 0.1) 40%,
+        transparent 70%);
+      animation: glow-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow-pulse {
+      from { opacity: 0.3; transform: scale(1); }
+      to { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    .counter-dots {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(248, 113, 113, 0.3) 2px, transparent 2px),
+        radial-gradient(circle at 80% 20%, rgba(251, 113, 133, 0.3) 2px, transparent 2px),
+        radial-gradient(circle at 40% 40%, rgba(244, 114, 182, 0.3) 2px, transparent 2px);
+      background-size: 50px 50px;
+      animation: dots-float 20s linear infinite;
+      opacity: 0.3;
+    }
+
+    @keyframes dots-float {
+      0% { transform: translateY(0) translateX(0); }
+      100% { transform: translateY(-50px) translateX(50px); }
+    }
+
+    .counter-label {
+      position: relative;
+      z-index: 2;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      background: linear-gradient(90deg, #fca5a5, #f9a8d4, #fda4af);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: label-shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes label-shimmer {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    .floating-icon {
+      position: absolute;
+      font-size: 1.8rem;
+      animation: float-random 15s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    @keyframes float-random {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      25% { transform: translate(100px, -50px) rotate(90deg) scale(1.2); }
+      50% { transform: translate(0, -100px) rotate(180deg) scale(1); }
+      75% { transform: translate(-100px, -50px) rotate(270deg) scale(0.8); }
+      100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+    }
+
+    .counter-spark {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 10px 2px rgba(236, 72, 153, 0.8);
+      animation: spark-fly 2s linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes spark-fly {
+      0% { 
+        transform: translate(0, 0) scale(0); 
+        opacity: 0; 
+      }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { 
+        transform: translate(var(--spark-x), var(--spark-y)) scale(1); 
+        opacity: 0; 
+      }
+    }
+
+    .counter-hover-effect {
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .counter-hover-effect:hover {
+      transform: translateY(-10px) rotateX(10deg) rotateY(5deg);
+      box-shadow: 
+        0 25px 50px rgba(239, 68, 68, 0.3),
+        0 0 100px rgba(236, 72, 153, 0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen px-4 py-12 relative">
+
+  <div id="particles"></div>
+
+  <nav id="navbar" class="navbar fixed top-0 left-0 right-0 px-6 py-4 transition-all duration-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center">
+          <i class="fas fa-user-secret text-white"></i>
         </div>
+        <div>
+          <a href="#" class="text-xl font-bold text-white text-gradient">Sumon Ray</a>
+          <div class="text-xs text-pink-300">Anonymous Portal</div>
+        </div>
+      </div>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="#" class="nav-link"><i class="fas fa-home mr-2"></i>Home</a>
+        <div class="relative">
+          <a href="#" class="nav-link"><i class="fas fa-comment-dots mr-2"></i>Messages
+            <span id="navBadge" class="notification-badge">0</span>
+          </a>
+        </div>
+      </div>
     </div>
+  </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Categories Sidebar -->
-        <aside class="categories-sidebar" role="complementary" aria-label="Video categories">
-            <h3 class="categories-title">Browse Categories</h3>
-            <ul class="categories-list" id="categories-list">
-                <!-- Categories will be dynamically loaded -->
-            </ul>
-            
-            <!-- AdSense Sidebar Ad -->
-            <div class="adsense-sidebar" id="adsense-sidebar">
-                <!-- Display AdSense Ad Here -->
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-                <!-- Sidebar Ad -->
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                     data-ad-slot="SIDEBAR_AD_SLOT_ID"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
-        </aside>
+  <section class="w-full max-w-2xl mx-auto relative z-10 mt-16">
+    <div data-aos="zoom-in-up">
+      
+      <div class="text-center mb-12">
+        <div class="inline-block p-4 rounded-2xl glass-enhanced neon-border mb-6 heartbeat">
+          <i class="fas fa-user-secret text-4xl text-gradient"></i>
+        </div>
+        <h1 class="text-5xl font-bold mb-4 text-gradient">Anonymous Whisper</h1>
+        <p class="text-pink-300 text-lg">Your identity is encrypted. Share thoughts freely.</p>
+      </div>
 
-        <!-- Main Video Content -->
-        <main role="main">
-            <!-- Top AdSense Banner -->
-            <div class="adsense-container" id="top-banner-ad">
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-                <!-- Top Banner Ad -->
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                     data-ad-slot="TOP_BANNER_AD_SLOT_ID"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+      <div class="glass-enhanced rounded-3xl p-8 md:p-10 relative neon-border" id="messageFormContainer">
+        <div class="flex flex-col items-center mb-10 relative">
+          <div class="relative">
+            <img src="https://github.com/raaysumon/sumonray/blob/main/assets/images/portfolio/p1.jpg" 
+                 class="w-24 h-24 rounded-full border-4 border-pink-900 mb-4 avatar-glow" alt="Sumon">
+            <!-- Floating hearts around avatar -->
+            <div class="floating-hearts" style="top: -10px; left: -10px;">❤️</div>
+            <div class="floating-hearts" style="bottom: 20px; right: -10px; animation-delay: 2s;">💖</div>
+            <div class="floating-hearts" style="top: 40px; right: -20px; animation-delay: 4s;">💕</div>
+          </div>
+          <h3 class="text-2xl font-bold text-white">Sumon Ray</h3>
+          <p class="text-pink-300">Researcher</p>
+        </div>
+
+        <form id="contactForm" class="space-y-8">
+          <div class="relative group">
+            <textarea 
+              name="message" rows="6" maxlength="1000" required
+              placeholder="Type your anonymous message here..."
+              class="w-full p-6 rounded-2xl bg-slate-900/80 text-white outline-none border border-pink-900 focus:border-pink-500 transition-all focus:ring-2 focus:ring-pink-500/30"></textarea>
+            <div class="flex justify-between mt-2 px-2 text-sm text-pink-300">
+              <span><i class="fas fa-shield-alt text-pink-400"></i> Encrypted & Anonymous</span>
+              <span id="charCount">0/1000</span>
             </div>
-            
-            <div class="search-results-info hidden" id="search-results-info">
-                <h3>Search Results for: "<span id="search-query"></span>"</h3>
-                <p>Found <span id="results-count">0</span> videos</p>
+          </div>
+
+          <button id="submitBtn" type="submit" 
+                  class="w-full py-5 bg-gradient-to-r from-pink-600 via-red-500 to-rose-600 
+                         text-white font-bold rounded-2xl transition-all 
+                         hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(236,72,153,0.5)] 
+                         active:scale-95">
+            Send Anonymous Message <i class="fa-solid fa-heart ml-2"></i>
+          </button>
+          
+          <div id="formStatus" class="min-h-[48px] text-center mt-4"></div>
+        </form>
+      </div>
+
+      <!-- Super Fancy Total Messages Counter -->
+      <div class="mt-12 counter-container">
+        <div class="counter-card p-8 md:p-12 counter-hover-effect">
+          <div class="counter-glow"></div>
+          <div class="counter-dots"></div>
+          
+          <!-- Floating Icons -->
+          <div class="floating-icon" style="top: 20px; left: 20px; color: #f87171; animation-delay: 0s;">
+            <i class="fas fa-comment"></i>
+          </div>
+          <div class="floating-icon" style="top: 20px; right: 20px; color: #fb7185; animation-delay: 3s;">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="floating-icon" style="bottom: 20px; left: 20px; color: #f472b6; animation-delay: 6s;">
+            <i class="fas fa-heart"></i>
+          </div>
+          <div class="floating-icon" style="bottom: 20px; right: 20px; color: #ef4444; animation-delay: 9s;">
+            <i class="fas fa-paper-plane"></i>
+          </div>
+          
+          <div class="text-center relative z-10">
+            <div id="totalSent" class="counter-number text-7xl md:text-8xl lg:text-9xl mb-4">0</div>
+            <div class="counter-label text-xl md:text-2xl font-bold">
+              Total Anonymous Messages
             </div>
-            
-            <div class="video-grid" id="video-grid">
-                <!-- Videos will be loaded here by JavaScript -->
+            <div class="text-pink-300/80 text-sm md:text-base mt-3">
+              <i class="fas fa-lock mr-2"></i>All messages are securely encrypted
             </div>
-            
-            <!-- Middle AdSense Banner -->
-            <div class="adsense-container" id="middle-banner-ad">
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-                <!-- Middle Banner Ad -->
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                     data-ad-slot="MIDDLE_BANNER_AD_SLOT_ID"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
-            
-            <!-- Empty State -->
-            <div class="empty-state hidden" id="empty-state">
-                <i class="fas fa-video-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                <h3>No videos found</h3>
-                <p>Try a different search or upload your own video!</p>
-                <button class="btn btn-success mt-1" onclick="showUploadModal()">
-                    <i class="fas fa-upload"></i> Upload Video
-                </button>
-            </div>
-        </main>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <!-- Video Player Page (Hidden by Default) -->
-    <div class="video-player-container hidden" id="video-player-page">
-        <button class="btn btn-secondary" onclick="showHome()">
-            <i class="fas fa-arrow-left"></i> Back to Home
-        </button>
+  <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+    <button id="scrollTopBtn" 
+            class="w-12 h-12 rounded-full glass-enhanced neon-border 
+                   flex items-center justify-center text-red-400 
+                   transition-all opacity-0 invisible hover:bg-red-500/20">
+      <i class="fas fa-chevron-up"></i>
+    </button>
+    <button id="scrollBottomBtn" 
+            class="w-12 h-12 rounded-full glass-enhanced neon-border 
+                   flex items-center justify-center text-pink-400 
+                   transition-all hover:bg-pink-500/20">
+      <i class="fas fa-chevron-down"></i>
+    </button>
+  </div>
+
+  <script>
+    AOS.init();
+    emailjs.init("JQnIyfJwnIP3vDRbR");
+
+    // Particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDelay = Math.random() * 20 + 's';
+      particlesContainer.appendChild(p);
+    }
+
+    // Create floating hearts
+    function createFloatingHearts() {
+      const container = document.getElementById('messageFormContainer');
+      if (!container) return;
+      
+      for (let i = 0; i < 5; i++) {
+        const heart = document.createElement('div');
+        heart.innerHTML = ['❤️', '💖', '💕', '💗', '💓'][Math.floor(Math.random() * 5)];
+        heart.className = 'floating-hearts';
+        heart.style.position = 'absolute';
+        heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.top = Math.random() * 100 + '%';
+        heart.style.opacity = '0';
+        heart.style.animationDelay = Math.random() * 5 + 's';
+        heart.style.zIndex = '-1';
         
-        <article class="video-player-wrapper mt-2" role="article">
-            <iframe class="drive-player" id="drive-player" frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen
-                    title="Video Player"></iframe>
-        </article>
+        container.appendChild(heart);
         
-        <div class="video-details">
-            <h1 id="video-title">Video Title</h1>
-            <div class="d-flex align-center gap-1 mt-1">
-                <div class="category-tag" id="video-category">Category</div>
-                <span>Uploaded by: <strong id="uploader-name-display">User</strong></span>
-            </div>
-            <p id="video-description" class="mt-2">Video description will appear here.</p>
-            
-            <div class="tags-container" id="video-tags-container">
-                <!-- Tags will be loaded here -->
-            </div>
-            
-            <div class="video-meta mt-2">
-                <span><i class="far fa-eye"></i> <span id="view-count">0</span> views</span>
-                <span><i class="far fa-calendar"></i> <span id="upload-date">Today</span></span>
-            </div>
-        </div>
+        setTimeout(() => {
+          heart.style.opacity = '0.3';
+        }, 100);
+      }
+    }
+
+    // Create spark effects for counter
+    function createCounterSparks(count = 5) {
+      const counterCard = document.querySelector('.counter-card');
+      if (!counterCard) return;
+      
+      for (let i = 0; i < count; i++) {
+        const spark = document.createElement('div');
+        spark.className = 'counter-spark';
         
-        <!-- AdSense Ad below video details -->
-        <div class="adsense-leaderboard mt-2" id="adsense-leaderboard">
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-            <!-- Leaderboard Ad -->
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:728px;height:90px"
-                 data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                 data-ad-slot="LEADERBOARD_AD_SLOT_ID"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 100 + Math.random() * 100;
+        const sparkX = Math.cos(angle) * distance;
+        const sparkY = Math.sin(angle) * distance;
+        
+        spark.style.setProperty('--spark-x', `${sparkX}px`);
+        spark.style.setProperty('--spark-y', `${sparkY}px`);
+        spark.style.left = '50%';
+        spark.style.top = '50%';
+        spark.style.animationDelay = Math.random() * 2 + 's';
+        
+        // Random spark color
+        const colors = ['#f87171', '#fb7185', '#f472b6', '#ec4899', '#ef4444'];
+        spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+        spark.style.boxShadow = `0 0 15px 3px ${colors[Math.floor(Math.random() * colors.length)]}`;
+        
+        counterCard.appendChild(spark);
+        
+        // Remove spark after animation
+        setTimeout(() => {
+          if (spark.parentNode) {
+            spark.remove();
+          }
+        }, 2000);
+      }
+    }
 
-    <!-- Admin Portal with Password Prompt -->
-    <div class="admin-overlay" id="admin-overlay">
-        <div class="admin-panel">
-            <!-- Password Prompt Screen -->
-            <div id="admin-password-prompt" class="password-prompt">
-                <h2>Admin Portal</h2>
-                <p>Enter admin password to continue:</p>
-                <input type="password" id="admin-password" class="password-input" 
-                       placeholder="Enter password" autocomplete="off" aria-label="Admin password">
-                <div class="d-flex gap-1 justify-between">
-                    <button class="btn btn-secondary" onclick="closeAdminPortal()">Cancel</button>
-                    <button class="btn btn-primary" onclick="verifyAdminPassword()">Enter</button>
-                </div>
-                <p class="mt-1"><small>Default password: admin123</small></p>
-            </div>
-            
-            <!-- Admin Panel Content (hidden by default) -->
-            <div id="admin-panel-content" class="hidden">
-                <div class="d-flex justify-between align-center mb-2">
-                    <h2>Admin Portal</h2>
-                    <button class="btn btn-secondary" onclick="closeAdminPortal()" aria-label="Close admin panel">
-                        <i class="fas fa-times"></i> Close
-                    </button>
-                </div>
-                
-                <div class="admin-tabs" role="tablist">
-                    <button class="admin-tab active" onclick="switchAdminTab('manage')" role="tab">Manage Videos</button>
-                    <button class="admin-tab" onclick="switchAdminTab('ads')" role="tab">Manage Ads</button>
-                    <button class="admin-tab" onclick="switchAdminTab('analytics')" role="tab">Analytics</button>
-                </div>
-                
-                <!-- Manage Videos Section -->
-                <div class="admin-section active" id="manage-section" role="tabpanel">
-                    <h3 class="mb-2">Manage Videos</h3>
-                    <div class="video-list" id="admin-video-list">
-                        <!-- Videos will be loaded here -->
-                    </div>
-                </div>
-                
-                <!-- Manage Ads Section -->
-                <div class="admin-section" id="ads-section" role="tabpanel">
-                    <h3 class="mb-2">Manage Ads</h3>
-                    <div class="form-group">
-                        <label>Enable Banner Ads</label>
-                        <div class="d-flex align-center gap-1">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="banner-ads-toggle">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span>Show banner ads on site</span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Enable Video Ads</label>
-                        <div class="d-flex align-center gap-1">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="video-ads-toggle" disabled>
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span>Show video ads after playback <small>(Not available with current setup)</small></span>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="saveAdSettings()">Save Ad Settings</button>
-                </div>
-                
-                <!-- Analytics Section -->
-                <div class="admin-section" id="analytics-section" role="tabpanel">
-                    <h3 class="mb-2">Analytics Dashboard</h3>
-                    
-                    <div class="analytics-grid">
-                        <div class="analytics-card" style="background-color: var(--secondary);">
-                            <h4>Total Views</h4>
-                            <h2 id="total-views">0</h2>
-                        </div>
-                        <div class="analytics-card" style="background-color: var(--success);">
-                            <h4>Total Videos</h4>
-                            <h2 id="total-videos">0</h2>
-                        </div>
-                        <div class="analytics-card" style="background-color: #9b59b6;">
-                            <h4>Total Categories</h4>
-                            <h2 id="total-categories">0</h2>
-                        </div>
-                        <div class="analytics-card" style="background-color: #f39c12;">
-                            <h4>Active Uploaders</h4>
-                            <h2 id="total-uploaders">0</h2>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Ad Revenue (Demo)</label>
-                        <div class="d-flex align-center gap-1">
-                            <span style="font-size: 1.5rem; font-weight: bold;">$<span id="ad-revenue">0.00</span></span>
-                            <small>Real ad revenue will appear after AdSense integration</small>
-                        </div>
-                    </div>
-                    
-                    <h4 class="mt-2">Most Popular Videos</h4>
-                    <div id="popular-videos-list">
-                        <!-- Popular videos will be loaded here -->
-                    </div>
-                    
-                    <h4 class="mt-2">Category Distribution</h4>
-                    <div id="category-distribution">
-                        <!-- Category distribution will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer role="contentinfo">
-        <div class="footer-content">
-            <a href="#" class="logo" onclick="showHome(); return false;" style="font-size: 1.5rem;">Ray<span>vid</span></a>
-            <p style="margin: 1rem 0;">Share your videos with the world. A free video sharing platform powered by Google Drive</p>
-            <div class="d-flex justify-center flex-wrap gap-1" style="margin: 1rem 0;">
-                <a href="#" onclick="showHome(); return false;" style="text-decoration: none;">Home</a> |
-                <a href="#" onclick="showUploadModal(); return false;" style="text-decoration: none;">Upload</a> |
-                <a href="#" onclick="alert('About Rayvid\n\nA free platform for video sharing and discovery.'); return false;" style="text-decoration: none;">About</a> |
-                <a href="#" onclick="alert('Contact: support@rayvid.example.com'); return false;" style="text-decoration: none;">Contact</a>
-            </div>
-            <p>© 2024 Rayvid. All rights reserved. | <small>Videos are hosted on Google Drive by uploaders</small></p>
-        </div>
-    </footer>
-
-    <script>
-        // Initial Data Storage
-        let videos = [
-            {
-                id: 1,
-                title: "Introduction to Web Development for Beginners",
-                description: "Learn the basics of HTML, CSS and JavaScript in this comprehensive tutorial for absolute beginners.",
-                driveId: "1WZQ_9cL-sfL2q5r6t8kYvxJy7NcHlMpB",
-                category: "Education",
-                duration: "12:45",
-                views: 1250,
-                uploaderName: "John Doe",
-                uploadDate: "2024-03-15",
-                tags: ["web development", "tutorial", "beginners", "coding", "programming"],
-                thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 2,
-                title: "Mountain Adventure Documentary - Himalayas Expedition",
-                description: "Exploring the highest peaks and breathtaking landscapes of the Himalayas in this epic adventure documentary.",
-                driveId: "1ABC123def456GHI789jkl",
-                category: "Entertainment",
-                duration: "24:30",
-                views: 850,
-                uploaderName: "Adventure Seeker",
-                uploadDate: "2024-03-10",
-                tags: ["adventure", "documentary", "mountains", "travel", "nature"],
-                thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 3,
-                title: "Advanced JavaScript Techniques 2024",
-                description: "Master modern JavaScript with ES6+ features, async/await, and best practices for professional development.",
-                driveId: "1XYZ789abc123DEF456ghi",
-                category: "Technology",
-                duration: "18:15",
-                views: 2100,
-                uploaderName: "Tech Guru",
-                uploadDate: "2024-03-05",
-                tags: ["javascript", "programming", "web development", "coding", "es6"],
-                thumbnail: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 4,
-                title: "Gaming Highlights - Epic Fortnite Moments",
-                description: "The best gaming moments from top Fortnite streamers around the world. Epic wins and funny fails!",
-                driveId: "1MNO456pqr789STU012vwx",
-                category: "Gaming",
-                duration: "15:20",
-                views: 3200,
-                uploaderName: "Gamer Pro",
-                uploadDate: "2024-03-01",
-                tags: ["gaming", "fortnite", "highlights", "streaming", "esports"],
-                thumbnail: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 5,
-                title: "Learn Guitar in 30 Days - Complete Course",
-                description: "A complete beginner's guide to playing your favorite songs on guitar. From basics to advanced chords.",
-                driveId: "1JKL012mno345PQR678stu",
-                category: "Music",
-                duration: "22:10",
-                views: 950,
-                uploaderName: "Music Master",
-                uploadDate: "2024-02-28",
-                tags: ["guitar", "music", "tutorial", "beginners", "learning"],
-                thumbnail: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 6,
-                title: "Football Skills Tutorial - Improve Your Game",
-                description: "Professional football training techniques to improve your skills, dribbling, and shooting.",
-                driveId: "1VWX345yza678BCD901efg",
-                category: "Sports",
-                duration: "16:45",
-                views: 1800,
-                uploaderName: "Sports Coach",
-                uploadDate: "2024-02-25",
-                tags: ["football", "sports", "training", "soccer", "fitness"],
-                thumbnail: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            }
-        ];
-
-        // Default thumbnails for each category
-        const defaultThumbnails = {
-            "Entertainment": "https://images.unsplash.com/photo-1489599809516-9827b6d1cf13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Education": "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Gaming": "https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Technology": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Music": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Sports": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Comedy": "https://images.unsplash.com/photo-1545239351-ef35f43d514b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Tutorial": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Other": "https://images.unsplash.com/photo-1574717024453-1f2b07e6c3e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "default": "https://images.unsplash.com/photo-1536240478700-b869070f9279?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-        };
-
-        let adSettings = {
-            bannerAds: false,
-            videoAds: false,
-            adRevenue: 0.00
-        };
-
-        let adminPassword = "admin123";
-        let currentVideoId = null;
-        let currentCategory = "all";
-        let searchQuery = "";
-
-        // DOM Elements
-        const videoGrid = document.getElementById('video-grid');
-        const videoPlayerPage = document.getElementById('video-player-page');
-        const adminOverlay = document.getElementById('admin-overlay');
-        const uploadModal = document.getElementById('upload-modal');
-        const searchInput = document.getElementById('search-input');
-        const categoriesList = document.getElementById('categories-list');
-        const searchResultsInfo = document.getElementById('search-results-info');
-        const emptyState = document.getElementById('empty-state');
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            renderVideoGrid();
-            setupEventListeners();
-            loadAdSettings();
-            updateCategories();
-            updateAnalytics();
-            
-            // Set up search with debounce
-            let searchTimeout;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    searchVideos(this.value);
-                }, 300);
-            });
-            
-            // Load data from localStorage
-            loadFromLocalStorage();
-            
-            // Initialize AdSense
-            initializeAdSense();
+    // Red-pink confetti with hearts
+    function redPinkConfetti() {
+      // Regular confetti
+      confetti({
+        particleCount: 200,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#ef4444', '#ec4899', '#f87171', '#fb7185', '#f472b6', '#f9a8d4'],
+        shapes: ['circle', 'heart'],
+        scalar: 1.2
+      });
+      
+      // Heart-shaped confetti
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#ef4444', '#ec4899'],
+          shapes: ['heart'],
+          scalar: 2
         });
+      }, 300);
+    }
 
-        // Theme Toggle
-        function toggleTheme() {
-            const body = document.body;
-            const themeIcon = document.querySelector('.theme-toggle i');
-            
-            if(body.classList.contains('dark-mode')) {
-                body.classList.remove('dark-mode');
-                body.classList.add('light-mode');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                body.classList.remove('light-mode');
-                body.classList.add('dark-mode');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-            
-            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
+    // Scroll Logic
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    const scrollBottomBtn = document.getElementById('scrollBottomBtn');
 
-        // Check for saved theme
-        const savedTheme = localStorage.getItem('theme');
-        if(savedTheme === 'light') {
-            document.body.classList.remove('dark-mode');
-            document.body.classList.add('light-mode');
-            document.querySelector('.theme-toggle i').classList.remove('fa-moon');
-            document.querySelector('.theme-toggle i').classList.add('fa-sun');
-        }
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.replace('opacity-0', 'opacity-100');
+        scrollTopBtn.classList.replace('invisible', 'visible');
+      } else {
+        scrollTopBtn.classList.replace('opacity-100', 'opacity-0');
+        scrollTopBtn.classList.replace('visible', 'invisible');
+      }
+    });
 
-        // Load data from localStorage
-        function loadFromLocalStorage() {
-            const savedVideos = localStorage.getItem('videos');
-            if(savedVideos) {
-                videos = JSON.parse(savedVideos);
-                renderVideoGrid();
-                updateCategories();
-            }
-            
-            const savedAdSettings = localStorage.getItem('adSettings');
-            if(savedAdSettings) {
-                adSettings = JSON.parse(savedAdSettings);
-                loadAdSettings();
-            }
-            
-            const savedPassword = localStorage.getItem('adminPassword');
-            if(savedPassword) {
-                adminPassword = savedPassword;
-            }
-        }
+    scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollBottomBtn.onclick = () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
-        // Initialize AdSense
-        function initializeAdSense() {
-            // Initialize AdSense ads
-            if(window.adsbygoogle) {
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            }
-        }
+    // Stats Logic - Only total messages
+    let totalMessages = 0;
 
-        // Get default thumbnail for a category
-        function getDefaultThumbnail(category) {
-            return defaultThumbnails[category] || defaultThumbnails.default;
-        }
+    // Initialize with 1.5K if not already set
+    if (!localStorage.getItem('totalSent')) {
+      localStorage.setItem('totalSent', 1500);
+    }
 
-        // Render Video Grid
-        function renderVideoGrid(filteredVideos = null) {
-            const videosToShow = filteredVideos || getFilteredVideos();
-            videoGrid.innerHTML = '';
-            
-            if(videosToShow.length === 0) {
-                emptyState.classList.remove('hidden');
-                searchResultsInfo.classList.add('hidden');
-                return;
-            }
-            
-            emptyState.classList.add('hidden');
-            
-            videosToShow.forEach(video => {
-                const videoCard = document.createElement('article');
-                videoCard.className = 'video-card';
-                videoCard.setAttribute('role', 'article');
-                videoCard.innerHTML = `
-                    <div style="position: relative;">
-                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail" loading="lazy">
-                        <div class="duration">${video.duration}</div>
-                    </div>
-                    <div class="video-info">
-                        <h3 class="video-title">${video.title}</h3>
-                        <div class="video-meta">
-                            <span><i class="far fa-eye"></i> ${video.views.toLocaleString()}</span>
-                            <span class="category-tag">${video.category}</span>
-                        </div>
-                        ${video.tags && video.tags.length > 0 ? `
-                            <div class="tags-container">
-                                ${video.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                        <div class="uploader-info">
-                            <i class="far fa-user"></i> ${video.uploaderName}
-                        </div>
-                    </div>
-                `;
-                
-                videoCard.addEventListener('click', () => playVideo(video.id));
-                videoCard.setAttribute('tabindex', '0');
-                videoCard.addEventListener('keypress', (e) => {
-                    if(e.key === 'Enter') playVideo(video.id);
-                });
-                
-                videoGrid.appendChild(videoCard);
-            });
-        }
+    function formatStat(num) {
+      if(num >= 1000) return (num/1000).toFixed(1) + 'K';
+      return num;
+    }
 
-        // Get filtered videos based on category and search
-        function getFilteredVideos() {
-            let filtered = videos;
-            
-            // Apply category filter
-            if(currentCategory !== "all") {
-                filtered = filtered.filter(video => video.category === currentCategory);
-            }
-            
-            // Apply search filter
-            if(searchQuery.trim() !== "") {
-                const query = searchQuery.toLowerCase();
-                filtered = filtered.filter(video => 
-                    video.title.toLowerCase().includes(query) ||
-                    video.description.toLowerCase().includes(query) ||
-                    video.uploaderName.toLowerCase().includes(query) ||
-                    (video.tags && video.tags.some(tag => tag.toLowerCase().includes(query)))
-                );
-            }
-            
-            return filtered;
+    function updateCounterWithAnimation(newValue, oldValue) {
+      const counterElement = document.getElementById('totalSent');
+      const badgeElement = document.getElementById('navBadge');
+      
+      // Calculate animation steps
+      const steps = 20;
+      const increment = (newValue - oldValue) / steps;
+      let current = oldValue;
+      
+      function animateStep() {
+        current += increment;
+        const displayValue = Math.round(current);
+        
+        // Update display
+        counterElement.innerText = formatStat(displayValue);
+        badgeElement.innerText = formatStat(displayValue);
+        
+        // Add spark effect occasionally
+        if (Math.random() > 0.7) {
+          createCounterSparks(1);
         }
+        
+        // Shake effect
+        if (current < newValue) {
+          counterElement.style.transform = 'scale(1.1) rotate(5deg)';
+          setTimeout(() => {
+            counterElement.style.transform = 'scale(1) rotate(0deg)';
+          }, 100);
+        }
+        
+        if (current < newValue) {
+          requestAnimationFrame(animateStep);
+        } else {
+          // Final update
+          counterElement.innerText = formatStat(newValue);
+          badgeElement.innerText = formatStat(newValue);
+          counterElement.style.transform = 'scale(1.2)';
+          setTimeout(() => {
+            counterElement.style.transform = 'scale(1)';
+          }, 200);
+          
+          // Big spark effect
+          createCounterSparks(10);
+        }
+      }
+      
+      animateStep();
+    }
 
-        // Search Videos
-        function searchVideos(query) {
-            searchQuery = query.toLowerCase().trim();
-            
-            if(searchQuery === "") {
-                searchResultsInfo.classList.add('hidden');
-                renderVideoGrid();
-                updateCategories();
-                return;
-            }
-            
-            const filteredVideos = getFilteredVideos();
-            
-            document.getElementById('search-query').textContent = query;
-            document.getElementById('results-count').textContent = filteredVideos.length;
-            searchResultsInfo.classList.remove('hidden');
-            
-            renderVideoGrid(filteredVideos);
+    function updateStatsDisplay() {
+      const total = parseInt(localStorage.getItem('totalSent') || 0);
+      const counterElement = document.getElementById('totalSent');
+      const badgeElement = document.getElementById('navBadge');
+      
+      // Initial animation
+      let displayNumber = 0;
+      const interval = setInterval(() => {
+        displayNumber += Math.ceil(total / 30);
+        if (displayNumber >= total) {
+          displayNumber = total;
+          clearInterval(interval);
         }
+        counterElement.innerText = formatStat(displayNumber);
+        badgeElement.innerText = formatStat(displayNumber);
+      }, 30);
+    }
 
-        // Update Categories List
-        function updateCategories() {
-            categoriesList.innerHTML = '';
-            
-            // Get all unique categories
-            const categories = ["all", ...new Set(videos.map(video => video.category))];
-            
-            // Count videos per category
-            const categoryCounts = {};
-            videos.forEach(video => {
-                categoryCounts[video.category] = (categoryCounts[video.category] || 0) + 1;
-            });
-            
-            categories.forEach(category => {
-                const listItem = document.createElement('li');
-                const count = category === "all" ? videos.length : (categoryCounts[category] || 0);
-                
-                listItem.className = `category-item ${currentCategory === category ? 'active' : ''}`;
-                listItem.innerHTML = `
-                    <span>${category === "all" ? "All Videos" : category}</span>
-                    <span class="category-count">${count}</span>
-                `;
-                
-                listItem.addEventListener('click', () => {
-                    currentCategory = category;
-                    updateCategories();
-                    renderVideoGrid();
-                    
-                    // Hide search results if switching categories
-                    if(searchQuery !== "") {
-                        searchQuery = "";
-                        searchInput.value = "";
-                        searchResultsInfo.classList.add('hidden');
-                    }
-                });
-                
-                categoriesList.appendChild(listItem);
-            });
-        }
+    function incrementStats() {
+      const oldValue = parseInt(localStorage.getItem('totalSent') || 0);
+      const newValue = oldValue + 1;
+      localStorage.setItem('totalSent', newValue);
+      
+      // Animate the counter
+      updateCounterWithAnimation(newValue, oldValue);
+      
+      // Create celebration effects
+      createCounterSparks(15);
+      
+      // Add temporary glow to counter
+      const counterCard = document.querySelector('.counter-card');
+      counterCard.style.boxShadow = '0 0 50px rgba(236, 72, 153, 0.5)';
+      setTimeout(() => {
+        counterCard.style.boxShadow = '';
+      }, 1000);
+    }
 
-        // Show Upload Modal
-        function showUploadModal() {
-            uploadModal.style.display = 'flex';
-            document.getElementById('video-title-input').focus();
-            
-            // Show default thumbnail preview based on selected category
-            updateDefaultThumbnailPreview();
-        }
+    // Initialize display
+    updateStatsDisplay();
 
-        // Close Upload Modal
-        function closeUploadModal() {
-            uploadModal.style.display = 'none';
-            document.getElementById('upload-form').reset();
-            document.getElementById('thumbnail-preview').style.display = 'none';
-            document.getElementById('default-thumbnail-info').style.display = 'none';
-            document.getElementById('custom-category-group').style.display = 'none';
-        }
+    // Form Submission
+    const form = document.getElementById('contactForm');
+    const charCount = document.getElementById('charCount');
 
-        // Update default thumbnail preview based on selected category
-        function updateDefaultThumbnailPreview() {
-            const categorySelect = document.getElementById('video-category-input');
-            const thumbnailPreview = document.getElementById('thumbnail-preview');
-            const defaultThumbnailInfo = document.getElementById('default-thumbnail-info');
-            const thumbnailUrlInput = document.getElementById('thumbnail-url');
-            
-            // Show default thumbnail for current category
-            const category = categorySelect.value || "default";
-            const defaultThumbnail = getDefaultThumbnail(category);
-            
-            thumbnailPreview.src = defaultThumbnail;
-            thumbnailPreview.style.display = 'block';
-            defaultThumbnailInfo.style.display = 'block';
-            
-            // If user enters a URL, update the preview
-            thumbnailUrlInput.addEventListener('input', function() {
-                if(this.value.trim() !== '') {
-                    thumbnailPreview.src = this.value;
-                    defaultThumbnailInfo.style.display = 'none';
-                    thumbnailPreview.onerror = function() {
-                        thumbnailPreview.src = defaultThumbnail;
-                        defaultThumbnailInfo.style.display = 'block';
-                        alert('Could not load thumbnail image. Using default thumbnail instead.');
-                    };
-                } else {
-                    thumbnailPreview.src = defaultThumbnail;
-                    defaultThumbnailInfo.style.display = 'block';
-                }
-            });
-        }
+    form.message.oninput = (e) => { 
+      charCount.innerText = `${e.target.value.length}/1000`;
+      if (e.target.value.length > 800) {
+        charCount.classList.add('text-red-400');
+      } else {
+        charCount.classList.remove('text-red-400');
+      }
+    };
 
-        // Show Admin Portal with password prompt
-        function showAdminPortal() {
-            adminOverlay.style.display = 'flex';
-            document.getElementById('admin-password-prompt').classList.remove('hidden');
-            document.getElementById('admin-panel-content').classList.add('hidden');
-            document.getElementById('admin-password').value = '';
-            document.getElementById('admin-password').focus();
-        }
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('formStatus');
+      
+      if (form.message.value.trim().length === 0) {
+        status.innerHTML = "<p class='text-red-400'><i class='fas fa-exclamation-circle mr-2'></i>Please enter a message</p>";
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = "<i class='fas fa-lock mr-2'></i> Encrypting...";
 
-        // Verify Admin Password
-        function verifyAdminPassword() {
-            const passwordInput = document.getElementById('admin-password').value;
-            
-            if(passwordInput === adminPassword) {
-                document.getElementById('admin-password-prompt').classList.add('hidden');
-                document.getElementById('admin-panel-content').classList.remove('hidden');
-                updateAdminVideoList();
-                updateAnalytics();
-            } else {
-                alert('Incorrect password! Try: admin123');
-                document.getElementById('admin-password').value = '';
-                document.getElementById('admin-password').focus();
-            }
-        }
+      emailjs.send("service_94sts5a", "template_rztfe9z", {
+        message: form.message.value,
+        timestamp: new Date().toLocaleString()
+      }).then(() => {
+        status.innerHTML = "<p class='text-pink-400 animate-pulse'><i class='fas fa-heart mr-2'></i>Message sent successfully!</p>";
+        incrementStats();
+        redPinkConfetti();
+        
+        // Add temporary success glow
+        document.getElementById('messageFormContainer').classList.add('ring-2', 'ring-pink-500');
+        setTimeout(() => {
+          document.getElementById('messageFormContainer').classList.remove('ring-2', 'ring-pink-500');
+        }, 2000);
+        
+        form.reset();
+        charCount.innerText = "0/1000";
+        charCount.classList.remove('text-red-400');
+      }).catch(() => {
+        status.innerHTML = "<p class='text-red-400'><i class='fas fa-exclamation-triangle mr-2'></i>Error sending message. Please try again.</p>";
+      }).finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Send Anonymous Message <i class="fa-solid fa-heart ml-2"></i>';
+      });
+    };
 
-        // Close Admin Portal
-        function closeAdminPortal() {
-            adminOverlay.style.display = 'none';
-        }
+    // Initialize visual effects
+    setTimeout(() => {
+      createFloatingHearts();
+      // Create initial sparks
+      setInterval(() => {
+        createCounterSparks(2);
+      }, 3000);
+    }, 500);
 
-        // Switch Admin Tab
-        function switchAdminTab(tabName) {
-            // Update active tab button
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Show active section
-            document.querySelectorAll('.admin-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-section`).classList.add('active');
-        }
+    // Add hover effect to counter
+    const counterCard = document.querySelector('.counter-card');
+    counterCard.addEventListener('mouseenter', () => {
+      createCounterSparks(8);
+    });
 
-        // Update Admin Video List
-        function updateAdminVideoList() {
-            const adminVideoList = document.getElementById('admin-video-list');
-            adminVideoList.innerHTML = '';
-            
-            videos.forEach(video => {
-                const videoItem = document.createElement('div');
-                videoItem.className = 'admin-video-item';
-                videoItem.innerHTML = `
-                    <h4>${video.title}</h4>
-                    <p style="font-size: 0.9rem; margin: 0.5rem 0;">
-                        ${video.category} • ${video.duration} • Uploaded by: ${video.uploaderName}
-                    </p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
-                        <span><i class="far fa-eye"></i> ${video.views} views</span>
-                        <span>${video.uploadDate}</span>
-                    </div>
-                    <div class="video-actions">
-                        <button class="action-btn edit-btn" onclick="editVideo(${video.id})">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteVideo(${video.id})">Delete</button>
-                    </div>
-                `;
-                
-                adminVideoList.appendChild(videoItem);
-            });
-        }
-
-        // Update Analytics
-        function updateAnalytics() {
-            const totalViews = videos.reduce((sum, video) => sum + video.views, 0);
-            const totalVideos = videos.length;
-            
-            // Get unique uploaders
-            const uploaders = [...new Set(videos.map(video => video.uploaderName))];
-            const categories = [...new Set(videos.map(video => video.category))];
-            
-            document.getElementById('total-views').textContent = totalViews.toLocaleString();
-            document.getElementById('total-videos').textContent = totalVideos;
-            document.getElementById('ad-revenue').textContent = adSettings.adRevenue.toFixed(2);
-            document.getElementById('total-uploaders').textContent = uploaders.length;
-            document.getElementById('total-categories').textContent = categories.length;
-            
-            // Update popular videos list
-            const popularVideosList = document.getElementById('popular-videos-list');
-            popularVideosList.innerHTML = '';
-            
-            // Sort videos by views and take top 5
-            const popularVideos = [...videos]
-                .sort((a, b) => b.views - a.views)
-                .slice(0, 5);
-            
-            popularVideos.forEach(video => {
-                const videoItem = document.createElement('div');
-                videoItem.className = 'admin-video-item';
-                videoItem.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <img src="${video.thumbnail}" alt="${video.title}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;">
-                        <div style="flex: 1;">
-                            <h4 style="margin: 0;">${video.title}</h4>
-                            <p style="font-size: 0.9rem; margin: 0.5rem 0;">
-                                ${video.views.toLocaleString()} views • ${video.uploaderName}
-                            </p>
-                        </div>
-                    </div>
-                `;
-                popularVideosList.appendChild(videoItem);
-            });
-            
-            // Update category distribution
-            const categoryDistribution = document.getElementById('category-distribution');
-            categoryDistribution.innerHTML = '';
-            
-            // Count videos per category
-            const categoryCounts = {};
-            videos.forEach(video => {
-                categoryCounts[video.category] = (categoryCounts[video.category] || 0) + 1;
-            });
-            
-            // Display category distribution
-            Object.entries(categoryCounts).forEach(([category, count]) => {
-                const percentage = Math.round((count / totalVideos) * 100);
-                const bar = document.createElement('div');
-                bar.style.marginBottom = '0.5rem';
-                bar.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
-                        <span>${category}</span>
-                        <span>${count} videos (${percentage}%)</span>
-                    </div>
-                    <div style="background-color: #e0e0e0; border-radius: 10px; height: 10px;">
-                        <div style="background-color: var(--primary); width: ${percentage}%; height: 100%; border-radius: 10px;"></div>
-                    </div>
-                `;
-                categoryDistribution.appendChild(bar);
-            });
-        }
-
-        // Play Video
-        function playVideo(videoId) {
-            const video = videos.find(v => v.id === videoId);
-            if(!video) return;
-            
-            currentVideoId = videoId;
-            
-            // Update video info with proper HTML structure for SEO
-            document.getElementById('video-title').textContent = video.title;
-            document.getElementById('video-category').textContent = video.category;
-            document.getElementById('video-description').textContent = video.description;
-            document.getElementById('view-count').textContent = (video.views + 1).toLocaleString();
-            document.getElementById('uploader-name-display').textContent = video.uploaderName;
-            document.getElementById('upload-date').textContent = video.uploadDate;
-            
-            // Update tags
-            const tagsContainer = document.getElementById('video-tags-container');
-            tagsContainer.innerHTML = '';
-            if(video.tags && video.tags.length > 0) {
-                video.tags.forEach(tag => {
-                    const tagElement = document.createElement('span');
-                    tagElement.className = 'tag';
-                    tagElement.textContent = tag;
-                    tagsContainer.appendChild(tagElement);
-                });
-            }
-            
-            // Extract Drive ID
-            let driveId = video.driveId;
-            
-            // If it's a full URL, extract the ID
-            if(driveId.includes('drive.google.com')) {
-                const match = driveId.match(/\/d\/([^\/]+)/);
-                if(match) driveId = match[1];
-            }
-            
-            // Set up the Drive iframe
-            const driveUrl = `https://drive.google.com/file/d/${driveId}/preview`;
-            const drivePlayer = document.getElementById('drive-player');
-            drivePlayer.src = driveUrl;
-            
-            // Update page title for better SEO
-            document.title = `${video.title} - Rayvid`;
-            
-            // Show video player, hide home
-            document.querySelector('.container').style.display = 'none';
-            document.querySelectorAll('.adsense-container').forEach(el => el.style.display = 'none');
-            videoPlayerPage.classList.remove('hidden');
-            
-            // Increment view count
-            video.views++;
-            updateAnalytics();
-            
-            // Store in localStorage
-            localStorage.setItem('videos', JSON.stringify(videos));
-            
-            // Track video play in localStorage for analytics
-            const videoPlays = JSON.parse(localStorage.getItem('videoPlays') || '[]');
-            videoPlays.push({
-                videoId: videoId,
-                videoTitle: video.title,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('videoPlays', JSON.stringify(videoPlays));
-        }
-
-        // Show Home Page
-        function showHome() {
-            document.title = "Rayvid - Free Video Sharing Platform";
-            document.querySelector('.container').style.display = 'flex';
-            document.querySelectorAll('.adsense-container').forEach(el => el.style.display = 'block');
-            videoPlayerPage.classList.add('hidden');
-            
-            // Reset video player
-            document.getElementById('drive-player').src = '';
-            
-            // Reset search if active
-            if(searchQuery !== "") {
-                searchQuery = "";
-                searchInput.value = "";
-                searchResultsInfo.classList.add('hidden');
-            }
-            
-            // Update video grid and categories
-            renderVideoGrid();
-            updateCategories();
-        }
-
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Upload Form for Everyone
-            document.getElementById('upload-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form values
-                const driveLink = document.getElementById('drive-link').value;
-                const title = document.getElementById('video-title-input').value;
-                const description = document.getElementById('video-description-input').value;
-                const categorySelect = document.getElementById('video-category-input');
-                const category = categorySelect.value === "Other" 
-                    ? document.getElementById('custom-category').value 
-                    : categorySelect.value;
-                const thumbnailUrl = document.getElementById('thumbnail-url').value;
-                const tagsInput = document.getElementById('video-tags').value;
-                const uploaderName = document.getElementById('uploader-name').value;
-                
-                // Validate required fields
-                if(!driveLink || !title || !category || !uploaderName) {
-                    alert('Please fill in all required fields marked with *');
-                    return;
-                }
-                
-                // Validate category
-                if(categorySelect.value === "Other" && !document.getElementById('custom-category').value) {
-                    alert('Please enter a custom category name');
-                    return;
-                }
-                
-                // Extract Drive ID from link
-                let driveId = '';
-                const match = driveLink.match(/\/d\/([^\/]+)/);
-                if(match) {
-                    driveId = match[1];
-                } else {
-                    driveId = driveLink;
-                }
-                
-                // Process tags
-                const tags = tagsInput.split(',')
-                    .map(tag => tag.trim())
-                    .filter(tag => tag !== "")
-                    .slice(0, 10); // Limit to 10 tags
-                
-                // Use provided thumbnail or default thumbnail based on category
-                const finalThumbnail = thumbnailUrl.trim() !== "" 
-                    ? thumbnailUrl 
-                    : getDefaultThumbnail(category);
-                
-                // Create new video object
-                const newVideo = {
-                    id: videos.length > 0 ? Math.max(...videos.map(v => v.id)) + 1 : 1,
-                    title: title,
-                    description: description,
-                    driveId: driveId,
-                    category: category,
-                    duration: "10:00", // Default duration
-                    views: 0,
-                    uploaderName: uploaderName,
-                    uploadDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-                    tags: tags,
-                    thumbnail: finalThumbnail
-                };
-                
-                // Add to videos array
-                videos.push(newVideo);
-                
-                // Save to localStorage
-                localStorage.setItem('videos', JSON.stringify(videos));
-                
-                // Reset form and close modal
-                this.reset();
-                closeUploadModal();
-                
-                // Update UI
-                renderVideoGrid();
-                updateCategories();
-                updateAnalytics();
-                
-                // Show success message
-                alert('Video uploaded successfully! Thank you for sharing.');
-            });
-            
-            // Show/hide custom category field
-            document.getElementById('video-category-input').addEventListener('change', function() {
-                const customCategoryGroup = document.getElementById('custom-category-group');
-                if(this.value === "Other") {
-                    customCategoryGroup.style.display = 'block';
-                } else {
-                    customCategoryGroup.style.display = 'none';
-                }
-                
-                // Update default thumbnail preview when category changes
-                updateDefaultThumbnailPreview();
-            });
-            
-            // Enter key to search
-            searchInput.addEventListener('keypress', function(e) {
-                if(e.key === 'Enter') {
-                    searchVideos(this.value);
-                }
-            });
-        }
-
-        // Load Ad Settings to UI
-        function loadAdSettings() {
-            document.getElementById('banner-ads-toggle').checked = adSettings.bannerAds;
-            document.getElementById('video-ads-toggle').checked = adSettings.videoAds;
-            
-            // Show/hide ads based on settings
-            toggleAdsVisibility(adSettings.bannerAds);
-        }
-
-        // Save Ad Settings
-        function saveAdSettings() {
-            adSettings.bannerAds = document.getElementById('banner-ads-toggle').checked;
-            adSettings.videoAds = document.getElementById('video-ads-toggle').checked;
-            
-            localStorage.setItem('adSettings', JSON.stringify(adSettings));
-            toggleAdsVisibility(adSettings.bannerAds);
-            
-            alert('Ad settings saved! Ads are ' + (adSettings.bannerAds ? 'ON' : 'OFF'));
-        }
-
-        // Toggle Ads Visibility
-        function toggleAdsVisibility(showAds) {
-            const ads = document.querySelectorAll('.adsense-sidebar, .adsense-container, .adsense-leaderboard');
-            ads.forEach(ad => {
-                ad.style.display = showAds ? 'block' : 'none';
-            });
-            
-            // Refresh ads when made visible
-            if(showAds && window.adsbygoogle) {
-                setTimeout(() => {
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                }, 500);
-            }
-        }
-
-        // Delete Video
-        function deleteVideo(videoId) {
-            if(confirm('Are you sure you want to delete this video?')) {
-                videos = videos.filter(video => video.id !== videoId);
-                localStorage.setItem('videos', JSON.stringify(videos));
-                updateAdminVideoList();
-                renderVideoGrid();
-                updateCategories();
-                updateAnalytics();
-                alert('Video deleted successfully!');
-            }
-        }
-
-        // Edit Video
-        function editVideo(videoId) {
-            const video = videos.find(v => v.id === videoId);
-            if(!video) return;
-            
-            // For simplicity, we'll use the upload form to edit
-            showUploadModal();
-            
-            // Fill form with video data
-            document.getElementById('drive-link').value = `https://drive.google.com/file/d/${video.driveId}/view`;
-            document.getElementById('video-title-input').value = video.title;
-            document.getElementById('video-description-input').value = video.description;
-            document.getElementById('thumbnail-url').value = video.thumbnail;
-            document.getElementById('video-tags').value = video.tags ? video.tags.join(', ') : '';
-            document.getElementById('uploader-name').value = video.uploaderName;
-            
-            // Handle category
-            const categorySelect = document.getElementById('video-category-input');
-            const existingOption = Array.from(categorySelect.options).find(opt => opt.value === video.category);
-            if(existingOption) {
-                categorySelect.value = video.category;
-                document.getElementById('custom-category-group').style.display = 'none';
-            } else {
-                categorySelect.value = "Other";
-                document.getElementById('custom-category').value = video.category;
-                document.getElementById('custom-category-group').style.display = 'block';
-            }
-            
-            // Show thumbnail preview
-            const thumbnailPreview = document.getElementById('thumbnail-preview');
-            const defaultThumbnailInfo = document.getElementById('default-thumbnail-info');
-            thumbnailPreview.src = video.thumbnail;
-            thumbnailPreview.style.display = 'block';
-            
-            // Check if it's a default thumbnail
-            const defaultThumbs = Object.values(defaultThumbnails);
-            if(defaultThumbs.includes(video.thumbnail)) {
-                defaultThumbnailInfo.style.display = 'block';
-            } else {
-                defaultThumbnailInfo.style.display = 'none';
-            }
-            
-            // Modify submit behavior to update instead of create
-            const form = document.getElementById('upload-form');
-            const originalSubmit = form.onsubmit;
-            
-            form.onsubmit = function(e) {
-                e.preventDefault();
-                
-                // Get updated values
-                const driveLink = document.getElementById('drive-link').value;
-                const title = document.getElementById('video-title-input').value;
-                const description = document.getElementById('video-description-input').value;
-                const category = categorySelect.value === "Other" 
-                    ? document.getElementById('custom-category').value 
-                    : categorySelect.value;
-                const thumbnailUrl = document.getElementById('thumbnail-url').value;
-                const tagsInput = document.getElementById('video-tags').value;
-                const uploaderName = document.getElementById('uploader-name').value;
-                
-                // Update video
-                video.title = title;
-                video.description = description;
-                video.category = category;
-                video.thumbnail = thumbnailUrl || getDefaultThumbnail(category);
-                video.tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
-                video.uploaderName = uploaderName;
-                
-                // Extract Drive ID
-                let driveId = '';
-                const match = driveLink.match(/\/d\/([^\/]+)/);
-                if(match) {
-                    driveId = match[1];
-                } else {
-                    driveId = driveLink;
-                }
-                video.driveId = driveId;
-                
-                // Save to localStorage
-                localStorage.setItem('videos', JSON.stringify(videos));
-                
-                // Reset form and close modal
-                form.reset();
-                closeUploadModal();
-                
-                // Update UI
-                updateAdminVideoList();
-                renderVideoGrid();
-                updateCategories();
-                updateAnalytics();
-                
-                // Restore original submit behavior
-                form.onsubmit = originalSubmit;
-                
-                alert('Video updated successfully!');
-            };
-            
-            alert('Video data loaded. Make your changes and submit to update.');
-        }
-    </script>
+    // Random counter animations
+    setInterval(() => {
+      const counterNumber = document.getElementById('totalSent');
+      counterNumber.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        counterNumber.style.transform = 'scale(1)';
+      }, 200);
+    }, 8000);
+  </script>
 </body>
-</html> 
+</html>
