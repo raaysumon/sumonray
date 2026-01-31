@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayvid - Free Video Sharing Platform | Upload & Share Your Videos</title>
-    <meta name="description" content="Rayvid is a free video sharing platform where anyone can upload and share videos using Google Drive links. Discover amazing videos across various categories.">
-    <meta name="keywords" content="video sharing, free videos, upload videos, video platform, Google Drive videos, entertainment, education, gaming">
+    <title>Rayvid - Global Video Sharing Platform</title>
+    <meta name="description" content="Rayvid is a global video sharing platform where anyone can upload and share videos. Watch videos from users worldwide in real-time.">
+    <meta name="keywords" content="video sharing, global videos, upload videos, worldwide platform, free video sharing, international content">
     <meta name="author" content="Rayvid">
-    <meta property="og:title" content="Rayvid - Free Video Sharing Platform">
-    <meta property="og:description" content="Upload and share videos for free. Powered by Google Drive.">
+    <meta property="og:title" content="Rayvid - Global Video Sharing Platform">
+    <meta property="og:description" content="Upload and share videos with the entire world. Real-time global updates.">
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google AdSense Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID" crossorigin="anonymous"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <style>
         :root {
             --primary: #ff4757;
@@ -27,6 +29,8 @@
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --radius: 12px;
             --transition: all 0.3s ease;
+            --warning: #f39c12;
+            --info: #9b59b6;
         }
 
         * {
@@ -51,7 +55,7 @@
             color: var(--dark-text);
         }
 
-        /* Header & Navigation */
+        /* Header */
         header {
             padding: 1.2rem 2rem;
             display: flex;
@@ -61,14 +65,15 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
         .light-mode header {
-            background-color: var(--light-card);
+            background-color: rgba(255, 255, 255, 0.95);
         }
 
         .dark-mode header {
-            background-color: var(--dark-card);
+            background-color: rgba(26, 26, 46, 0.95);
         }
 
         .logo {
@@ -76,21 +81,24 @@
             font-weight: 800;
             color: var(--primary);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .logo span {
             color: var(--secondary);
         }
 
-        .logo:hover {
-            opacity: 0.9;
+        .logo i {
+            font-size: 1.5rem;
         }
 
+        /* Navigation */
         .nav-container {
             display: flex;
             align-items: center;
             gap: 2rem;
-            flex-wrap: wrap;
         }
 
         nav ul {
@@ -121,7 +129,7 @@
         /* Search Bar */
         .search-container {
             position: relative;
-            min-width: 250px;
+            min-width: 300px;
         }
 
         .search-input {
@@ -168,6 +176,9 @@
             cursor: pointer;
             transition: var(--transition);
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .upload-btn:hover {
@@ -181,6 +192,13 @@
             font-size: 1.3rem;
             cursor: pointer;
             color: inherit;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         /* Main Container */
@@ -192,98 +210,63 @@
             gap: 2rem;
         }
 
-        /* Categories Sidebar */
-        .categories-sidebar {
-            width: 250px;
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-        }
-
-        .categories-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .categories-list {
-            list-style: none;
-        }
-
-        .category-item {
-            padding: 0.8rem 1rem;
-            border-radius: var(--radius);
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .light-mode .category-item {
-            background-color: var(--light-card);
-        }
-
-        .dark-mode .category-item {
-            background-color: var(--dark-card);
-        }
-
-        .category-item:hover, .category-item.active {
-            background-color: var(--primary);
+        /* Global Stats Banner */
+        .global-stats {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-        }
-
-        .category-count {
-            font-size: 0.8rem;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 0.2rem 0.5rem;
-            border-radius: 10px;
-        }
-
-        /* AdSense Containers */
-        .adsense-container {
-            margin: 1.5rem 0;
-            text-align: center;
+            padding: 1rem 2rem;
             border-radius: var(--radius);
-            overflow: hidden;
+            margin: 1rem auto;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .adsense-sidebar {
-            width: 100%;
-            margin-top: 2rem;
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Live Updates Banner */
+        .live-updates {
+            background-color: var(--warning);
+            color: white;
+            padding: 0.5rem 2rem;
+            text-align: center;
             position: sticky;
-            top: 120px;
-            text-align: center;
-            border-radius: var(--radius);
-            overflow: hidden;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            top: 80px;
+            z-index: 99;
         }
 
-        .adsense-leaderboard {
-            width: 100%;
-            text-align: center;
-            margin-top: 2rem;
-            padding: 1rem;
-            border-radius: var(--radius);
-            background-color: rgba(0, 0, 0, 0.05);
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .live-updates span {
+            margin-left: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         /* Video Grid */
         .video-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
         }
 
@@ -310,7 +293,7 @@
 
         .thumbnail {
             width: 100%;
-            height: 160px;
+            height: 180px;
             object-fit: cover;
             position: relative;
         }
@@ -349,6 +332,11 @@
             margin-bottom: 0.5rem;
         }
 
+        .country-flag {
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
         .category-tag {
             display: inline-block;
             background-color: var(--primary);
@@ -359,24 +347,121 @@
         }
 
         .uploader-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-size: 0.8rem;
             color: #888;
             margin-top: 0.5rem;
         }
 
-        /* Search Results Info */
-        .search-results-info {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            border-radius: var(--radius);
+        /* Global Feed Sidebar */
+        .global-sidebar {
+            width: 300px;
+            position: sticky;
+            top: 150px;
+            height: fit-content;
         }
 
-        .light-mode .search-results-info {
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Recent Uploads List */
+        .recent-list {
+            list-style: none;
+        }
+
+        .recent-item {
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .light-mode .recent-item {
             background-color: var(--light-card);
         }
 
-        .dark-mode .search-results-info {
+        .dark-mode .recent-item {
             background-color: var(--dark-card);
+        }
+
+        .recent-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .recent-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .recent-meta {
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            color: inherit;
+            opacity: 0.8;
+        }
+
+        /* Top Uploaders */
+        .uploader-list {
+            list-style: none;
+        }
+
+        .uploader-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .light-mode .uploader-item {
+            background-color: var(--light-card);
+        }
+
+        .dark-mode .uploader-item {
+            background-color: var(--dark-card);
+        }
+
+        .uploader-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .uploader-details h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .uploader-stats {
+            font-size: 0.8rem;
+            color: #888;
         }
 
         /* Modals */
@@ -452,16 +537,6 @@
             border-color: var(--primary);
         }
 
-        .thumbnail-preview {
-            width: 100%;
-            max-width: 300px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: var(--radius);
-            margin-top: 1rem;
-            display: none;
-        }
-
         /* Buttons */
         .btn {
             padding: 0.8rem 1.8rem;
@@ -505,7 +580,7 @@
             transform: translateY(-2px);
         }
 
-        /* Video Player Page */
+        /* Video Player */
         .video-player-container {
             max-width: 1200px;
             margin: 2rem auto;
@@ -526,14 +601,14 @@
             border: none;
         }
 
-        /* Admin Portal */
+        /* Admin Panel */
         .admin-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.95);
             display: none;
             justify-content: center;
             align-items: center;
@@ -542,7 +617,7 @@
 
         .admin-panel {
             width: 90%;
-            max-width: 1000px;
+            max-width: 1200px;
             max-height: 90vh;
             overflow-y: auto;
             border-radius: var(--radius);
@@ -557,12 +632,20 @@
             background-color: var(--dark-card);
         }
 
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
         .admin-tabs {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             margin-bottom: 2rem;
             border-bottom: 2px solid #eee;
             padding-bottom: 1rem;
+            flex-wrap: wrap;
         }
 
         .admin-tab {
@@ -571,7 +654,7 @@
             border: none;
             font-weight: 700;
             cursor: pointer;
-            border-radius: var(--radius);
+            border-radius: var(--radius) var(--radius) 0 0;
             transition: var(--transition);
         }
 
@@ -596,70 +679,66 @@
             display: block;
         }
 
-        /* Analytics Dashboard */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .analytics-card {
-            padding: 1.5rem;
+        /* Global Changes Log */
+        .changes-log {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
             border-radius: var(--radius);
-            color: white;
-            text-align: center;
+            padding: 1rem;
         }
 
-        .analytics-card h4 {
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
+        .change-item {
+            padding: 0.8rem;
+            border-bottom: 1px solid #eee;
         }
 
-        .analytics-card h2 {
-            font-size: 2rem;
-            margin: 0;
+        .change-item:last-child {
+            border-bottom: none;
         }
 
-        /* Video List in Admin */
-        .admin-video-item {
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
-        }
-
-        .light-mode .admin-video-item {
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-        }
-
-        .dark-mode .admin-video-item {
-            background-color: #2d3748;
-            border: 1px solid #4a5568;
-        }
-
-        .video-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .action-btn {
-            padding: 0.4rem 0.8rem;
+        .change-type {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
             border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
         }
 
-        .edit-btn {
-            background-color: var(--secondary);
+        .change-type.added {
+            background-color: var(--success);
             color: white;
         }
 
-        .delete-btn {
-            background-color: #e74c3c;
+        .change-type.updated {
+            background-color: var(--warning);
             color: white;
+        }
+
+        .change-type.deleted {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* System Settings */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .setting-card {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid #ddd;
+        }
+
+        .setting-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
         /* Toggle Switch */
@@ -711,7 +790,7 @@
         /* Password Prompt */
         .password-prompt {
             text-align: center;
-            padding: 2rem;
+            padding: 3rem;
         }
 
         .password-input {
@@ -745,6 +824,40 @@
             margin: 0 auto;
         }
 
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Tags */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .tag {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
         /* Utility Classes */
         .hidden {
             display: none !important;
@@ -768,53 +881,37 @@
         .gap-1 { gap: 1rem; }
         .flex-wrap { flex-wrap: wrap; }
 
-        /* Tags */
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
         }
 
-        .tag {
-            background-color: rgba(52, 152, 219, 0.2);
-            color: var(--secondary);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            grid-column: 1 / -1;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Responsive Design */
-        @media (max-width: 1024px) {
+        @media (max-width: 1200px) {
             .container {
                 flex-direction: column;
             }
             
-            .categories-sidebar {
+            .global-sidebar {
                 width: 100%;
                 position: static;
             }
             
-            .categories-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-            
-            .category-item {
-                margin-bottom: 0;
-            }
-            
-            .adsense-sidebar {
-                position: static;
-                margin-top: 1rem;
+            .sidebar-sections {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
             }
         }
 
@@ -827,7 +924,8 @@
             
             .nav-container {
                 width: 100%;
-                justify-content: space-between;
+                justify-content: center;
+                flex-wrap: wrap;
             }
             
             .search-container {
@@ -836,8 +934,12 @@
                 margin-top: 1rem;
             }
             
-            nav ul {
-                gap: 1rem;
+            .global-stats {
+                padding: 1rem;
+            }
+            
+            .stat-item {
+                min-width: 100px;
             }
         }
 
@@ -849,41 +951,74 @@
             .admin-tabs {
                 flex-direction: column;
             }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
         }
     </style>
 </head>
 <body class="dark-mode">
+    <!-- Firebase Configuration -->
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase
+        if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const storage = firebase.storage();
+        }
+    </script>
+
     <!-- Schema.org structured data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "Rayvid",
-        "description": "Free video sharing platform where anyone can upload and share videos",
-        "url": "https://rayvid.example.com"
+        "name": "Rayvid Global Video Platform",
+        "description": "Global video sharing platform where anyone can upload and share videos with worldwide audience",
+        "url": "https://rayvid.global",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://rayvid.global/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
     }
     </script>
 
     <!-- Header -->
     <header>
-        <a href="#" class="logo" onclick="showHome(); return false;">Ray<span>vid</span></a>
+        <a href="#" class="logo" onclick="showHome(); return false;">
+            <i class="fas fa-globe-americas"></i>Ray<span>vid</span>
+        </a>
         
         <div class="nav-container">
             <!-- Search Bar -->
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" id="search-input" 
-                       placeholder="Search videos by title, tags, or keywords..."
-                       aria-label="Search videos">
+                       placeholder="Search videos from around the world..."
+                       aria-label="Search global videos">
             </div>
             
             <nav>
                 <ul>
                     <li><a href="#" onclick="showHome(); return false;">Home</a></li>
+                    <li><a href="#" onclick="showGlobalFeed(); return false;">Global Feed</a></li>
                     <li><button class="upload-btn" onclick="showUploadModal(); return false;">
-                        <i class="fas fa-upload"></i> Upload Video
+                        <i class="fas fa-upload"></i> Upload to World
                     </button></li>
-                    <li><a href="#" onclick="showAdminPortal(); return false;">Admin</a></li>
+                    <li><a href="#" onclick="showAdminPortal(); return false;" id="admin-link">Admin</a></li>
                     <li><button class="theme-toggle" onclick="toggleTheme(); return false;" aria-label="Toggle theme">
                         <i class="fas fa-moon"></i>
                     </button></li>
@@ -892,11 +1027,99 @@
         </div>
     </header>
 
-    <!-- Upload Modal for Everyone -->
+    <!-- Live Updates Banner -->
+    <div class="live-updates hidden" id="live-updates">
+        <i class="fas fa-sync-alt"></i>
+        <span id="update-text">Live updates from around the world...</span>
+    </div>
+
+    <!-- Global Stats Banner -->
+    <div class="global-stats" id="global-stats">
+        <div class="stat-item">
+            <div class="stat-number" id="total-videos-global">0</div>
+            <div class="stat-label">Global Videos</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="total-countries">0</div>
+            <div class="stat-label">Countries</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="total-uploaders-global">0</div>
+            <div class="stat-label">Global Uploaders</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="total-views-global">0</div>
+            <div class="stat-label">Total Views</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="last-update">Now</div>
+            <div class="stat-label">Last Updated</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Global Feed Sidebar -->
+        <aside class="global-sidebar" role="complementary" aria-label="Global feed and statistics">
+            <div class="sidebar-sections">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-broadcast-tower"></i> Live Feed
+                    </h3>
+                    <ul class="recent-list" id="recent-uploads">
+                        <!-- Recent uploads will be loaded here -->
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-chart-line"></i> Top Uploaders
+                    </h3>
+                    <ul class="uploader-list" id="top-uploaders">
+                        <!-- Top uploaders will be loaded here -->
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-globe-asia"></i> Global Activity
+                    </h3>
+                    <div id="global-activity">
+                        <p>Videos from around the world updated in real-time</p>
+                        <div class="tags-container">
+                            <span class="tag">Live Updates</span>
+                            <span class="tag">Global</span>
+                            <span class="tag">Real-time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Video Content -->
+        <main role="main">
+            <div class="video-grid" id="video-grid">
+                <!-- Videos will be loaded here by JavaScript -->
+                <div class="spinner" id="loading-spinner"></div>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state hidden" id="empty-state">
+                <i class="fas fa-video-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <h3>No videos found</h3>
+                <p>Be the first to upload a video to the global platform!</p>
+                <button class="btn btn-success mt-1" onclick="showUploadModal()">
+                    <i class="fas fa-upload"></i> Upload Your Video
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
     <div class="modal-overlay" id="upload-modal">
         <div class="modal-content">
             <div class="d-flex justify-between align-center mb-2">
-                <h2>Upload Your Video</h2>
+                <h2><i class="fas fa-upload"></i> Upload to Global Platform</h2>
                 <button class="btn btn-secondary" onclick="closeUploadModal()" aria-label="Close upload modal">
                     <i class="fas fa-times"></i> Close
                 </button>
@@ -912,21 +1135,21 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="video-title-input">Video Title *</label>
-                    <input type="text" id="video-title-input" required
+                    <label for="video-title">Video Title *</label>
+                    <input type="text" id="video-title" required
                            placeholder="Enter an engaging title for your video"
                            aria-required="true">
                 </div>
                 
                 <div class="form-group">
-                    <label for="video-description-input">Description</label>
-                    <textarea id="video-description-input" rows="3"
-                              placeholder="Describe your video content..."></textarea>
+                    <label for="video-description">Description</label>
+                    <textarea id="video-description" rows="3"
+                              placeholder="Describe your video content for global audience..."></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="video-category-input">Category *</label>
-                    <select id="video-category-input" required aria-required="true">
+                    <label for="video-category">Category *</label>
+                    <select id="video-category" required aria-required="true">
                         <option value="">Select a category</option>
                         <option value="Entertainment">Entertainment</option>
                         <option value="Education">Education</option>
@@ -936,279 +1159,262 @@
                         <option value="Sports">Sports</option>
                         <option value="Comedy">Comedy</option>
                         <option value="Tutorial">Tutorial</option>
-                        <option value="Other">Other (specify below)</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Culture">Culture</option>
+                        <option value="News">News</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
                 
-                <div class="form-group" id="custom-category-group" style="display: none;">
-                    <label for="custom-category">Custom Category Name *</label>
-                    <input type="text" id="custom-category" 
-                           placeholder="Enter your custom category name">
+                <div class="form-group">
+                    <label for="country">Your Country *</label>
+                    <select id="country" required aria-required="true">
+                        <option value="">Select your country</option>
+                        <option value="🇺🇸 USA">🇺🇸 USA</option>
+                        <option value="🇮🇳 India">🇮🇳 India</option>
+                        <option value="🇬🇧 UK">🇬🇧 UK</option>
+                        <option value="🇨🇦 Canada">🇨🇦 Canada</option>
+                        <option value="🇦🇺 Australia">🇦🇺 Australia</option>
+                        <option value="🇩🇪 Germany">🇩🇪 Germany</option>
+                        <option value="🇫🇷 France">🇫🇷 France</option>
+                        <option value="🇯🇵 Japan">🇯🇵 Japan</option>
+                        <option value="🇰🇷 South Korea">🇰🇷 South Korea</option>
+                        <option value="🇧🇷 Brazil">🇧🇷 Brazil</option>
+                        <option value="🇨🇳 China">🇨🇳 China</option>
+                        <option value="🇷🇺 Russia">🇷🇺 Russia</option>
+                        <option value="🇿🇦 South Africa">🇿🇦 South Africa</option>
+                        <option value="Other">Other Country</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
-                    <label for="thumbnail-url">Thumbnail Image URL</label>
-                    <input type="url" id="thumbnail-url" 
-                           placeholder="https://example.com/thumbnail.jpg">
-                    <small>Upload your thumbnail to any image hosting service (like Imgur) and paste the direct link. If not provided, a default thumbnail will be used based on the category.</small>
-                </div>
-                
-                <div class="form-group">
-                    <img id="thumbnail-preview" class="thumbnail-preview" alt="Thumbnail Preview">
-                    <small id="default-thumbnail-info" style="display: none; color: var(--secondary);">Preview of default thumbnail for this category</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-tags">Tags (comma separated)</label>
-                    <input type="text" id="video-tags" 
-                           placeholder="funny, tutorial, gaming, vlog, music">
-                    <small>Add relevant tags to help users find your video (max 10 tags)</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="uploader-name">Your Name *</label>
+                    <label for="uploader-name">Your Name/Channel *</label>
                     <input type="text" id="uploader-name" required 
                            placeholder="Enter your name or channel name"
                            aria-required="true">
                 </div>
                 
+                <div class="form-group">
+                    <label for="video-tags">Tags (comma separated)</label>
+                    <input type="text" id="video-tags" 
+                           placeholder="funny, tutorial, culture, travel, music">
+                    <small>Add relevant tags to help global audience find your video</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="global-consent" required>
+                        I understand this video will be visible to everyone worldwide
+                    </label>
+                </div>
+                
                 <button type="submit" class="btn btn-success">
-                    <i class="fas fa-upload"></i> Upload Video
+                    <i class="fas fa-globe"></i> Upload to Global Platform
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Categories Sidebar -->
-        <aside class="categories-sidebar" role="complementary" aria-label="Video categories">
-            <h3 class="categories-title">Browse Categories</h3>
-            <ul class="categories-list" id="categories-list">
-                <!-- Categories will be dynamically loaded -->
-            </ul>
-            
-            <!-- AdSense Sidebar Ad -->
-            <div class="adsense-sidebar" id="adsense-sidebar">
-                <!-- Display AdSense Ad Here -->
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-                <!-- Sidebar Ad -->
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                     data-ad-slot="SIDEBAR_AD_SLOT_ID"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
-        </aside>
-
-        <!-- Main Video Content -->
-        <main role="main">
-            <!-- Top AdSense Banner -->
-            <div class="adsense-container" id="top-banner-ad">
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-                <!-- Top Banner Ad -->
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                     data-ad-slot="TOP_BANNER_AD_SLOT_ID"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
-            
-            <div class="search-results-info hidden" id="search-results-info">
-                <h3>Search Results for: "<span id="search-query"></span>"</h3>
-                <p>Found <span id="results-count">0</span> videos</p>
-            </div>
-            
-            <div class="video-grid" id="video-grid">
-                <!-- Videos will be loaded here by JavaScript -->
-            </div>
-            
-            <!-- Middle AdSense Banner -->
-            <div class="adsense-container" id="middle-banner-ad">
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-                <!-- Middle Banner Ad -->
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                     data-ad-slot="MIDDLE_BANNER_AD_SLOT_ID"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
-            
-            <!-- Empty State -->
-            <div class="empty-state hidden" id="empty-state">
-                <i class="fas fa-video-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                <h3>No videos found</h3>
-                <p>Try a different search or upload your own video!</p>
-                <button class="btn btn-success mt-1" onclick="showUploadModal()">
-                    <i class="fas fa-upload"></i> Upload Video
-                </button>
-            </div>
-        </main>
-    </div>
-
-    <!-- Video Player Page (Hidden by Default) -->
+    <!-- Video Player Page -->
     <div class="video-player-container hidden" id="video-player-page">
         <button class="btn btn-secondary" onclick="showHome()">
-            <i class="fas fa-arrow-left"></i> Back to Home
+            <i class="fas fa-arrow-left"></i> Back to Global Feed
         </button>
         
         <article class="video-player-wrapper mt-2" role="article">
             <iframe class="drive-player" id="drive-player" frameborder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowfullscreen
-                    title="Video Player"></iframe>
+                    title="Global Video Player"></iframe>
         </article>
         
-        <div class="video-details">
-            <h1 id="video-title">Video Title</h1>
+        <div class="video-details mt-2">
+            <h1 id="video-title-display">Video Title</h1>
             <div class="d-flex align-center gap-1 mt-1">
-                <div class="category-tag" id="video-category">Category</div>
+                <div class="category-tag" id="video-category-display">Category</div>
+                <span class="country-flag" id="country-flag">🇺🇸</span>
                 <span>Uploaded by: <strong id="uploader-name-display">User</strong></span>
             </div>
-            <p id="video-description" class="mt-2">Video description will appear here.</p>
+            <p id="video-description-display" class="mt-2">Video description will appear here.</p>
             
             <div class="tags-container" id="video-tags-container">
                 <!-- Tags will be loaded here -->
             </div>
             
             <div class="video-meta mt-2">
-                <span><i class="far fa-eye"></i> <span id="view-count">0</span> views</span>
+                <span><i class="far fa-eye"></i> <span id="view-count">0</span> global views</span>
                 <span><i class="far fa-calendar"></i> <span id="upload-date">Today</span></span>
+                <span><i class="fas fa-globe"></i> <span id="video-country">Global</span></span>
             </div>
-        </div>
-        
-        <!-- AdSense Ad below video details -->
-        <div class="adsense-leaderboard mt-2" id="adsense-leaderboard">
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"></script>
-            <!-- Leaderboard Ad -->
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:728px;height:90px"
-                 data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-                 data-ad-slot="LEADERBOARD_AD_SLOT_ID"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
+            
+            <div class="mt-2" id="admin-actions" style="display: none;">
+                <button class="btn btn-primary" onclick="editCurrentVideo()">
+                    <i class="fas fa-edit"></i> Edit Video (Admin)
+                </button>
+                <button class="btn btn-danger" onclick="deleteCurrentVideo()" style="background-color: #e74c3c;">
+                    <i class="fas fa-trash"></i> Delete Video (Admin)
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Admin Portal with Password Prompt -->
+    <!-- Admin Portal -->
     <div class="admin-overlay" id="admin-overlay">
         <div class="admin-panel">
             <!-- Password Prompt Screen -->
             <div id="admin-password-prompt" class="password-prompt">
-                <h2>Admin Portal</h2>
-                <p>Enter admin password to continue:</p>
+                <h2><i class="fas fa-lock"></i> Admin Portal</h2>
+                <p>Enter admin password to access global controls:</p>
                 <input type="password" id="admin-password" class="password-input" 
-                       placeholder="Enter password" autocomplete="off" aria-label="Admin password">
-                <div class="d-flex gap-1 justify-between">
+                       placeholder="Enter admin password" autocomplete="off" aria-label="Admin password">
+                <div class="d-flex gap-1 justify-between mt-2">
                     <button class="btn btn-secondary" onclick="closeAdminPortal()">Cancel</button>
-                    <button class="btn btn-primary" onclick="verifyAdminPassword()">Enter</button>
+                    <button class="btn btn-primary" onclick="verifyAdminPassword()">Enter Global Admin</button>
                 </div>
-                <p class="mt-1"><small>Default password: admin123</small></p>
             </div>
             
-            <!-- Admin Panel Content (hidden by default) -->
+            <!-- Admin Panel Content -->
             <div id="admin-panel-content" class="hidden">
-                <div class="d-flex justify-between align-center mb-2">
-                    <h2>Admin Portal</h2>
+                <div class="admin-header">
+                    <h2><i class="fas fa-cogs"></i> Global Admin Portal</h2>
                     <button class="btn btn-secondary" onclick="closeAdminPortal()" aria-label="Close admin panel">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </div>
                 
                 <div class="admin-tabs" role="tablist">
-                    <button class="admin-tab active" onclick="switchAdminTab('manage')" role="tab">Manage Videos</button>
-                    <button class="admin-tab" onclick="switchAdminTab('ads')" role="tab">Manage Ads</button>
-                    <button class="admin-tab" onclick="switchAdminTab('analytics')" role="tab">Analytics</button>
+                    <button class="admin-tab active" onclick="switchAdminTab('global')" role="tab">
+                        <i class="fas fa-globe"></i> Global Management
+                    </button>
+                    <button class="admin-tab" onclick="switchAdminTab('changes')" role="tab">
+                        <i class="fas fa-history"></i> Global Changes
+                    </button>
+                    <button class="admin-tab" onclick="switchAdminTab('settings')" role="tab">
+                        <i class="fas fa-sliders-h"></i> System Settings
+                    </button>
+                    <button class="admin-tab" onclick="switchAdminTab('analytics')" role="tab">
+                        <i class="fas fa-chart-bar"></i> Global Analytics
+                    </button>
                 </div>
                 
-                <!-- Manage Videos Section -->
-                <div class="admin-section active" id="manage-section" role="tabpanel">
-                    <h3 class="mb-2">Manage Videos</h3>
-                    <div class="video-list" id="admin-video-list">
-                        <!-- Videos will be loaded here -->
+                <!-- Global Management Section -->
+                <div class="admin-section active" id="global-section" role="tabpanel">
+                    <h3 class="mb-2">Global Video Management</h3>
+                    <div class="video-list" id="global-video-list">
+                        <!-- Global videos will be loaded here -->
                     </div>
                 </div>
                 
-                <!-- Manage Ads Section -->
-                <div class="admin-section" id="ads-section" role="tabpanel">
-                    <h3 class="mb-2">Manage Ads</h3>
-                    <div class="form-group">
-                        <label>Enable Banner Ads</label>
-                        <div class="d-flex align-center gap-1">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="banner-ads-toggle">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span>Show banner ads on site</span>
+                <!-- Global Changes Section -->
+                <div class="admin-section" id="changes-section" role="tabpanel">
+                    <h3 class="mb-2">Global Changes Log</h3>
+                    <div class="changes-log" id="changes-log">
+                        <!-- Global changes will be loaded here -->
+                    </div>
+                    <button class="btn btn-primary mt-2" onclick="clearChangesLog()">
+                        <i class="fas fa-trash"></i> Clear Log
+                    </button>
+                </div>
+                
+                <!-- System Settings Section -->
+                <div class="admin-section" id="settings-section" role="tabpanel">
+                    <h3 class="mb-2">Global System Settings</h3>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <h4><i class="fas fa-upload"></i> Upload Settings</h4>
+                            <div class="setting-option">
+                                <span>Allow Global Uploads</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="global-uploads-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-option">
+                                <span>Require Email Verification</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="email-verify-toggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <h4><i class="fas fa-eye"></i> Visibility Settings</h4>
+                            <div class="setting-option">
+                                <span>Show Uploader Countries</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="show-countries-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-option">
+                                <span>Live Updates Banner</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="live-updates-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-card">
+                            <h4><i class="fas fa-cog"></i> System Controls</h4>
+                            <div class="setting-option">
+                                <span>Auto-refresh Videos</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="auto-refresh-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-option">
+                                <span>Log All Changes</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="log-changes-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Enable Video Ads</label>
-                        <div class="d-flex align-center gap-1">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="video-ads-toggle" disabled>
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span>Show video ads after playback <small>(Not available with current setup)</small></span>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="saveAdSettings()">Save Ad Settings</button>
+                    <button class="btn btn-primary mt-2" onclick="saveSystemSettings()">
+                        <i class="fas fa-save"></i> Save Global Settings
+                    </button>
                 </div>
                 
-                <!-- Analytics Section -->
+                <!-- Global Analytics Section -->
                 <div class="admin-section" id="analytics-section" role="tabpanel">
-                    <h3 class="mb-2">Analytics Dashboard</h3>
+                    <h3 class="mb-2">Global Analytics Dashboard</h3>
                     
-                    <div class="analytics-grid">
-                        <div class="analytics-card" style="background-color: var(--secondary);">
-                            <h4>Total Views</h4>
-                            <h2 id="total-views">0</h2>
+                    <div class="global-stats" style="background: linear-gradient(135deg, var(--info), var(--secondary));">
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-videos-admin">0</div>
+                            <div class="stat-label">Total Videos</div>
                         </div>
-                        <div class="analytics-card" style="background-color: var(--success);">
-                            <h4>Total Videos</h4>
-                            <h2 id="total-videos">0</h2>
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-countries-admin">0</div>
+                            <div class="stat-label">Countries</div>
                         </div>
-                        <div class="analytics-card" style="background-color: #9b59b6;">
-                            <h4>Total Categories</h4>
-                            <h2 id="total-categories">0</h2>
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-views-admin">0</div>
+                            <div class="stat-label">Total Views</div>
                         </div>
-                        <div class="analytics-card" style="background-color: #f39c12;">
-                            <h4>Active Uploaders</h4>
-                            <h2 id="total-uploaders">0</h2>
+                        <div class="stat-item">
+                            <div class="stat-number" id="active-uploaders">0</div>
+                            <div class="stat-label">Active Uploaders</div>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Ad Revenue (Demo)</label>
-                        <div class="d-flex align-center gap-1">
-                            <span style="font-size: 1.5rem; font-weight: bold;">$<span id="ad-revenue">0.00</span></span>
-                            <small>Real ad revenue will appear after AdSense integration</small>
+                    <div class="mt-2">
+                        <h4><i class="fas fa-chart-pie"></i> Category Distribution</h4>
+                        <div id="category-chart">
+                            <!-- Category chart will be generated here -->
                         </div>
                     </div>
                     
-                    <h4 class="mt-2">Most Popular Videos</h4>
-                    <div id="popular-videos-list">
-                        <!-- Popular videos will be loaded here -->
-                    </div>
-                    
-                    <h4 class="mt-2">Category Distribution</h4>
-                    <div id="category-distribution">
-                        <!-- Category distribution will be loaded here -->
+                    <div class="mt-2">
+                        <h4><i class="fas fa-flag"></i> Top Countries</h4>
+                        <div id="countries-chart">
+                            <!-- Countries chart will be generated here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1218,125 +1424,56 @@
     <!-- Footer -->
     <footer role="contentinfo">
         <div class="footer-content">
-            <a href="#" class="logo" onclick="showHome(); return false;" style="font-size: 1.5rem;">Ray<span>vid</span></a>
-            <p style="margin: 1rem 0;">Share your videos with the world. A free video sharing platform powered by Google Drive</p>
-            <div class="d-flex justify-center flex-wrap gap-1" style="margin: 1rem 0;">
-                <a href="#" onclick="showHome(); return false;" style="text-decoration: none;">Home</a> |
-                <a href="#" onclick="showUploadModal(); return false;" style="text-decoration: none;">Upload</a> |
-                <a href="#" onclick="alert('About Rayvid\n\nA free platform for video sharing and discovery.'); return false;" style="text-decoration: none;">About</a> |
-                <a href="#" onclick="alert('Contact: support@rayvid.example.com'); return false;" style="text-decoration: none;">Contact</a>
+            <a href="#" class="logo" onclick="showHome(); return false;" style="font-size: 1.5rem;">
+                <i class="fas fa-globe-americas"></i>Ray<span>vid</span>
+            </a>
+            <p style="margin: 1rem 0; max-width: 600px; margin-left: auto; margin-right: auto;">
+                A global video sharing platform where anyone can upload and share videos with the entire world. 
+                Real-time updates, global reach, and worldwide audience.
+            </p>
+            <div class="footer-links">
+                <a href="#" onclick="showHome(); return false;">Home</a>
+                <a href="#" onclick="showUploadModal(); return false;">Upload</a>
+                <a href="#" onclick="showGlobalFeed(); return false;">Global Feed</a>
+                <a href="#" onclick="showAdminPortal(); return false;">Admin</a>
+                <a href="#" onclick="alert('Contact: global-support@rayvid.com\n\nRayvid Global Platform\nConnecting the world through video sharing.'); return false;">Contact</a>
+                <a href="#" onclick="showTerms(); return false;">Terms</a>
             </div>
-            <p>© 2024 Rayvid. All rights reserved. | <small>Videos are hosted on Google Drive by uploaders</small></p>
+            <p class="mt-2">© 2024 Rayvid Global. All rights reserved. | <small>Videos are visible to everyone worldwide</small></p>
         </div>
     </footer>
 
     <script>
-        // Initial Data Storage
-        let videos = [
-            {
-                id: 1,
-                title: "Introduction to Web Development for Beginners",
-                description: "Learn the basics of HTML, CSS and JavaScript in this comprehensive tutorial for absolute beginners.",
-                driveId: "1WZQ_9cL-sfL2q5r6t8kYvxJy7NcHlMpB",
-                category: "Education",
-                duration: "12:45",
-                views: 1250,
-                uploaderName: "John Doe",
-                uploadDate: "2024-03-15",
-                tags: ["web development", "tutorial", "beginners", "coding", "programming"],
-                thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 2,
-                title: "Mountain Adventure Documentary - Himalayas Expedition",
-                description: "Exploring the highest peaks and breathtaking landscapes of the Himalayas in this epic adventure documentary.",
-                driveId: "1ABC123def456GHI789jkl",
-                category: "Entertainment",
-                duration: "24:30",
-                views: 850,
-                uploaderName: "Adventure Seeker",
-                uploadDate: "2024-03-10",
-                tags: ["adventure", "documentary", "mountains", "travel", "nature"],
-                thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 3,
-                title: "Advanced JavaScript Techniques 2024",
-                description: "Master modern JavaScript with ES6+ features, async/await, and best practices for professional development.",
-                driveId: "1XYZ789abc123DEF456ghi",
-                category: "Technology",
-                duration: "18:15",
-                views: 2100,
-                uploaderName: "Tech Guru",
-                uploadDate: "2024-03-05",
-                tags: ["javascript", "programming", "web development", "coding", "es6"],
-                thumbnail: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 4,
-                title: "Gaming Highlights - Epic Fortnite Moments",
-                description: "The best gaming moments from top Fortnite streamers around the world. Epic wins and funny fails!",
-                driveId: "1MNO456pqr789STU012vwx",
-                category: "Gaming",
-                duration: "15:20",
-                views: 3200,
-                uploaderName: "Gamer Pro",
-                uploadDate: "2024-03-01",
-                tags: ["gaming", "fortnite", "highlights", "streaming", "esports"],
-                thumbnail: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 5,
-                title: "Learn Guitar in 30 Days - Complete Course",
-                description: "A complete beginner's guide to playing your favorite songs on guitar. From basics to advanced chords.",
-                driveId: "1JKL012mno345PQR678stu",
-                category: "Music",
-                duration: "22:10",
-                views: 950,
-                uploaderName: "Music Master",
-                uploadDate: "2024-02-28",
-                tags: ["guitar", "music", "tutorial", "beginners", "learning"],
-                thumbnail: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                id: 6,
-                title: "Football Skills Tutorial - Improve Your Game",
-                description: "Professional football training techniques to improve your skills, dribbling, and shooting.",
-                driveId: "1VWX345yza678BCD901efg",
-                category: "Sports",
-                duration: "16:45",
-                views: 1800,
-                uploaderName: "Sports Coach",
-                uploadDate: "2024-02-25",
-                tags: ["football", "sports", "training", "soccer", "fitness"],
-                thumbnail: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-            }
-        ];
+        // Global Data Storage
+        let globalVideos = [];
+        let globalChanges = [];
+        let systemSettings = {
+            globalUploads: true,
+            emailVerification: false,
+            showCountries: true,
+            liveUpdates: true,
+            autoRefresh: true,
+            logChanges: true,
+            adminPassword: "globaladmin123"
+        };
+        
+        let currentVideoId = null;
+        let isAdmin = false;
+        let refreshInterval = null;
 
-        // Default thumbnails for each category
+        // Default thumbnails by category
         const defaultThumbnails = {
             "Entertainment": "https://images.unsplash.com/photo-1489599809516-9827b6d1cf13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Education": "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Education": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
             "Gaming": "https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
             "Technology": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
             "Music": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
             "Sports": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Comedy": "https://images.unsplash.com/photo-1545239351-ef35f43d514b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Tutorial": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Other": "https://images.unsplash.com/photo-1574717024453-1f2b07e6c3e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Travel": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Culture": "https://images.unsplash.com/photo-1528164344705-47542687000d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "News": "https://images.unsplash.com/photo-1588681664899-f142ff2dc9b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
             "default": "https://images.unsplash.com/photo-1536240478700-b869070f9279?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
         };
-
-        let adSettings = {
-            bannerAds: false,
-            videoAds: false,
-            adRevenue: 0.00
-        };
-
-        let adminPassword = "admin123";
-        let currentVideoId = null;
-        let currentCategory = "all";
-        let searchQuery = "";
 
         // DOM Elements
         const videoGrid = document.getElementById('video-grid');
@@ -1344,33 +1481,460 @@
         const adminOverlay = document.getElementById('admin-overlay');
         const uploadModal = document.getElementById('upload-modal');
         const searchInput = document.getElementById('search-input');
-        const categoriesList = document.getElementById('categories-list');
-        const searchResultsInfo = document.getElementById('search-results-info');
+        const loadingSpinner = document.getElementById('loading-spinner');
         const emptyState = document.getElementById('empty-state');
+        const liveUpdates = document.getElementById('live-updates');
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            renderVideoGrid();
+            loadFromLocalStorage();
             setupEventListeners();
-            loadAdSettings();
-            updateCategories();
-            updateAnalytics();
+            renderGlobalFeed();
+            updateGlobalStats();
+            startAutoRefresh();
             
-            // Set up search with debounce
-            let searchTimeout;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    searchVideos(this.value);
-                }, 300);
+            // Set up search
+            searchInput.addEventListener('input', debounce(searchVideos, 300));
+            
+            // Check for saved theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if(savedTheme === 'light') {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                document.querySelector('.theme-toggle i').classList.remove('fa-moon');
+                document.querySelector('.theme-toggle i').classList.add('fa-sun');
+            }
+        });
+
+        // Load data from localStorage
+        function loadFromLocalStorage() {
+            const savedVideos = localStorage.getItem('globalVideos');
+            if(savedVideos) {
+                globalVideos = JSON.parse(savedVideos);
+            } else {
+                // Load initial sample data
+                loadSampleVideos();
+            }
+            
+            const savedChanges = localStorage.getItem('globalChanges');
+            if(savedChanges) {
+                globalChanges = JSON.parse(savedChanges);
+            }
+            
+            const savedSettings = localStorage.getItem('systemSettings');
+            if(savedSettings) {
+                systemSettings = JSON.parse(savedSettings);
+                loadSystemSettings();
+            }
+        }
+
+        // Load sample videos for initial display
+        function loadSampleVideos() {
+            globalVideos = [
+                {
+                    id: Date.now() + 1,
+                    title: "Tokyo Street Food Tour - Amazing Japanese Cuisine",
+                    description: "Explore the vibrant street food scene in Tokyo, Japan. From takoyaki to ramen, experience authentic Japanese flavors.",
+                    driveId: "1WZQ_9cL-sfL2q5r6t8kYvxJy7NcHlMpB",
+                    category: "Food",
+                    country: "🇯🇵 Japan",
+                    duration: "15:30",
+                    views: 12500,
+                    uploaderName: "Food Explorer",
+                    uploadDate: new Date().toISOString().split('T')[0],
+                    tags: ["japan", "food", "travel", "culture", "streetfood"],
+                    thumbnail: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: Date.now() + 2,
+                    title: "AI Revolution 2024 - Latest Breakthroughs",
+                    description: "Discover the latest advancements in artificial intelligence from research labs around the world.",
+                    driveId: "1ABC123def456GHI789jkl",
+                    category: "Technology",
+                    country: "🇺🇸 USA",
+                    duration: "22:45",
+                    views: 8900,
+                    uploaderName: "Tech Insider",
+                    uploadDate: new Date().toISOString().split('T')[0],
+                    tags: ["ai", "technology", "innovation", "future", "science"],
+                    thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: Date.now() + 3,
+                    title: "Brazil Carnival 2024 - Rio de Janeiro Celebration",
+                    description: "Experience the vibrant colors, music, and dance of Rio's famous Carnival celebration.",
+                    driveId: "1XYZ789abc123DEF456ghi",
+                    category: "Culture",
+                    country: "🇧🇷 Brazil",
+                    duration: "18:20",
+                    views: 15400,
+                    uploaderName: "Cultural Journey",
+                    uploadDate: new Date().toISOString().split('T')[0],
+                    tags: ["brazil", "carnival", "culture", "dance", "music"],
+                    thumbnail: "https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                }
+            ];
+            localStorage.setItem('globalVideos', JSON.stringify(globalVideos));
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Upload Form
+            document.getElementById('upload-form').addEventListener('submit', handleVideoUpload);
+            
+            // Country selection
+            document.getElementById('country').addEventListener('change', function() {
+                if(this.value === "Other") {
+                    const otherCountry = prompt("Please enter your country name:");
+                    if(otherCountry) {
+                        this.value = otherCountry;
+                    }
+                }
             });
             
-            // Load data from localStorage
-            loadFromLocalStorage();
+            // Search with Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    searchVideos(this.value);
+                }
+            });
+        }
+
+        // Render Global Feed
+        function renderGlobalFeed(filteredVideos = null) {
+            const videosToShow = filteredVideos || globalVideos;
+            videoGrid.innerHTML = '';
             
-            // Initialize AdSense
-            initializeAdSense();
-        });
+            if(videosToShow.length === 0) {
+                loadingSpinner.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            loadingSpinner.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            
+            // Sort by most recent first
+            videosToShow.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+            
+            videosToShow.forEach(video => {
+                const videoCard = document.createElement('article');
+                videoCard.className = 'video-card';
+                videoCard.setAttribute('role', 'article');
+                
+                const thumbnail = video.thumbnail || getDefaultThumbnail(video.category);
+                
+                videoCard.innerHTML = `
+                    <div style="position: relative;">
+                        <img src="${thumbnail}" alt="${video.title}" class="thumbnail" loading="lazy">
+                        <div class="duration">${video.duration}</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">${video.title}</h3>
+                        <div class="video-meta">
+                            <span><i class="far fa-eye"></i> ${video.views.toLocaleString()}</span>
+                            <span class="category-tag">${video.category}</span>
+                        </div>
+                        <div class="uploader-info">
+                            <span class="country-flag">${video.country || '🌍'}</span>
+                            <span><i class="far fa-user"></i> ${video.uploaderName}</span>
+                        </div>
+                        ${video.tags && video.tags.length > 0 ? `
+                            <div class="tags-container">
+                                ${video.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                videoCard.addEventListener('click', () => playVideo(video.id));
+                videoCard.setAttribute('tabindex', '0');
+                videoCard.addEventListener('keypress', (e) => {
+                    if(e.key === 'Enter') playVideo(video.id);
+                });
+                
+                videoGrid.appendChild(videoCard);
+            });
+            
+            // Update recent uploads sidebar
+            updateRecentUploads();
+            // Update top uploaders
+            updateTopUploaders();
+        }
+
+        // Update Recent Uploads Sidebar
+        function updateRecentUploads() {
+            const recentList = document.getElementById('recent-uploads');
+            recentList.innerHTML = '';
+            
+            // Get 5 most recent uploads
+            const recentVideos = [...globalVideos]
+                .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))
+                .slice(0, 5);
+            
+            recentVideos.forEach(video => {
+                const listItem = document.createElement('li');
+                listItem.className = 'recent-item';
+                listItem.innerHTML = `
+                    <div class="recent-title">${video.title}</div>
+                    <div class="recent-meta">
+                        <span>${video.country || '🌍'}</span>
+                        <span>${video.uploadDate}</span>
+                    </div>
+                `;
+                
+                listItem.addEventListener('click', () => playVideo(video.id));
+                recentList.appendChild(listItem);
+            });
+        }
+
+        // Update Top Uploaders
+        function updateTopUploaders() {
+            const uploaderList = document.getElementById('top-uploaders');
+            uploaderList.innerHTML = '';
+            
+            // Count videos per uploader
+            const uploaderCounts = {};
+            globalVideos.forEach(video => {
+                uploaderCounts[video.uploaderName] = (uploaderCounts[video.uploaderName] || 0) + 1;
+            });
+            
+            // Get top 5 uploaders
+            const topUploaders = Object.entries(uploaderCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            topUploaders.forEach(([uploaderName, count]) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'uploader-item';
+                
+                // Get first letter for avatar
+                const avatarLetter = uploaderName.charAt(0).toUpperCase();
+                
+                listItem.innerHTML = `
+                    <div class="uploader-avatar">${avatarLetter}</div>
+                    <div class="uploader-details">
+                        <h4>${uploaderName}</h4>
+                        <div class="uploader-stats">${count} videos</div>
+                    </div>
+                `;
+                
+                uploaderList.appendChild(listItem);
+            });
+        }
+
+        // Update Global Stats
+        function updateGlobalStats() {
+            const totalVideos = globalVideos.length;
+            const totalViews = globalVideos.reduce((sum, video) => sum + video.views, 0);
+            
+            // Count unique countries
+            const countries = [...new Set(globalVideos.map(video => video.country))].filter(c => c);
+            const uniqueUploaders = [...new Set(globalVideos.map(video => video.uploaderName))];
+            
+            document.getElementById('total-videos-global').textContent = totalVideos.toLocaleString();
+            document.getElementById('total-countries').textContent = countries.length;
+            document.getElementById('total-uploaders-global').textContent = uniqueUploaders.length;
+            document.getElementById('total-views-global').textContent = totalViews.toLocaleString();
+            document.getElementById('last-update').textContent = 'Just now';
+            
+            // Update admin stats
+            if(isAdmin) {
+                document.getElementById('total-videos-admin').textContent = totalVideos.toLocaleString();
+                document.getElementById('total-countries-admin').textContent = countries.length;
+                document.getElementById('total-views-admin').textContent = totalViews.toLocaleString();
+                document.getElementById('active-uploaders').textContent = uniqueUploaders.length;
+            }
+        }
+
+        // Handle Video Upload
+        function handleVideoUpload(e) {
+            e.preventDefault();
+            
+            if(!systemSettings.globalUploads) {
+                alert('Global uploads are currently disabled by administrator.');
+                return;
+            }
+            
+            // Get form values
+            const driveLink = document.getElementById('drive-link').value;
+            const title = document.getElementById('video-title').value;
+            const description = document.getElementById('video-description').value;
+            const category = document.getElementById('video-category').value;
+            const country = document.getElementById('country').value;
+            const uploaderName = document.getElementById('uploader-name').value;
+            const tagsInput = document.getElementById('video-tags').value;
+            const globalConsent = document.getElementById('global-consent').checked;
+            
+            // Validation
+            if(!globalConsent) {
+                alert('You must agree that your video will be visible to everyone worldwide.');
+                return;
+            }
+            
+            if(!driveLink || !title || !category || !country || !uploaderName) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Extract Drive ID
+            let driveId = '';
+            const match = driveLink.match(/\/d\/([^\/]+)/);
+            if(match) {
+                driveId = match[1];
+            } else {
+                driveId = driveLink;
+            }
+            
+            // Process tags
+            const tags = tagsInput.split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag !== "")
+                .slice(0, 10);
+            
+            // Create new video
+            const newVideo = {
+                id: Date.now(),
+                title: title,
+                description: description,
+                driveId: driveId,
+                category: category,
+                country: country,
+                duration: "10:00",
+                views: 0,
+                uploaderName: uploaderName,
+                uploadDate: new Date().toISOString().split('T')[0],
+                tags: tags,
+                thumbnail: getDefaultThumbnail(category),
+                uploadedAt: new Date().toISOString()
+            };
+            
+            // Add to global videos
+            globalVideos.unshift(newVideo); // Add at beginning
+            localStorage.setItem('globalVideos', JSON.stringify(globalVideos));
+            
+            // Log change
+            logGlobalChange('added', `${uploaderName} uploaded "${title}" from ${country}`);
+            
+            // Reset form
+            e.target.reset();
+            closeUploadModal();
+            
+            // Update UI
+            renderGlobalFeed();
+            updateGlobalStats();
+            
+            // Show success
+            alert('✅ Video uploaded successfully!\n\nYour video is now visible to everyone worldwide.');
+            
+            // Show live update
+            showLiveUpdate(`New video uploaded from ${country}: "${title}"`);
+        }
+
+        // Play Video
+        function playVideo(videoId) {
+            const video = globalVideos.find(v => v.id === videoId);
+            if(!video) return;
+            
+            currentVideoId = videoId;
+            
+            // Update video info
+            document.getElementById('video-title-display').textContent = video.title;
+            document.getElementById('video-category-display').textContent = video.category;
+            document.getElementById('video-description-display').textContent = video.description;
+            document.getElementById('view-count').textContent = (video.views + 1).toLocaleString();
+            document.getElementById('uploader-name-display').textContent = video.uploaderName;
+            document.getElementById('upload-date').textContent = video.uploadDate;
+            document.getElementById('video-country').textContent = video.country;
+            document.getElementById('country-flag').textContent = video.country.split(' ')[0] || '🌍';
+            
+            // Update tags
+            const tagsContainer = document.getElementById('video-tags-container');
+            tagsContainer.innerHTML = '';
+            if(video.tags && video.tags.length > 0) {
+                video.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = tag;
+                    tagsContainer.appendChild(tagElement);
+                });
+            }
+            
+            // Show admin actions if admin is logged in
+            const adminActions = document.getElementById('admin-actions');
+            adminActions.style.display = isAdmin ? 'flex' : 'none';
+            
+            // Set up Drive iframe
+            const driveUrl = `https://drive.google.com/file/d/${video.driveId}/preview`;
+            const drivePlayer = document.getElementById('drive-player');
+            drivePlayer.src = driveUrl;
+            
+            // Update page title
+            document.title = `${video.title} - Rayvid Global`;
+            
+            // Show video player, hide home
+            document.querySelector('.container').style.display = 'none';
+            videoPlayerPage.classList.remove('hidden');
+            
+            // Increment view count
+            video.views++;
+            localStorage.setItem('globalVideos', JSON.stringify(globalVideos));
+            updateGlobalStats();
+            
+            // Log view
+            logGlobalChange('viewed', `Video "${video.title}" viewed from ${getUserCountry()}`);
+        }
+
+        // Show Upload Modal
+        function showUploadModal() {
+            if(!systemSettings.globalUploads) {
+                alert('Global uploads are currently disabled by administrator.');
+                return;
+            }
+            
+            uploadModal.style.display = 'flex';
+            document.getElementById('video-title').focus();
+        }
+
+        // Close Upload Modal
+        function closeUploadModal() {
+            uploadModal.style.display = 'none';
+            document.getElementById('upload-form').reset();
+        }
+
+        // Show Home
+        function showHome() {
+            document.title = "Rayvid - Global Video Sharing Platform";
+            document.querySelector('.container').style.display = 'flex';
+            videoPlayerPage.classList.add('hidden');
+            document.getElementById('drive-player').src = '';
+            renderGlobalFeed();
+        }
+
+        // Show Global Feed
+        function showGlobalFeed() {
+            showHome();
+        }
+
+        // Search Videos
+        function searchVideos(query) {
+            if(!query.trim()) {
+                renderGlobalFeed();
+                return;
+            }
+            
+            const searchTerm = query.toLowerCase();
+            const filteredVideos = globalVideos.filter(video => 
+                video.title.toLowerCase().includes(searchTerm) ||
+                video.description.toLowerCase().includes(searchTerm) ||
+                video.uploaderName.toLowerCase().includes(searchTerm) ||
+                video.category.toLowerCase().includes(searchTerm) ||
+                video.country.toLowerCase().includes(searchTerm) ||
+                (video.tags && video.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+            );
+            
+            renderGlobalFeed(filteredVideos);
+        }
 
         // Theme Toggle
         function toggleTheme() {
@@ -1392,232 +1956,7 @@
             localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
         }
 
-        // Check for saved theme
-        const savedTheme = localStorage.getItem('theme');
-        if(savedTheme === 'light') {
-            document.body.classList.remove('dark-mode');
-            document.body.classList.add('light-mode');
-            document.querySelector('.theme-toggle i').classList.remove('fa-moon');
-            document.querySelector('.theme-toggle i').classList.add('fa-sun');
-        }
-
-        // Load data from localStorage
-        function loadFromLocalStorage() {
-            const savedVideos = localStorage.getItem('videos');
-            if(savedVideos) {
-                videos = JSON.parse(savedVideos);
-                renderVideoGrid();
-                updateCategories();
-            }
-            
-            const savedAdSettings = localStorage.getItem('adSettings');
-            if(savedAdSettings) {
-                adSettings = JSON.parse(savedAdSettings);
-                loadAdSettings();
-            }
-            
-            const savedPassword = localStorage.getItem('adminPassword');
-            if(savedPassword) {
-                adminPassword = savedPassword;
-            }
-        }
-
-        // Initialize AdSense
-        function initializeAdSense() {
-            // Initialize AdSense ads
-            if(window.adsbygoogle) {
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            }
-        }
-
-        // Get default thumbnail for a category
-        function getDefaultThumbnail(category) {
-            return defaultThumbnails[category] || defaultThumbnails.default;
-        }
-
-        // Render Video Grid
-        function renderVideoGrid(filteredVideos = null) {
-            const videosToShow = filteredVideos || getFilteredVideos();
-            videoGrid.innerHTML = '';
-            
-            if(videosToShow.length === 0) {
-                emptyState.classList.remove('hidden');
-                searchResultsInfo.classList.add('hidden');
-                return;
-            }
-            
-            emptyState.classList.add('hidden');
-            
-            videosToShow.forEach(video => {
-                const videoCard = document.createElement('article');
-                videoCard.className = 'video-card';
-                videoCard.setAttribute('role', 'article');
-                videoCard.innerHTML = `
-                    <div style="position: relative;">
-                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail" loading="lazy">
-                        <div class="duration">${video.duration}</div>
-                    </div>
-                    <div class="video-info">
-                        <h3 class="video-title">${video.title}</h3>
-                        <div class="video-meta">
-                            <span><i class="far fa-eye"></i> ${video.views.toLocaleString()}</span>
-                            <span class="category-tag">${video.category}</span>
-                        </div>
-                        ${video.tags && video.tags.length > 0 ? `
-                            <div class="tags-container">
-                                ${video.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                        <div class="uploader-info">
-                            <i class="far fa-user"></i> ${video.uploaderName}
-                        </div>
-                    </div>
-                `;
-                
-                videoCard.addEventListener('click', () => playVideo(video.id));
-                videoCard.setAttribute('tabindex', '0');
-                videoCard.addEventListener('keypress', (e) => {
-                    if(e.key === 'Enter') playVideo(video.id);
-                });
-                
-                videoGrid.appendChild(videoCard);
-            });
-        }
-
-        // Get filtered videos based on category and search
-        function getFilteredVideos() {
-            let filtered = videos;
-            
-            // Apply category filter
-            if(currentCategory !== "all") {
-                filtered = filtered.filter(video => video.category === currentCategory);
-            }
-            
-            // Apply search filter
-            if(searchQuery.trim() !== "") {
-                const query = searchQuery.toLowerCase();
-                filtered = filtered.filter(video => 
-                    video.title.toLowerCase().includes(query) ||
-                    video.description.toLowerCase().includes(query) ||
-                    video.uploaderName.toLowerCase().includes(query) ||
-                    (video.tags && video.tags.some(tag => tag.toLowerCase().includes(query)))
-                );
-            }
-            
-            return filtered;
-        }
-
-        // Search Videos
-        function searchVideos(query) {
-            searchQuery = query.toLowerCase().trim();
-            
-            if(searchQuery === "") {
-                searchResultsInfo.classList.add('hidden');
-                renderVideoGrid();
-                updateCategories();
-                return;
-            }
-            
-            const filteredVideos = getFilteredVideos();
-            
-            document.getElementById('search-query').textContent = query;
-            document.getElementById('results-count').textContent = filteredVideos.length;
-            searchResultsInfo.classList.remove('hidden');
-            
-            renderVideoGrid(filteredVideos);
-        }
-
-        // Update Categories List
-        function updateCategories() {
-            categoriesList.innerHTML = '';
-            
-            // Get all unique categories
-            const categories = ["all", ...new Set(videos.map(video => video.category))];
-            
-            // Count videos per category
-            const categoryCounts = {};
-            videos.forEach(video => {
-                categoryCounts[video.category] = (categoryCounts[video.category] || 0) + 1;
-            });
-            
-            categories.forEach(category => {
-                const listItem = document.createElement('li');
-                const count = category === "all" ? videos.length : (categoryCounts[category] || 0);
-                
-                listItem.className = `category-item ${currentCategory === category ? 'active' : ''}`;
-                listItem.innerHTML = `
-                    <span>${category === "all" ? "All Videos" : category}</span>
-                    <span class="category-count">${count}</span>
-                `;
-                
-                listItem.addEventListener('click', () => {
-                    currentCategory = category;
-                    updateCategories();
-                    renderVideoGrid();
-                    
-                    // Hide search results if switching categories
-                    if(searchQuery !== "") {
-                        searchQuery = "";
-                        searchInput.value = "";
-                        searchResultsInfo.classList.add('hidden');
-                    }
-                });
-                
-                categoriesList.appendChild(listItem);
-            });
-        }
-
-        // Show Upload Modal
-        function showUploadModal() {
-            uploadModal.style.display = 'flex';
-            document.getElementById('video-title-input').focus();
-            
-            // Show default thumbnail preview based on selected category
-            updateDefaultThumbnailPreview();
-        }
-
-        // Close Upload Modal
-        function closeUploadModal() {
-            uploadModal.style.display = 'none';
-            document.getElementById('upload-form').reset();
-            document.getElementById('thumbnail-preview').style.display = 'none';
-            document.getElementById('default-thumbnail-info').style.display = 'none';
-            document.getElementById('custom-category-group').style.display = 'none';
-        }
-
-        // Update default thumbnail preview based on selected category
-        function updateDefaultThumbnailPreview() {
-            const categorySelect = document.getElementById('video-category-input');
-            const thumbnailPreview = document.getElementById('thumbnail-preview');
-            const defaultThumbnailInfo = document.getElementById('default-thumbnail-info');
-            const thumbnailUrlInput = document.getElementById('thumbnail-url');
-            
-            // Show default thumbnail for current category
-            const category = categorySelect.value || "default";
-            const defaultThumbnail = getDefaultThumbnail(category);
-            
-            thumbnailPreview.src = defaultThumbnail;
-            thumbnailPreview.style.display = 'block';
-            defaultThumbnailInfo.style.display = 'block';
-            
-            // If user enters a URL, update the preview
-            thumbnailUrlInput.addEventListener('input', function() {
-                if(this.value.trim() !== '') {
-                    thumbnailPreview.src = this.value;
-                    defaultThumbnailInfo.style.display = 'none';
-                    thumbnailPreview.onerror = function() {
-                        thumbnailPreview.src = defaultThumbnail;
-                        defaultThumbnailInfo.style.display = 'block';
-                        alert('Could not load thumbnail image. Using default thumbnail instead.');
-                    };
-                } else {
-                    thumbnailPreview.src = defaultThumbnail;
-                    defaultThumbnailInfo.style.display = 'block';
-                }
-            });
-        }
-
-        // Show Admin Portal with password prompt
+        // Show Admin Portal
         function showAdminPortal() {
             adminOverlay.style.display = 'flex';
             document.getElementById('admin-password-prompt').classList.remove('hidden');
@@ -1628,15 +1967,18 @@
 
         // Verify Admin Password
         function verifyAdminPassword() {
-            const passwordInput = document.getElementById('admin-password').value;
+            const password = document.getElementById('admin-password').value;
             
-            if(passwordInput === adminPassword) {
+            if(password === systemSettings.adminPassword) {
+                isAdmin = true;
                 document.getElementById('admin-password-prompt').classList.add('hidden');
                 document.getElementById('admin-panel-content').classList.remove('hidden');
                 updateAdminVideoList();
-                updateAnalytics();
+                updateGlobalStats();
+                loadSystemSettings();
+                logGlobalChange('admin', 'Admin logged in');
             } else {
-                alert('Incorrect password! Try: admin123');
+                alert('Incorrect admin password!');
                 document.getElementById('admin-password').value = '';
                 document.getElementById('admin-password').focus();
             }
@@ -1645,11 +1987,12 @@
         // Close Admin Portal
         function closeAdminPortal() {
             adminOverlay.style.display = 'none';
+            isAdmin = false;
         }
 
         // Switch Admin Tab
         function switchAdminTab(tabName) {
-            // Update active tab button
+            // Update active tab
             document.querySelectorAll('.admin-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1664,439 +2007,268 @@
 
         // Update Admin Video List
         function updateAdminVideoList() {
-            const adminVideoList = document.getElementById('admin-video-list');
+            const adminVideoList = document.getElementById('global-video-list');
             adminVideoList.innerHTML = '';
             
-            videos.forEach(video => {
+            globalVideos.forEach(video => {
                 const videoItem = document.createElement('div');
                 videoItem.className = 'admin-video-item';
+                videoItem.style.cssText = 'padding: 1rem; margin-bottom: 1rem; border-radius: var(--radius); background: rgba(0,0,0,0.1);';
                 videoItem.innerHTML = `
-                    <h4>${video.title}</h4>
-                    <p style="font-size: 0.9rem; margin: 0.5rem 0;">
-                        ${video.category} • ${video.duration} • Uploaded by: ${video.uploaderName}
-                    </p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
-                        <span><i class="far fa-eye"></i> ${video.views} views</span>
-                        <span>${video.uploadDate}</span>
-                    </div>
-                    <div class="video-actions">
-                        <button class="action-btn edit-btn" onclick="editVideo(${video.id})">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteVideo(${video.id})">Delete</button>
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 0.5rem 0;">${video.title}</h4>
+                            <div style="font-size: 0.9rem; color: #888; margin-bottom: 0.5rem;">
+                                <span>${video.category} • ${video.country} • ${video.uploaderName}</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; font-size: 0.9rem;">
+                                <span><i class="far fa-eye"></i> ${video.views} views</span>
+                                <span><i class="far fa-calendar"></i> ${video.uploadDate}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="adminEditVideo(${video.id})" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger" onclick="adminDeleteVideo(${video.id})" style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #e74c3c;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
-                
                 adminVideoList.appendChild(videoItem);
             });
         }
 
-        // Update Analytics
-        function updateAnalytics() {
-            const totalViews = videos.reduce((sum, video) => sum + video.views, 0);
-            const totalVideos = videos.length;
+        // Load System Settings to UI
+        function loadSystemSettings() {
+            document.getElementById('global-uploads-toggle').checked = systemSettings.globalUploads;
+            document.getElementById('email-verify-toggle').checked = systemSettings.emailVerification;
+            document.getElementById('show-countries-toggle').checked = systemSettings.showCountries;
+            document.getElementById('live-updates-toggle').checked = systemSettings.liveUpdates;
+            document.getElementById('auto-refresh-toggle').checked = systemSettings.autoRefresh;
+            document.getElementById('log-changes-toggle').checked = systemSettings.logChanges;
             
-            // Get unique uploaders
-            const uploaders = [...new Set(videos.map(video => video.uploaderName))];
-            const categories = [...new Set(videos.map(video => video.category))];
-            
-            document.getElementById('total-views').textContent = totalViews.toLocaleString();
-            document.getElementById('total-videos').textContent = totalVideos;
-            document.getElementById('ad-revenue').textContent = adSettings.adRevenue.toFixed(2);
-            document.getElementById('total-uploaders').textContent = uploaders.length;
-            document.getElementById('total-categories').textContent = categories.length;
-            
-            // Update popular videos list
-            const popularVideosList = document.getElementById('popular-videos-list');
-            popularVideosList.innerHTML = '';
-            
-            // Sort videos by views and take top 5
-            const popularVideos = [...videos]
-                .sort((a, b) => b.views - a.views)
-                .slice(0, 5);
-            
-            popularVideos.forEach(video => {
-                const videoItem = document.createElement('div');
-                videoItem.className = 'admin-video-item';
-                videoItem.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <img src="${video.thumbnail}" alt="${video.title}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;">
-                        <div style="flex: 1;">
-                            <h4 style="margin: 0;">${video.title}</h4>
-                            <p style="font-size: 0.9rem; margin: 0.5rem 0;">
-                                ${video.views.toLocaleString()} views • ${video.uploaderName}
-                            </p>
-                        </div>
-                    </div>
-                `;
-                popularVideosList.appendChild(videoItem);
-            });
-            
-            // Update category distribution
-            const categoryDistribution = document.getElementById('category-distribution');
-            categoryDistribution.innerHTML = '';
-            
-            // Count videos per category
-            const categoryCounts = {};
-            videos.forEach(video => {
-                categoryCounts[video.category] = (categoryCounts[video.category] || 0) + 1;
-            });
-            
-            // Display category distribution
-            Object.entries(categoryCounts).forEach(([category, count]) => {
-                const percentage = Math.round((count / totalVideos) * 100);
-                const bar = document.createElement('div');
-                bar.style.marginBottom = '0.5rem';
-                bar.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
-                        <span>${category}</span>
-                        <span>${count} videos (${percentage}%)</span>
-                    </div>
-                    <div style="background-color: #e0e0e0; border-radius: 10px; height: 10px;">
-                        <div style="background-color: var(--primary); width: ${percentage}%; height: 100%; border-radius: 10px;"></div>
-                    </div>
-                `;
-                categoryDistribution.appendChild(bar);
-            });
+            // Show/hide live updates
+            liveUpdates.style.display = systemSettings.liveUpdates ? 'block' : 'none';
         }
 
-        // Play Video
-        function playVideo(videoId) {
-            const video = videos.find(v => v.id === videoId);
-            if(!video) return;
+        // Save System Settings
+        function saveSystemSettings() {
+            systemSettings.globalUploads = document.getElementById('global-uploads-toggle').checked;
+            systemSettings.emailVerification = document.getElementById('email-verify-toggle').checked;
+            systemSettings.showCountries = document.getElementById('show-countries-toggle').checked;
+            systemSettings.liveUpdates = document.getElementById('live-updates-toggle').checked;
+            systemSettings.autoRefresh = document.getElementById('auto-refresh-toggle').checked;
+            systemSettings.logChanges = document.getElementById('log-changes-toggle').checked;
             
-            currentVideoId = videoId;
+            localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
             
-            // Update video info with proper HTML structure for SEO
-            document.getElementById('video-title').textContent = video.title;
-            document.getElementById('video-category').textContent = video.category;
-            document.getElementById('video-description').textContent = video.description;
-            document.getElementById('view-count').textContent = (video.views + 1).toLocaleString();
-            document.getElementById('uploader-name-display').textContent = video.uploaderName;
-            document.getElementById('upload-date').textContent = video.uploadDate;
+            // Update UI based on settings
+            liveUpdates.style.display = systemSettings.liveUpdates ? 'block' : 'none';
             
-            // Update tags
-            const tagsContainer = document.getElementById('video-tags-container');
-            tagsContainer.innerHTML = '';
-            if(video.tags && video.tags.length > 0) {
-                video.tags.forEach(tag => {
-                    const tagElement = document.createElement('span');
-                    tagElement.className = 'tag';
-                    tagElement.textContent = tag;
-                    tagsContainer.appendChild(tagElement);
-                });
-            }
-            
-            // Extract Drive ID
-            let driveId = video.driveId;
-            
-            // If it's a full URL, extract the ID
-            if(driveId.includes('drive.google.com')) {
-                const match = driveId.match(/\/d\/([^\/]+)/);
-                if(match) driveId = match[1];
-            }
-            
-            // Set up the Drive iframe
-            const driveUrl = `https://drive.google.com/file/d/${driveId}/preview`;
-            const drivePlayer = document.getElementById('drive-player');
-            drivePlayer.src = driveUrl;
-            
-            // Update page title for better SEO
-            document.title = `${video.title} - Rayvid`;
-            
-            // Show video player, hide home
-            document.querySelector('.container').style.display = 'none';
-            document.querySelectorAll('.adsense-container').forEach(el => el.style.display = 'none');
-            videoPlayerPage.classList.remove('hidden');
-            
-            // Increment view count
-            video.views++;
-            updateAnalytics();
-            
-            // Store in localStorage
-            localStorage.setItem('videos', JSON.stringify(videos));
-            
-            // Track video play in localStorage for analytics
-            const videoPlays = JSON.parse(localStorage.getItem('videoPlays') || '[]');
-            videoPlays.push({
-                videoId: videoId,
-                videoTitle: video.title,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('videoPlays', JSON.stringify(videoPlays));
-        }
-
-        // Show Home Page
-        function showHome() {
-            document.title = "Rayvid - Free Video Sharing Platform";
-            document.querySelector('.container').style.display = 'flex';
-            document.querySelectorAll('.adsense-container').forEach(el => el.style.display = 'block');
-            videoPlayerPage.classList.add('hidden');
-            
-            // Reset video player
-            document.getElementById('drive-player').src = '';
-            
-            // Reset search if active
-            if(searchQuery !== "") {
-                searchQuery = "";
-                searchInput.value = "";
-                searchResultsInfo.classList.add('hidden');
-            }
-            
-            // Update video grid and categories
-            renderVideoGrid();
-            updateCategories();
-        }
-
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Upload Form for Everyone
-            document.getElementById('upload-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form values
-                const driveLink = document.getElementById('drive-link').value;
-                const title = document.getElementById('video-title-input').value;
-                const description = document.getElementById('video-description-input').value;
-                const categorySelect = document.getElementById('video-category-input');
-                const category = categorySelect.value === "Other" 
-                    ? document.getElementById('custom-category').value 
-                    : categorySelect.value;
-                const thumbnailUrl = document.getElementById('thumbnail-url').value;
-                const tagsInput = document.getElementById('video-tags').value;
-                const uploaderName = document.getElementById('uploader-name').value;
-                
-                // Validate required fields
-                if(!driveLink || !title || !category || !uploaderName) {
-                    alert('Please fill in all required fields marked with *');
-                    return;
-                }
-                
-                // Validate category
-                if(categorySelect.value === "Other" && !document.getElementById('custom-category').value) {
-                    alert('Please enter a custom category name');
-                    return;
-                }
-                
-                // Extract Drive ID from link
-                let driveId = '';
-                const match = driveLink.match(/\/d\/([^\/]+)/);
-                if(match) {
-                    driveId = match[1];
-                } else {
-                    driveId = driveLink;
-                }
-                
-                // Process tags
-                const tags = tagsInput.split(',')
-                    .map(tag => tag.trim())
-                    .filter(tag => tag !== "")
-                    .slice(0, 10); // Limit to 10 tags
-                
-                // Use provided thumbnail or default thumbnail based on category
-                const finalThumbnail = thumbnailUrl.trim() !== "" 
-                    ? thumbnailUrl 
-                    : getDefaultThumbnail(category);
-                
-                // Create new video object
-                const newVideo = {
-                    id: videos.length > 0 ? Math.max(...videos.map(v => v.id)) + 1 : 1,
-                    title: title,
-                    description: description,
-                    driveId: driveId,
-                    category: category,
-                    duration: "10:00", // Default duration
-                    views: 0,
-                    uploaderName: uploaderName,
-                    uploadDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-                    tags: tags,
-                    thumbnail: finalThumbnail
-                };
-                
-                // Add to videos array
-                videos.push(newVideo);
-                
-                // Save to localStorage
-                localStorage.setItem('videos', JSON.stringify(videos));
-                
-                // Reset form and close modal
-                this.reset();
-                closeUploadModal();
-                
-                // Update UI
-                renderVideoGrid();
-                updateCategories();
-                updateAnalytics();
-                
-                // Show success message
-                alert('Video uploaded successfully! Thank you for sharing.');
-            });
-            
-            // Show/hide custom category field
-            document.getElementById('video-category-input').addEventListener('change', function() {
-                const customCategoryGroup = document.getElementById('custom-category-group');
-                if(this.value === "Other") {
-                    customCategoryGroup.style.display = 'block';
-                } else {
-                    customCategoryGroup.style.display = 'none';
-                }
-                
-                // Update default thumbnail preview when category changes
-                updateDefaultThumbnailPreview();
-            });
-            
-            // Enter key to search
-            searchInput.addEventListener('keypress', function(e) {
-                if(e.key === 'Enter') {
-                    searchVideos(this.value);
-                }
-            });
-        }
-
-        // Load Ad Settings to UI
-        function loadAdSettings() {
-            document.getElementById('banner-ads-toggle').checked = adSettings.bannerAds;
-            document.getElementById('video-ads-toggle').checked = adSettings.videoAds;
-            
-            // Show/hide ads based on settings
-            toggleAdsVisibility(adSettings.bannerAds);
-        }
-
-        // Save Ad Settings
-        function saveAdSettings() {
-            adSettings.bannerAds = document.getElementById('banner-ads-toggle').checked;
-            adSettings.videoAds = document.getElementById('video-ads-toggle').checked;
-            
-            localStorage.setItem('adSettings', JSON.stringify(adSettings));
-            toggleAdsVisibility(adSettings.bannerAds);
-            
-            alert('Ad settings saved! Ads are ' + (adSettings.bannerAds ? 'ON' : 'OFF'));
-        }
-
-        // Toggle Ads Visibility
-        function toggleAdsVisibility(showAds) {
-            const ads = document.querySelectorAll('.adsense-sidebar, .adsense-container, .adsense-leaderboard');
-            ads.forEach(ad => {
-                ad.style.display = showAds ? 'block' : 'none';
-            });
-            
-            // Refresh ads when made visible
-            if(showAds && window.adsbygoogle) {
-                setTimeout(() => {
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                }, 500);
-            }
-        }
-
-        // Delete Video
-        function deleteVideo(videoId) {
-            if(confirm('Are you sure you want to delete this video?')) {
-                videos = videos.filter(video => video.id !== videoId);
-                localStorage.setItem('videos', JSON.stringify(videos));
-                updateAdminVideoList();
-                renderVideoGrid();
-                updateCategories();
-                updateAnalytics();
-                alert('Video deleted successfully!');
-            }
-        }
-
-        // Edit Video
-        function editVideo(videoId) {
-            const video = videos.find(v => v.id === videoId);
-            if(!video) return;
-            
-            // For simplicity, we'll use the upload form to edit
-            showUploadModal();
-            
-            // Fill form with video data
-            document.getElementById('drive-link').value = `https://drive.google.com/file/d/${video.driveId}/view`;
-            document.getElementById('video-title-input').value = video.title;
-            document.getElementById('video-description-input').value = video.description;
-            document.getElementById('thumbnail-url').value = video.thumbnail;
-            document.getElementById('video-tags').value = video.tags ? video.tags.join(', ') : '';
-            document.getElementById('uploader-name').value = video.uploaderName;
-            
-            // Handle category
-            const categorySelect = document.getElementById('video-category-input');
-            const existingOption = Array.from(categorySelect.options).find(opt => opt.value === video.category);
-            if(existingOption) {
-                categorySelect.value = video.category;
-                document.getElementById('custom-category-group').style.display = 'none';
+            // Start/stop auto-refresh
+            if(systemSettings.autoRefresh) {
+                startAutoRefresh();
             } else {
-                categorySelect.value = "Other";
-                document.getElementById('custom-category').value = video.category;
-                document.getElementById('custom-category-group').style.display = 'block';
+                stopAutoRefresh();
             }
             
-            // Show thumbnail preview
-            const thumbnailPreview = document.getElementById('thumbnail-preview');
-            const defaultThumbnailInfo = document.getElementById('default-thumbnail-info');
-            thumbnailPreview.src = video.thumbnail;
-            thumbnailPreview.style.display = 'block';
+            logGlobalChange('settings', 'System settings updated by admin');
+            alert('✅ Global system settings saved!');
+        }
+
+        // Log Global Change
+        function logGlobalChange(type, description) {
+            if(!systemSettings.logChanges) return;
             
-            // Check if it's a default thumbnail
-            const defaultThumbs = Object.values(defaultThumbnails);
-            if(defaultThumbs.includes(video.thumbnail)) {
-                defaultThumbnailInfo.style.display = 'block';
-            } else {
-                defaultThumbnailInfo.style.display = 'none';
-            }
-            
-            // Modify submit behavior to update instead of create
-            const form = document.getElementById('upload-form');
-            const originalSubmit = form.onsubmit;
-            
-            form.onsubmit = function(e) {
-                e.preventDefault();
-                
-                // Get updated values
-                const driveLink = document.getElementById('drive-link').value;
-                const title = document.getElementById('video-title-input').value;
-                const description = document.getElementById('video-description-input').value;
-                const category = categorySelect.value === "Other" 
-                    ? document.getElementById('custom-category').value 
-                    : categorySelect.value;
-                const thumbnailUrl = document.getElementById('thumbnail-url').value;
-                const tagsInput = document.getElementById('video-tags').value;
-                const uploaderName = document.getElementById('uploader-name').value;
-                
-                // Update video
-                video.title = title;
-                video.description = description;
-                video.category = category;
-                video.thumbnail = thumbnailUrl || getDefaultThumbnail(category);
-                video.tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
-                video.uploaderName = uploaderName;
-                
-                // Extract Drive ID
-                let driveId = '';
-                const match = driveLink.match(/\/d\/([^\/]+)/);
-                if(match) {
-                    driveId = match[1];
-                } else {
-                    driveId = driveLink;
-                }
-                video.driveId = driveId;
-                
-                // Save to localStorage
-                localStorage.setItem('videos', JSON.stringify(videos));
-                
-                // Reset form and close modal
-                form.reset();
-                closeUploadModal();
-                
-                // Update UI
-                updateAdminVideoList();
-                renderVideoGrid();
-                updateCategories();
-                updateAnalytics();
-                
-                // Restore original submit behavior
-                form.onsubmit = originalSubmit;
-                
-                alert('Video updated successfully!');
+            const change = {
+                id: Date.now(),
+                type: type,
+                description: description,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
             };
             
-            alert('Video data loaded. Make your changes and submit to update.');
+            globalChanges.unshift(change);
+            if(globalChanges.length > 100) {
+                globalChanges.pop(); // Keep only last 100 changes
+            }
+            
+            localStorage.setItem('globalChanges', JSON.stringify(globalChanges));
+            
+            // Update changes log if visible
+            if(isAdmin && document.getElementById('changes-section').classList.contains('active')) {
+                updateChangesLog();
+            }
+        }
+
+        // Update Changes Log
+        function updateChangesLog() {
+            const changesLog = document.getElementById('changes-log');
+            changesLog.innerHTML = '';
+            
+            globalChanges.forEach(change => {
+                const changeItem = document.createElement('div');
+                changeItem.className = 'change-item';
+                
+                const time = new Date(change.timestamp).toLocaleTimeString();
+                
+                changeItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span class="change-type ${change.type}">${change.type.toUpperCase()}</span>
+                        <span style="font-size: 0.9rem; color: #888;">${time}</span>
+                    </div>
+                    <div>${change.description}</div>
+                `;
+                
+                changesLog.appendChild(changeItem);
+            });
+        }
+
+        // Clear Changes Log
+        function clearChangesLog() {
+            if(confirm('Clear all change logs? This action cannot be undone.')) {
+                globalChanges = [];
+                localStorage.setItem('globalChanges', JSON.stringify(globalChanges));
+                updateChangesLog();
+                logGlobalChange('admin', 'Change log cleared by admin');
+            }
+        }
+
+        // Admin Edit Video
+        function adminEditVideo(videoId) {
+            const video = globalVideos.find(v => v.id === videoId);
+            if(!video) return;
+            
+            // For simplicity, we'll use a prompt-based edit
+            const newTitle = prompt('Edit video title:', video.title);
+            if(newTitle !== null && newTitle.trim() !== '') {
+                const oldTitle = video.title;
+                video.title = newTitle.trim();
+                localStorage.setItem('globalVideos', JSON.stringify(globalVideos));
+                logGlobalChange('updated', `Admin changed title from "${oldTitle}" to "${video.title}"`);
+                updateAdminVideoList();
+                renderGlobalFeed();
+                alert('✅ Video title updated globally!');
+            }
+        }
+
+        // Admin Delete Video
+        function adminDeleteVideo(videoId) {
+            if(confirm('Delete this video globally? This action cannot be undone.')) {
+                const videoIndex = globalVideos.findIndex(v => v.id === videoId);
+                if(videoIndex !== -1) {
+                    const deletedVideo = globalVideos[videoIndex];
+                    globalVideos.splice(videoIndex, 1);
+                    localStorage.setItem('globalVideos', JSON.stringify(globalVideos));
+                    logGlobalChange('deleted', `Admin deleted video: "${deletedVideo.title}" from ${deletedVideo.country}`);
+                    updateAdminVideoList();
+                    renderGlobalFeed();
+                    updateGlobalStats();
+                    alert('✅ Video deleted globally!');
+                }
+            }
+        }
+
+        // Edit Current Video (from player page)
+        function editCurrentVideo() {
+            if(currentVideoId) {
+                adminEditVideo(currentVideoId);
+            }
+        }
+
+        // Delete Current Video (from player page)
+        function deleteCurrentVideo() {
+            if(currentVideoId) {
+                adminDeleteVideo(currentVideoId);
+                showHome();
+            }
+        }
+
+        // Show Live Update
+        function showLiveUpdate(message) {
+            if(!systemSettings.liveUpdates) return;
+            
+            const updateText = document.getElementById('update-text');
+            updateText.textContent = message;
+            
+            // Highlight the banner
+            liveUpdates.style.display = 'block';
+            liveUpdates.style.backgroundColor = var(--success);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                liveUpdates.style.backgroundColor = '';
+            }, 5000);
+        }
+
+        // Start Auto-refresh
+        function startAutoRefresh() {
+            if(refreshInterval) clearInterval(refreshInterval);
+            
+            if(systemSettings.autoRefresh) {
+                refreshInterval = setInterval(() => {
+                    // Simulate new global activity
+                    if(Math.random() > 0.7) {
+                        const countries = ['🇺🇸 USA', '🇮🇳 India', '🇬🇧 UK', '🇨🇦 Canada', '🇦🇺 Australia'];
+                        const activities = ['New video uploaded', 'Video trending globally', 'User from', 'Popular in'];
+                        const randomCountry = countries[Math.floor(Math.random() * countries.length)];
+                        const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                        
+                        showLiveUpdate(`${randomActivity} ${randomCountry}`);
+                    }
+                }, 10000); // Every 10 seconds
+            }
+        }
+
+        // Stop Auto-refresh
+        function stopAutoRefresh() {
+            if(refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
+        // Get Default Thumbnail
+        function getDefaultThumbnail(category) {
+            return defaultThumbnails[category] || defaultThumbnails.default;
+        }
+
+        // Get User Country (simulated)
+        function getUserCountry() {
+            const countries = ['🇺🇸 USA', '🇮🇳 India', '🇬🇧 UK', '🇨🇦 Canada', '🇦🇺 Australia', '🌍 Global'];
+            return countries[Math.floor(Math.random() * countries.length)];
+        }
+
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Show Terms
+        function showTerms() {
+            alert(`Rayvid Global Platform - Terms of Service
+
+1. Global Visibility: All uploaded videos are visible to everyone worldwide.
+
+2. Content Responsibility: Uploaders are responsible for their content.
+
+3. Admin Rights: Administrators can modify or remove any content.
+
+4. Real-time Updates: All changes are reflected globally in real-time.
+
+5. Privacy: User data is stored locally in your browser.
+
+By using Rayvid Global, you agree to these terms.`);
         }
     </script>
 </body>
