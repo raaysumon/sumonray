@@ -11,6 +11,9 @@
     <meta property="og:description" content="Upload and share videos for free. Powered by Google Drive.">
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --primary: #ff4757;
@@ -752,6 +755,21 @@
             font-size: 0.8rem;
         }
 
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -928,7 +946,7 @@
                            aria-required="true">
                 </div>
                 
-                <button type="submit" class="btn btn-success">
+                <button type="submit" class="btn btn-success" id="upload-submit-btn">
                     <i class="fas fa-upload"></i> Upload Video
                 </button>
             </form>
@@ -1013,7 +1031,7 @@
                     <button class="btn btn-secondary" onclick="closeAdminPortal()">Cancel</button>
                     <button class="btn btn-primary" onclick="verifyAdminPassword()">Enter</button>
                 </div>
-                <p class="mt-1"><small>Default password: admin123</small></p>
+                <p class="mt-1"><small></small></p>
             </div>
             
             <!-- Admin Panel Content (hidden by default) -->
@@ -1027,7 +1045,6 @@
                 
                 <div class="admin-tabs" role="tablist">
                     <button class="admin-tab active" onclick="switchAdminTab('manage')" role="tab">Manage Videos</button>
-                    <button class="admin-tab" onclick="switchAdminTab('json')" role="tab">JSON Editor</button>
                     <button class="admin-tab" onclick="switchAdminTab('analytics')" role="tab">Analytics</button>
                 </div>
                 
@@ -1036,34 +1053,6 @@
                     <h3 class="mb-2">Manage Videos</h3>
                     <div class="video-list" id="admin-video-list">
                         <!-- Videos will be loaded here -->
-                    </div>
-                </div>
-                
-                <!-- JSON Editor Section -->
-                <div class="admin-section" id="json-section" role="tabpanel">
-                    <h3 class="mb-2">Edit Videos JSON File</h3>
-                    <p class="mb-2">Edit the JSON data directly. Changes will be saved to the JSON file.</p>
-                    
-                    <div class="json-editor-container">
-                        <textarea class="json-editor" id="json-editor" spellcheck="false"></textarea>
-                    </div>
-                    
-                    <div class="d-flex gap-1">
-                        <button class="btn btn-success" onclick="saveJsonData()">
-                            <i class="fas fa-save"></i> Save JSON Data
-                        </button>
-                        <button class="btn btn-secondary" onclick="loadJsonData()">
-                            <i class="fas fa-sync"></i> Reload from File
-                        </button>
-                        <button class="btn btn-primary" onclick="downloadJsonFile()">
-                            <i class="fas fa-download"></i> Download JSON File
-                        </button>
-                    </div>
-                    
-                    <div class="mt-2">
-                        <h4>JSON File Information</h4>
-                        <p>File Location: <code id="json-file-path">videos.json</code></p>
-                        <p>Last Updated: <span id="json-last-updated">Just now</span></p>
                     </div>
                 </div>
                 
@@ -1109,18 +1098,29 @@
         <div class="footer-content">
             <a href="#" class="logo" onclick="showHome(); return false;" style="font-size: 1.5rem;">Ray<span>vid</span></a>
             <p style="margin: 1rem 0;">Share your videos with the world. A free video sharing platform powered by Google Drive</p>
-            <div class="d-flex justify-center flex-wrap gap-1" style="margin: 1rem 0;">
-                <a href="#" onclick="showHome(); return false;" style="text-decoration: none;">Home</a> |
-                <a href="#" onclick="showUploadModal(); return false;" style="text-decoration: none;">Upload</a> |
-                <a href="#" onclick="alert('About Rayvid\n\nA free platform for video sharing and discovery.'); return false;" style="text-decoration: none;">About</a> |
-                <a href="#" onclick="alert('Contact: support@rayvid.example.com'); return false;" style="text-decoration: none;">Contact</a>
-            </div>
-            <p>© 2024 Rayvid. All rights reserved. | <small>Videos are hosted on Google Drive by uploaders</small></p>
+            
+            <p>© 2026 Rayvid. All rights reserved. | <small>Videos are hosted on Google Drive by uploaders</small></p>
         </div>
     </footer>
 
     <script>
-        // Initial Data Storage - This will be loaded from JSON file
+        // Firebase Configuration
+        // Replace with your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
+            authDomain: "rayvid-c074a.firebaseapp.com",
+            projectId: "rayvid-c074a",
+            storageBucket: "rayvid-c074a.firebasestorage.app",
+            messagingSenderId: "970771885312",
+            appId: "1:970771885312:web:104ae741f28287a01ad7e5",
+            measurementId: "G-LDBSZRRPQL"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Initial Data Storage
         let videos = [];
         let adminPassword = "admin123";
         let currentVideoId = null;
@@ -1150,11 +1150,10 @@
         const categoriesList = document.getElementById('categories-list');
         const searchResultsInfo = document.getElementById('search-results-info');
         const emptyState = document.getElementById('empty-state');
-        const jsonEditor = document.getElementById('json-editor');
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', async function() {
-            await loadVideosFromJSON();
+            await loadVideosFromFirestore();
             renderVideoGrid();
             setupEventListeners();
             updateCategories();
@@ -1177,7 +1176,39 @@
                 document.querySelector('.theme-toggle i').classList.remove('fa-moon');
                 document.querySelector('.theme-toggle i').classList.add('fa-sun');
             }
+            
+            // Real-time listener for video updates
+            setupRealtimeListener();
         });
+
+        // Set up real-time Firestore listener
+        function setupRealtimeListener() {
+            db.collection("videos")
+                .orderBy("createdAt", "desc")
+                .onSnapshot((snapshot) => {
+                    const videoChanges = [];
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            console.log("New video added: ", change.doc.data());
+                        }
+                        if (change.type === "modified") {
+                            console.log("Video modified: ", change.doc.data());
+                        }
+                        if (change.type === "removed") {
+                            console.log("Video removed: ", change.doc.id);
+                        }
+                    });
+                    
+                    // Reload videos from Firestore
+                    loadVideosFromFirestore().then(() => {
+                        renderVideoGrid();
+                        updateCategories();
+                        updateAnalytics();
+                    });
+                }, (error) => {
+                    console.error("Error in real-time listener: ", error);
+                });
+        }
 
         // Theme Toggle
         function toggleTheme() {
@@ -1199,79 +1230,96 @@
             localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
         }
 
-        // Load videos from JSON file
-        async function loadVideosFromJSON() {
+        // Load videos from Firebase Firestore
+        async function loadVideosFromFirestore() {
             try {
-                // Try to load from localStorage first (for demo purposes)
-                const savedVideos = localStorage.getItem('rayvid_videos_json');
+                const videosCollection = db.collection("videos");
+                const snapshot = await videosCollection.orderBy("createdAt", "desc").get();
                 
-                if(savedVideos) {
-                    videos = JSON.parse(savedVideos);
-                } else {
-                    // If no data in localStorage, create sample data
-                    videos = [
-                        {
-                            id: 1,
-                            title: "Introduction to Web Development for Beginners",
-                            description: "Learn the basics of HTML, CSS and JavaScript in this comprehensive tutorial for absolute beginners.",
-                            driveId: "1WZQ_9cL-sfL2q5r6t8kYvxJy7NcHlMpB",
-                            category: "Education",
-                            duration: "12:45",
-                            views: 1250,
-                            uploaderName: "John Doe",
-                            uploadDate: "2024-03-15",
-                            tags: ["web development", "tutorial", "beginners", "coding", "programming"],
-                            thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                        },
-                        {
-                            id: 2,
-                            title: "Mountain Adventure Documentary - Himalayas Expedition",
-                            description: "Exploring the highest peaks and breathtaking landscapes of the Himalayas in this epic adventure documentary.",
-                            driveId: "1ABC123def456GHI789jkl",
-                            category: "Entertainment",
-                            duration: "24:30",
-                            views: 850,
-                            uploaderName: "Adventure Seeker",
-                            uploadDate: "2024-03-10",
-                            tags: ["adventure", "documentary", "mountains", "travel", "nature"],
-                            thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                        }
-                    ];
-                    saveVideosToJSON();
-                }
-                
-                // Update last updated time
-                updateJsonLastUpdated();
-                
-            } catch (error) {
-                console.error('Error loading videos from JSON:', error);
                 videos = [];
-            }
-        }
-
-        // Save videos to JSON file (localStorage for demo)
-        async function saveVideosToJSON() {
-            try {
-                // Save to localStorage
-                localStorage.setItem('rayvid_videos_json', JSON.stringify(videos, null, 2));
+                snapshot.forEach(doc => {
+                    const videoData = doc.data();
+                    videoData.firebaseId = doc.id; // Store Firebase document ID
+                    videos.push(videoData);
+                });
                 
-                // Update last updated time
-                updateJsonLastUpdated();
-                
+                console.log(`Loaded ${videos.length} videos from Firestore`);
                 return true;
+                
             } catch (error) {
-                console.error('Error saving videos to JSON:', error);
+                console.error('Error loading videos from Firestore:', error);
+                videos = [];
                 return false;
             }
         }
 
-        // Update JSON last updated timestamp
-        function updateJsonLastUpdated() {
-            const now = new Date();
-            const formattedTime = now.toLocaleString();
-            const lastUpdatedElement = document.getElementById('json-last-updated');
-            if(lastUpdatedElement) {
-                lastUpdatedElement.textContent = formattedTime;
+        // Save video to Firebase Firestore
+        async function saveVideoToFirestore(videoData) {
+            try {
+                const videosCollection = db.collection("videos");
+                
+                // Add timestamp
+                videoData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                videoData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+                
+                // Add to Firestore
+                const docRef = await videosCollection.add(videoData);
+                console.log("Video saved with ID: ", docRef.id);
+                
+                // Add Firebase ID to local video object
+                videoData.firebaseId = docRef.id;
+                
+                return { success: true, id: docRef.id };
+                
+            } catch (error) {
+                console.error('Error saving video to Firestore:', error);
+                return { success: false, error: error };
+            }
+        }
+
+        // Update video in Firebase Firestore
+        async function updateVideoInFirestore(videoId, videoData) {
+            try {
+                const videoRef = db.collection("videos").doc(videoId);
+                
+                // Update timestamp
+                videoData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+                
+                await videoRef.update(videoData);
+                console.log("Video updated successfully: ", videoId);
+                
+                return { success: true };
+                
+            } catch (error) {
+                console.error('Error updating video in Firestore:', error);
+                return { success: false, error: error };
+            }
+        }
+
+        // Delete video from Firebase Firestore
+        async function deleteVideoFromFirestore(videoId) {
+            try {
+                await db.collection("videos").doc(videoId).delete();
+                console.log("Video deleted successfully: ", videoId);
+                return { success: true };
+            } catch (error) {
+                console.error('Error deleting video from Firestore:', error);
+                return { success: false, error: error };
+            }
+        }
+
+        // Increment view count in Firebase
+        async function incrementViewCount(videoId) {
+            try {
+                const videoRef = db.collection("videos").doc(videoId);
+                await videoRef.update({
+                    views: firebase.firestore.FieldValue.increment(1),
+                    lastViewed: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                return true;
+            } catch (error) {
+                console.error('Error incrementing view count:', error);
+                return false;
             }
         }
 
@@ -1299,13 +1347,14 @@
                 videoCard.setAttribute('role', 'article');
                 videoCard.innerHTML = `
                     <div style="position: relative;">
-                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail" loading="lazy">
-                        <div class="duration">${video.duration}</div>
+                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail" loading="lazy" 
+                             onerror="this.src='${getDefaultThumbnail(video.category)}'">
+                        <div class="duration">${video.duration || '10:00'}</div>
                     </div>
                     <div class="video-info">
                         <h3 class="video-title">${video.title}</h3>
                         <div class="video-meta">
-                            <span><i class="far fa-eye"></i> ${video.views.toLocaleString()}</span>
+                            <span><i class="far fa-eye"></i> ${(video.views || 0).toLocaleString()}</span>
                             <span class="category-tag">${video.category}</span>
                         </div>
                         ${video.tags && video.tags.length > 0 ? `
@@ -1319,10 +1368,10 @@
                     </div>
                 `;
                 
-                videoCard.addEventListener('click', () => playVideo(video.id));
+                videoCard.addEventListener('click', () => playVideo(video.firebaseId));
                 videoCard.setAttribute('tabindex', '0');
                 videoCard.addEventListener('keypress', (e) => {
-                    if(e.key === 'Enter') playVideo(video.id);
+                    if(e.key === 'Enter') playVideo(video.firebaseId);
                 });
                 
                 videoGrid.appendChild(videoCard);
@@ -1343,7 +1392,7 @@
                 const query = searchQuery.toLowerCase();
                 filtered = filtered.filter(video => 
                     video.title.toLowerCase().includes(query) ||
-                    video.description.toLowerCase().includes(query) ||
+                    (video.description && video.description.toLowerCase().includes(query)) ||
                     video.uploaderName.toLowerCase().includes(query) ||
                     (video.tags && video.tags.some(tag => tag.toLowerCase().includes(query)))
                 );
@@ -1428,6 +1477,11 @@
             document.getElementById('thumbnail-preview').style.display = 'none';
             document.getElementById('default-thumbnail-info').style.display = 'none';
             document.getElementById('custom-category-group').style.display = 'none';
+            
+            // Reset submit button
+            const submitBtn = document.getElementById('upload-submit-btn');
+            submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+            submitBtn.disabled = false;
         }
 
         // Update default thumbnail preview based on selected category
@@ -1480,7 +1534,6 @@
                 document.getElementById('admin-panel-content').classList.remove('hidden');
                 updateAdminVideoList();
                 updateAnalytics();
-                loadJsonData(); // Load JSON data into editor
             } else {
                 alert('Incorrect password! Try: admin123');
                 document.getElementById('admin-password').value = '';
@@ -1508,79 +1561,6 @@
             document.getElementById(`${tabName}-section`).classList.add('active');
         }
 
-        // Load JSON data into editor
-        function loadJsonData() {
-            try {
-                const jsonString = JSON.stringify(videos, null, 2);
-                jsonEditor.value = jsonString;
-            } catch (error) {
-                console.error('Error loading JSON data:', error);
-                jsonEditor.value = 'Error loading JSON data';
-            }
-        }
-
-        // Save JSON data from editor
-        async function saveJsonData() {
-            try {
-                const jsonText = jsonEditor.value;
-                const parsedData = JSON.parse(jsonText);
-                
-                // Validate the data structure
-                if(!Array.isArray(parsedData)) {
-                    throw new Error('JSON data must be an array');
-                }
-                
-                // Basic validation for each video
-                for(const video of parsedData) {
-                    if(!video.id || !video.title || !video.driveId) {
-                        throw new Error('Each video must have id, title, and driveId');
-                    }
-                }
-                
-                // Update videos array
-                videos = parsedData;
-                
-                // Save to JSON file
-                const success = await saveVideosToJSON();
-                
-                if(success) {
-                    alert('JSON data saved successfully!');
-                    
-                    // Update UI
-                    renderVideoGrid();
-                    updateCategories();
-                    updateAdminVideoList();
-                    updateAnalytics();
-                } else {
-                    alert('Error saving JSON data');
-                }
-                
-            } catch (error) {
-                alert('Invalid JSON format: ' + error.message);
-                console.error('JSON parsing error:', error);
-            }
-        }
-
-        // Download JSON file
-        function downloadJsonFile() {
-            try {
-                const jsonString = JSON.stringify(videos, null, 2);
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'videos.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                alert('JSON file downloaded successfully!');
-            } catch (error) {
-                console.error('Error downloading JSON file:', error);
-                alert('Error downloading JSON file');
-            }
-        }
-
         // Update Admin Video List
         function updateAdminVideoList() {
             const adminVideoList = document.getElementById('admin-video-list');
@@ -1592,15 +1572,15 @@
                 videoItem.innerHTML = `
                     <h4>${video.title}</h4>
                     <p style="font-size: 0.9rem; margin: 0.5rem 0;">
-                        ${video.category} • ${video.duration} • Uploaded by: ${video.uploaderName}
+                        ${video.category} • ${video.duration || '10:00'} • Uploaded by: ${video.uploaderName}
                     </p>
                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
-                        <span><i class="far fa-eye"></i> ${video.views} views</span>
-                        <span>${video.uploadDate}</span>
+                        <span><i class="far fa-eye"></i> ${video.views || 0} views</span>
+                        <span>${video.createdAt ? new Date(video.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</span>
                     </div>
                     <div class="video-actions">
-                        <button class="action-btn edit-btn" onclick="editVideo(${video.id})">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteVideo(${video.id})">Delete</button>
+                        <button class="action-btn edit-btn" onclick="editVideo('${video.firebaseId}')">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteVideo('${video.firebaseId}')">Delete</button>
                     </div>
                 `;
                 
@@ -1610,7 +1590,7 @@
 
         // Update Analytics
         function updateAnalytics() {
-            const totalViews = videos.reduce((sum, video) => sum + video.views, 0);
+            const totalViews = videos.reduce((sum, video) => sum + (video.views || 0), 0);
             const totalVideos = videos.length;
             
             // Get unique uploaders
@@ -1628,7 +1608,7 @@
             
             // Sort videos by views and take top 5
             const popularVideos = [...videos]
-                .sort((a, b) => b.views - a.views)
+                .sort((a, b) => (b.views || 0) - (a.views || 0))
                 .slice(0, 5);
             
             popularVideos.forEach(video => {
@@ -1636,11 +1616,12 @@
                 videoItem.className = 'admin-video-item';
                 videoItem.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <img src="${video.thumbnail}" alt="${video.title}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;">
+                        <img src="${video.thumbnail}" alt="${video.title}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;"
+                             onerror="this.src='${getDefaultThumbnail(video.category)}'">
                         <div style="flex: 1;">
                             <h4 style="margin: 0;">${video.title}</h4>
                             <p style="font-size: 0.9rem; margin: 0.5rem 0;">
-                                ${video.views.toLocaleString()} views • ${video.uploaderName}
+                                ${(video.views || 0).toLocaleString()} views • ${video.uploaderName}
                             </p>
                         </div>
                     </div>
@@ -1677,8 +1658,8 @@
         }
 
         // Play Video
-        function playVideo(videoId) {
-            const video = videos.find(v => v.id === videoId);
+        async function playVideo(videoId) {
+            const video = videos.find(v => v.firebaseId === videoId);
             if(!video) return;
             
             currentVideoId = videoId;
@@ -1686,10 +1667,10 @@
             // Update video info with proper HTML structure for SEO
             document.getElementById('video-title').textContent = video.title;
             document.getElementById('video-category').textContent = video.category;
-            document.getElementById('video-description').textContent = video.description;
-            document.getElementById('view-count').textContent = (video.views + 1).toLocaleString();
+            document.getElementById('video-description').textContent = video.description || 'No description provided.';
+            document.getElementById('view-count').textContent = ((video.views || 0) + 1).toLocaleString();
             document.getElementById('uploader-name-display').textContent = video.uploaderName;
-            document.getElementById('upload-date').textContent = video.uploadDate;
+            document.getElementById('upload-date').textContent = video.createdAt ? new Date(video.createdAt.seconds * 1000).toLocaleDateString() : 'Recently';
             
             // Update tags
             const tagsContainer = document.getElementById('video-tags-container');
@@ -1707,7 +1688,7 @@
             let driveId = video.driveId;
             
             // If it's a full URL, extract the ID
-            if(driveId.includes('drive.google.com')) {
+            if(driveId && driveId.includes('drive.google.com')) {
                 const match = driveId.match(/\/d\/([^\/]+)/);
                 if(match) driveId = match[1];
             }
@@ -1724,11 +1705,11 @@
             document.querySelector('.container').style.display = 'none';
             videoPlayerPage.classList.remove('hidden');
             
-            // Increment view count
-            video.views++;
+            // Increment view count in Firebase
+            await incrementViewCount(video.firebaseId);
             
-            // Save updated view count to JSON
-            saveVideosToJSON();
+            // Update local video views
+            video.views = (video.views || 0) + 1;
             
             // Update analytics
             updateAnalytics();
@@ -1761,88 +1742,96 @@
             document.getElementById('upload-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                // Get form values
-                const driveLink = document.getElementById('drive-link').value;
-                const title = document.getElementById('video-title-input').value;
-                const description = document.getElementById('video-description-input').value;
-                const categorySelect = document.getElementById('video-category-input');
-                const category = categorySelect.value === "Other" 
-                    ? document.getElementById('custom-category').value 
-                    : categorySelect.value;
-                const thumbnailUrl = document.getElementById('thumbnail-url').value;
-                const tagsInput = document.getElementById('video-tags').value;
-                const uploaderName = document.getElementById('uploader-name').value;
+                const submitBtn = document.getElementById('upload-submit-btn');
+                const originalBtnText = submitBtn.innerHTML;
                 
-                // Validate required fields
-                if(!driveLink || !title || !category || !uploaderName) {
-                    alert('Please fill in all required fields marked with *');
-                    return;
-                }
+                // Disable button and show loading
+                submitBtn.innerHTML = '<span class="loading-spinner"></span> Uploading...';
+                submitBtn.disabled = true;
                 
-                // Validate category
-                if(categorySelect.value === "Other" && !document.getElementById('custom-category').value) {
-                    alert('Please enter a custom category name');
-                    return;
-                }
-                
-                // Extract Drive ID from link
-                let driveId = '';
-                const match = driveLink.match(/\/d\/([^\/]+)/);
-                if(match) {
-                    driveId = match[1];
-                } else {
-                    driveId = driveLink;
-                }
-                
-                // Process tags
-                const tags = tagsInput.split(',')
-                    .map(tag => tag.trim())
-                    .filter(tag => tag !== "")
-                    .slice(0, 10); // Limit to 10 tags
-                
-                // Use provided thumbnail or default thumbnail based on category
-                const finalThumbnail = thumbnailUrl.trim() !== "" 
-                    ? thumbnailUrl 
-                    : getDefaultThumbnail(category);
-                
-                // Generate new ID
-                const newId = videos.length > 0 ? Math.max(...videos.map(v => v.id)) + 1 : 1;
-                
-                // Create new video object
-                const newVideo = {
-                    id: newId,
-                    title: title,
-                    description: description,
-                    driveId: driveId,
-                    category: category,
-                    duration: "10:00", // Default duration
-                    views: 0,
-                    uploaderName: uploaderName,
-                    uploadDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-                    tags: tags,
-                    thumbnail: finalThumbnail
-                };
-                
-                // Add to videos array
-                videos.push(newVideo);
-                
-                // Save to JSON file
-                const success = await saveVideosToJSON();
-                
-                if(success) {
-                    // Reset form and close modal
-                    this.reset();
-                    closeUploadModal();
+                try {
+                    // Get form values
+                    const driveLink = document.getElementById('drive-link').value;
+                    const title = document.getElementById('video-title-input').value;
+                    const description = document.getElementById('video-description-input').value;
+                    const categorySelect = document.getElementById('video-category-input');
+                    const category = categorySelect.value === "Other" 
+                        ? document.getElementById('custom-category').value 
+                        : categorySelect.value;
+                    const thumbnailUrl = document.getElementById('thumbnail-url').value;
+                    const tagsInput = document.getElementById('video-tags').value;
+                    const uploaderName = document.getElementById('uploader-name').value;
                     
-                    // Update UI
-                    renderVideoGrid();
-                    updateCategories();
-                    updateAnalytics();
+                    // Validate required fields
+                    if(!driveLink || !title || !category || !uploaderName) {
+                        alert('Please fill in all required fields marked with *');
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
                     
-                    // Show success message
-                    alert('Video uploaded successfully! Thank you for sharing.');
-                } else {
-                    alert('Error saving video. Please try again.');
+                    // Validate category
+                    if(categorySelect.value === "Other" && !document.getElementById('custom-category').value) {
+                        alert('Please enter a custom category name');
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    
+                    // Extract Drive ID from link
+                    let driveId = '';
+                    const match = driveLink.match(/\/d\/([^\/]+)/);
+                    if(match) {
+                        driveId = match[1];
+                    } else {
+                        driveId = driveLink;
+                    }
+                    
+                    // Process tags
+                    const tags = tagsInput.split(',')
+                        .map(tag => tag.trim())
+                        .filter(tag => tag !== "")
+                        .slice(0, 10); // Limit to 10 tags
+                    
+                    // Use provided thumbnail or default thumbnail based on category
+                    const finalThumbnail = thumbnailUrl.trim() !== "" 
+                        ? thumbnailUrl 
+                        : getDefaultThumbnail(category);
+                    
+                    // Create new video object
+                    const newVideo = {
+                        title: title,
+                        description: description,
+                        driveId: driveId,
+                        category: category,
+                        duration: "10:00", // Default duration
+                        views: 0,
+                        uploaderName: uploaderName,
+                        tags: tags,
+                        thumbnail: finalThumbnail
+                    };
+                    
+                    // Save to Firebase
+                    const result = await saveVideoToFirestore(newVideo);
+                    
+                    if(result.success) {
+                        // Reset form and close modal
+                        this.reset();
+                        closeUploadModal();
+                        
+                        // Show success message
+                        alert('Video uploaded successfully! Thank you for sharing.');
+                    } else {
+                        alert('Error uploading video. Please try again.');
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                    }
+                    
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('An error occurred. Please try again.');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
                 }
             });
             
@@ -1870,14 +1859,18 @@
         // Delete Video
         async function deleteVideo(videoId) {
             if(confirm('Are you sure you want to delete this video?')) {
-                videos = videos.filter(video => video.id !== videoId);
-                const success = await saveVideosToJSON();
+                const result = await deleteVideoFromFirestore(videoId);
                 
-                if(success) {
+                if(result.success) {
+                    // Remove from local array
+                    videos = videos.filter(video => video.firebaseId !== videoId);
+                    
+                    // Update UI
                     updateAdminVideoList();
                     renderVideoGrid();
                     updateCategories();
                     updateAnalytics();
+                    
                     alert('Video deleted successfully!');
                 } else {
                     alert('Error deleting video. Please try again.');
@@ -1886,107 +1879,56 @@
         }
 
         // Edit Video
-        function editVideo(videoId) {
-            const video = videos.find(v => v.id === videoId);
+        async function editVideo(videoId) {
+            const video = videos.find(v => v.firebaseId === videoId);
             if(!video) return;
             
-            // For simplicity, we'll use the upload form to edit
-            showUploadModal();
+            // For simplicity, we'll use a prompt-based edit (could be enhanced with a modal)
+            const newTitle = prompt('Edit video title:', video.title);
+            if(newTitle === null) return; // User cancelled
             
-            // Fill form with video data
-            document.getElementById('drive-link').value = `https://drive.google.com/file/d/${video.driveId}/view`;
-            document.getElementById('video-title-input').value = video.title;
-            document.getElementById('video-description-input').value = video.description;
-            document.getElementById('thumbnail-url').value = video.thumbnail;
-            document.getElementById('video-tags').value = video.tags ? video.tags.join(', ') : '';
-            document.getElementById('uploader-name').value = video.uploaderName;
+            const newCategory = prompt('Edit video category:', video.category);
+            if(newCategory === null) return;
             
-            // Handle category
-            const categorySelect = document.getElementById('video-category-input');
-            const existingOption = Array.from(categorySelect.options).find(opt => opt.value === video.category);
-            if(existingOption) {
-                categorySelect.value = video.category;
-                document.getElementById('custom-category-group').style.display = 'none';
-            } else {
-                categorySelect.value = "Other";
-                document.getElementById('custom-category').value = video.category;
-                document.getElementById('custom-category-group').style.display = 'block';
-            }
+            const newDescription = prompt('Edit video description:', video.description || '');
             
-            // Show thumbnail preview
-            const thumbnailPreview = document.getElementById('thumbnail-preview');
-            const defaultThumbnailInfo = document.getElementById('default-thumbnail-info');
-            thumbnailPreview.src = video.thumbnail;
-            thumbnailPreview.style.display = 'block';
-            
-            // Check if it's a default thumbnail
-            const defaultThumbs = Object.values(defaultThumbnails);
-            if(defaultThumbs.includes(video.thumbnail)) {
-                defaultThumbnailInfo.style.display = 'block';
-            } else {
-                defaultThumbnailInfo.style.display = 'none';
-            }
-            
-            // Modify submit behavior to update instead of create
-            const form = document.getElementById('upload-form');
-            const originalSubmit = form.onsubmit;
-            
-            form.onsubmit = async function(e) {
-                e.preventDefault();
-                
-                // Get updated values
-                const driveLink = document.getElementById('drive-link').value;
-                const title = document.getElementById('video-title-input').value;
-                const description = document.getElementById('video-description-input').value;
-                const category = categorySelect.value === "Other" 
-                    ? document.getElementById('custom-category').value 
-                    : categorySelect.value;
-                const thumbnailUrl = document.getElementById('thumbnail-url').value;
-                const tagsInput = document.getElementById('video-tags').value;
-                const uploaderName = document.getElementById('uploader-name').value;
-                
-                // Update video
-                video.title = title;
-                video.description = description;
-                video.category = category;
-                video.thumbnail = thumbnailUrl || getDefaultThumbnail(category);
-                video.tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
-                video.uploaderName = uploaderName;
-                
-                // Extract Drive ID
-                let driveId = '';
-                const match = driveLink.match(/\/d\/([^\/]+)/);
-                if(match) {
-                    driveId = match[1];
-                } else {
-                    driveId = driveLink;
-                }
-                video.driveId = driveId;
-                
-                // Save to JSON file
-                const success = await saveVideosToJSON();
-                
-                if(success) {
-                    // Reset form and close modal
-                    form.reset();
-                    closeUploadModal();
-                    
-                    // Update UI
-                    updateAdminVideoList();
-                    renderVideoGrid();
-                    updateCategories();
-                    updateAnalytics();
-                    
-                    // Restore original submit behavior
-                    form.onsubmit = originalSubmit;
-                    
-                    alert('Video updated successfully!');
-                } else {
-                    alert('Error updating video. Please try again.');
-                }
+            // Update video data
+            const updatedVideo = {
+                ...video,
+                title: newTitle,
+                category: newCategory,
+                description: newDescription,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            alert('Video data loaded. Make your changes and submit to update.');
+            // Remove Firebase ID before sending to Firestore
+            delete updatedVideo.firebaseId;
+            delete updatedVideo.createdAt;
+            
+            // Update in Firebase
+            const result = await updateVideoInFirestore(videoId, updatedVideo);
+            
+            if(result.success) {
+                // Update local array
+                const index = videos.findIndex(v => v.firebaseId === videoId);
+                if(index !== -1) {
+                    videos[index] = {
+                        ...updatedVideo,
+                        firebaseId: videoId,
+                        createdAt: video.createdAt
+                    };
+                }
+                
+                // Update UI
+                updateAdminVideoList();
+                renderVideoGrid();
+                updateCategories();
+                updateAnalytics();
+                
+                alert('Video updated successfully!');
+            } else {
+                alert('Error updating video. Please try again.');
+            }
         }
     </script>
 </body>
