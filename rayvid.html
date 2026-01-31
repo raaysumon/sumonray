@@ -2,581 +2,664 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rayvid - Fantasy Video Realm | Upload & Share Your Videos</title>
-    <meta name="description" content="Rayvid is a magical video sharing platform where creators share enchanted videos. Discover mystical content across various realms.">
-    <meta name="keywords" content="fantasy video sharing, magical videos, mystical content, fantasy entertainment, enchanted media">
-    <meta name="author" content="Rayvid Realm">
-    <meta property="og:title" content="Rayvid - Fantasy Video Realm">
-    <meta property="og:description" content="Upload and share mystical videos in our enchanted realm.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rayvid - Free Video Sharing Platform | Upload & Share Your Videos</title>
+    <meta name="description" content="Rayvid is a free video sharing platform where anyone can upload and share videos using Google Drive links. Discover amazing videos across various categories.">
+    <meta name="keywords" content="video sharing, free videos, upload videos, video platform, Google Drive videos, entertainment, education, gaming">
+    <meta name="author" content="Rayvid">
+    <meta property="og:title" content="Rayvid - Free Video Sharing Platform">
+    <meta property="og:description" content="Upload and share videos for free. Powered by Google Drive.">
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense Script - REPLACE 'ca-pub-XXXXX' WITH YOUR ACTUAL PUBLISHER ID -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXX" crossorigin="anonymous"></script>
+    
     <!-- Include Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
-            --primary: #8a2be2;
-            --secondary: #00d4ff;
-            --accent: #ff6b6b;
-            --success: #4ecdc4;
-            --warning: #ffd166;
-            --dark-bg: #0a0e17;
-            --dark-card: #1a1f35;
-            --dark-text: #e0e0ff;
-            --light-bg: #f4f1ff;
-            --light-card: #ffffff;
-            --light-text: #2d1b69;
-            --fantasy-gold: #ffd700;
-            --fantasy-silver: #c0c0c0;
-            --shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
-            --radius: 16px;
-            --transition: all 0.3s ease;
-            --border-glow: 0 0 15px rgba(0, 212, 255, 0.5);
+            --youtube-red: #ff0000;
+            --youtube-dark: #0f0f0f;
+            --youtube-dark-secondary: #212121;
+            --youtube-dark-tertiary: #3d3d3d;
+            --youtube-light: #ffffff;
+            --youtube-light-secondary: #f9f9f9;
+            --youtube-light-tertiary: #e5e5e5;
+            --youtube-text-dark: #f1f1f1;
+            --youtube-text-light: #0f0f0f;
+            --youtube-text-gray: #aaa;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --transition: all 0.2s ease;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html {
-            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Merriweather', serif;
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: var(--transition);
-            line-height: 1.6;
-            background-attachment: fixed;
-            min-height: 100vh;
-            position: relative;
+            line-height: 1.4;
+            background-color: var(--youtube-dark);
+            color: var(--youtube-text-dark);
         }
 
         body.light-mode {
-            background: linear-gradient(135deg, var(--light-bg) 0%, #e6e1ff 100%);
-            color: var(--light-text);
+            background-color: var(--youtube-light);
+            color: var(--youtube-text-light);
         }
 
-        body.dark-mode {
-            background: linear-gradient(135deg, var(--dark-bg) 0%, #111827 100%);
-            color: var(--dark-text);
+        /* AdSense Ad Containers */
+        .ad-container {
+            text-align: center;
+            margin: 20px 0;
+            overflow: hidden;
+            border-radius: var(--radius);
+        }
+        
+        .header-ad {
+            max-height: 90px;
+            margin: 10px auto;
+        }
+        
+        .sidebar-ad {
+            margin: 15px 24px;
+        }
+        
+        .video-grid-ad {
+            grid-column: 1 / -1;
+            margin: 20px 0;
+        }
+        
+        .player-ad {
+            margin: 20px 0;
         }
 
-        .fantasy-pattern {
+        /* YouTube-like Header */
+        header {
+            padding: 0 16px;
+            height: 56px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238a2be2' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* Fantasy Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark-card);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-        }
-
-        /* Header & Navigation */
-        header {
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
+            right: 0;
             z-index: 1000;
-            backdrop-filter: blur(10px);
+            background-color: var(--youtube-dark);
+            border-bottom: 1px solid var(--youtube-dark-tertiary);
         }
 
         .light-mode header {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-bottom: 2px solid var(--fantasy-gold);
+            background-color: var(--youtube-light);
+            border-bottom: 1px solid var(--youtube-light-tertiary);
         }
 
-        .dark-mode header {
-            background-color: rgba(26, 31, 53, 0.9);
-            border-bottom: 2px solid var(--fantasy-gold);
+        /* Left section - Logo and menu */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background-color: var(--youtube-dark-tertiary);
         }
 
         .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
             text-decoration: none;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
-        .logo i {
-            color: var(--fantasy-gold);
-            text-shadow: 0 0 10px var(--fantasy-gold);
+        .logo-icon {
+            color: var(--youtube-red);
+            font-size: 28px;
         }
 
-        .logo span {
-            color: var(--secondary);
-            text-shadow: 0 0 5px var(--secondary);
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        nav a {
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .light-mode nav a {
-            color: var(--light-text);
-            background: rgba(138, 43, 226, 0.1);
-        }
-
-        .dark-mode nav a {
-            color: var(--dark-text);
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        nav a:hover {
-            color: var(--fantasy-gold);
-            transform: translateY(-2px);
-            box-shadow: var(--border-glow);
-        }
-
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        nav a:hover::after {
-            transform: scaleX(1);
-        }
-
-        /* Mobile Menu */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
             color: inherit;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
+            letter-spacing: -0.5px;
         }
 
-        /* Search Bar */
-        .search-container {
-            position: relative;
+        /* Center section - Search */
+        .header-center {
             flex: 1;
-            max-width: 400px;
-            margin: 0 1rem;
+            max-width: 600px;
+            margin: 0 40px;
+            display: flex;
+        }
+
+        .search-container {
+            display: flex;
+            flex: 1;
         }
 
         .search-input {
-            width: 100%;
-            padding: 0.8rem 1rem 0.8rem 3rem;
-            border-radius: 50px;
-            border: 2px solid transparent;
-            font-size: 0.95rem;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            color: inherit;
-        }
-
-        .search-input:focus {
+            flex: 1;
+            padding: 0 16px;
+            height: 40px;
+            border: 1px solid var(--youtube-dark-tertiary);
+            background-color: var(--youtube-dark-secondary);
+            color: var(--youtube-text-dark);
+            font-size: 16px;
+            border-radius: 40px 0 0 40px;
             outline: none;
-            border-color: var(--primary);
-            box-shadow: var(--border-glow);
         }
 
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary);
+        .light-mode .search-input {
+            background-color: var(--youtube-light);
+            border-color: var(--youtube-light-tertiary);
+            color: var(--youtube-text-light);
         }
 
-        /* Buttons */
-        .upload-btn {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 0.8rem 1.8rem;
-            border-radius: 50px;
+        .search-button {
+            width: 64px;
+            height: 40px;
+            background-color: var(--youtube-dark-tertiary);
+            border: 1px solid var(--youtube-dark-tertiary);
+            border-left: none;
+            border-radius: 0 40px 40px 0;
+            cursor: pointer;
+            color: var(--youtube-text-gray);
+            transition: var(--transition);
+        }
+
+        .search-button:hover {
+            background-color: var(--youtube-dark-tertiary);
+            opacity: 0.8;
+        }
+
+        /* Right section - Actions */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-button {
+            background: none;
             border: none;
-            font-weight: 700;
+            color: inherit;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .header-button:hover {
+            background-color: var(--youtube-dark-tertiary);
+        }
+
+        .light-mode .header-button:hover {
+            background-color: var(--youtube-light-tertiary);
+        }
+
+        .upload-btn {
+            background-color: var(--youtube-red);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
-            white-space: nowrap;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .upload-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.4);
+            background-color: #cc0000;
         }
 
-        .upload-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .upload-btn:hover::before {
-            left: 100%;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--fantasy-gold);
-            transition: transform 0.3s ease;
-            padding: 0.5rem;
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(180deg);
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.5rem;
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--youtube-red);
+            color: white;
             display: flex;
-            gap: 1.5rem;
-            min-height: calc(100vh - 200px);
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
         }
 
-        /* Mobile-First Adjustments */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                padding: 1rem;
-                gap: 1rem;
-            }
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            margin-top: 56px;
+            min-height: calc(100vh - 56px);
         }
 
-        /* Categories Sidebar */
-        .categories-sidebar {
-            width: 280px;
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-            max-height: calc(100vh - 150px);
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 240px;
+            background-color: var(--youtube-dark);
+            position: fixed;
+            top: 56px;
+            left: 0;
+            bottom: 0;
             overflow-y: auto;
-            border-radius: var(--radius);
-            padding: 1.5rem;
+            padding: 12px 0;
+            transition: transform 0.3s ease;
+            z-index: 999;
         }
 
-        .light-mode .categories-sidebar {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--fantasy-silver);
+        .light-mode .sidebar {
+            background-color: var(--youtube-light);
+            border-right: 1px solid var(--youtube-light-tertiary);
         }
 
-        .dark-mode .categories-sidebar {
-            background: rgba(26, 31, 53, 0.9);
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--fantasy-silver);
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: inherit;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
         }
 
-        .categories-title {
-            font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 3px solid var(--fantasy-gold);
-            color: var(--fantasy-gold);
+        .sidebar-item:hover {
+            background-color: var(--youtube-dark-tertiary);
+        }
+
+        .light-mode .sidebar-item:hover {
+            background-color: var(--youtube-light-tertiary);
+        }
+
+        .sidebar-item.active {
+            background-color: var(--youtube-dark-tertiary);
+            font-weight: 500;
+        }
+
+        .light-mode .sidebar-item.active {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-icon {
+            margin-right: 24px;
+            font-size: 20px;
+            width: 24px;
             text-align: center;
         }
 
-        .categories-list {
-            list-style: none;
+        .sidebar-text {
+            font-size: 14px;
         }
 
-        .category-item {
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
+        .sidebar-divider {
+            height: 1px;
+            background-color: var(--youtube-dark-tertiary);
+            margin: 12px 24px;
+        }
+
+        .light-mode .sidebar-divider {
+            background-color: var(--youtube-light-tertiary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Categories Bar */
+        .categories-bar {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+
+        .categories-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            padding: 8px 16px;
+            background-color: var(--youtube-dark-tertiary);
+            border-radius: 8px;
+            font-size: 14px;
             cursor: pointer;
             transition: var(--transition);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid transparent;
-            position: relative;
-        }
-
-        .light-mode .category-item {
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 212, 255, 0.1));
-        }
-
-        .dark-mode .category-item {
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 212, 255, 0.2));
-        }
-
-        .category-item:hover, .category-item.active {
-            border-color: var(--fantasy-gold);
-            transform: translateX(10px);
-            box-shadow: var(--shadow);
-        }
-
-        .category-item.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-        .category-icon {
-            font-size: 1.2rem;
-            margin-right: 0.75rem;
-            color: var(--fantasy-gold);
-        }
-
-        .category-count {
-            font-size: 0.9rem;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-weight: 700;
-        }
-
-        /* Mobile Categories */
-        .mobile-categories-toggle {
-            display: none;
-            width: 100%;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
             border: none;
-            border-radius: var(--radius);
-            font-weight: 700;
-            cursor: pointer;
+            color: inherit;
+            white-space: nowrap;
+        }
+
+        .light-mode .category-chip {
+            background-color: var(--youtube-light-tertiary);
+        }
+
+        .category-chip:hover {
+            background-color: var(--youtube-dark-tertiary);
+            opacity: 0.8;
+        }
+
+        .category-chip.active {
+            background-color: var(--youtube-text-dark);
+            color: var(--youtube-dark);
+        }
+
+        .light-mode .category-chip.active {
+            background-color: var(--youtube-text-light);
+            color: var(--youtube-light);
         }
 
         /* Video Grid */
         .video-grid {
-            flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .video-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-
-        @media (max-width: 480px) {
-            .video-grid {
-                grid-template-columns: 1fr;
-            }
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
         }
 
         .video-card {
-            border-radius: var(--radius);
+            background: transparent;
+            border-radius: 8px;
             overflow: hidden;
             transition: var(--transition);
             cursor: pointer;
+        }
+
+        .video-card:hover .video-thumbnail {
+            transform: scale(1.03);
+        }
+
+        .video-thumbnail-container {
             position: relative;
-            border: 2px solid transparent;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .video-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: var(--shadow);
-            border-color: var(--fantasy-gold);
-        }
-
-        .light-mode .video-card {
-            background: var(--light-card);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .dark-mode .video-card {
-            background: var(--dark-card);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .thumbnail-container {
-            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
             overflow: hidden;
+            border-radius: 8px;
+            background-color: var(--youtube-dark-tertiary);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        /* Video duration overlay REMOVED from here */
+        /* .video-duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        } */
+
+        .video-info {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .channel-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--youtube-red);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
             flex-shrink: 0;
         }
 
-        .thumbnail {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .video-card:hover .thumbnail {
-            transform: scale(1.1);
-        }
-
-        .duration {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
-        .video-info {
-            padding: 1.2rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+        .video-details {
+            flex: 1;
         }
 
         .video-title {
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-            font-size: 1.1rem;
-            overflow: hidden;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            flex-grow: 1;
+            overflow: hidden;
+            line-height: 1.4;
         }
 
-        .video-meta {
+        .channel-name {
+            font-size: 14px;
+            color: var(--youtube-text-gray);
+            margin-bottom: 4px;
+        }
+
+        .video-stats {
+            font-size: 14px;
+            color: var(--youtube-text-gray);
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Video Player Page */
+        .video-player-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .video-player-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+        }
+
+        .player-section {
+            width: 100%;
+        }
+
+        .video-player-wrapper {
+            width: 100%;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .drive-player {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+
+        .video-player-info {
+            padding: 16px 0;
+        }
+
+        .video-player-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .video-player-stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
-            color: #888;
-            margin-bottom: 0.75rem;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--youtube-dark-tertiary);
         }
 
-        .category-tag {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .light-mode .video-player-stats {
+            border-bottom: 1px solid var(--youtube-light-tertiary);
         }
 
-        .uploader-info {
-            font-size: 0.9rem;
-            color: var(--fantasy-silver);
-            margin-top: 0.5rem;
+        .stats-left {
+            display: flex;
+            gap: 16px;
+            color: var(--youtube-text-gray);
+            font-size: 14px;
+        }
+
+        .stats-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-button {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: inherit;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        /* Ads in Video Grid */
-        .ad-card {
-            grid-column: span 1;
-            border: 3px dashed var(--fantasy-gold);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(192, 192, 192, 0.1));
+        .action-button:hover {
+            background-color: var(--youtube-dark-tertiary);
         }
 
-        .ad-label {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--fantasy-gold);
-            color: var(--dark-bg);
-            padding: 0.3rem 0.8rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            z-index: 2;
+        .light-mode .action-button:hover {
+            background-color: var(--youtube-light-tertiary);
         }
 
-        .ad-content {
-            padding: 1rem;
-            text-align: center;
+        .channel-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--youtube-dark-tertiary);
         }
 
-        .ad-title {
-            color: var(--fantasy-gold);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .light-mode .channel-info {
+            border-bottom: 1px solid var(--youtube-light-tertiary);
         }
 
-        .ad-description {
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            opacity: 0.9;
+        .channel-info-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        /* Search Results Info */
-        .search-results-info {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 212, 255, 0.1));
-            border: 2px solid var(--fantasy-silver);
+        .channel-subscribe {
+            background-color: var(--youtube-red);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .channel-subscribe:hover {
+            background-color: #cc0000;
+        }
+
+        .video-description {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--youtube-dark-tertiary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .light-mode .video-description {
+            border-bottom: 1px solid var(--youtube-light-tertiary);
+        }
+
+        /* Sidebar for video page */
+        .related-videos {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .related-video-item {
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .related-video-item:hover {
+            background-color: var(--youtube-dark-tertiary);
+        }
+
+        .light-mode .related-video-item:hover {
+            background-color: var(--youtube-light-tertiary);
+        }
+
+        .related-thumbnail {
+            width: 168px;
+            height: 94px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .related-video-info {
+            flex: 1;
+        }
+
+        .related-video-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .related-channel-name {
+            font-size: 12px;
+            color: var(--youtube-text-gray);
+            margin-bottom: 2px;
+        }
+
+        .related-video-stats {
+            font-size: 12px;
+            color: var(--youtube-text-gray);
         }
 
         /* Modals */
@@ -584,647 +667,726 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 14, 23, 0.95);
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            padding: 1rem;
+            padding: 20px;
         }
 
         .modal-content {
-            width: 95%;
-            max-width: 600px;
+            background-color: var(--youtube-dark);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            border-radius: var(--radius);
-            padding: 2rem;
-            position: relative;
-            border: 3px solid var(--fantasy-gold);
-            background: var(--dark-card);
-            box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
+        }
+
+        .light-mode .modal-content {
+            background-color: var(--youtube-light);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--youtube-dark-tertiary);
+        }
+
+        .light-mode .modal-header {
+            border-bottom: 1px solid var(--youtube-light-tertiary);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
         }
 
         .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
             background: none;
             border: none;
-            color: var(--fantasy-gold);
-            font-size: 1.5rem;
+            color: inherit;
+            font-size: 20px;
             cursor: pointer;
-            padding: 0.5rem;
+            padding: 4px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background-color: var(--youtube-dark-tertiary);
+        }
+
+        .light-mode .modal-close:hover {
+            background-color: var(--youtube-light-tertiary);
+        }
+
+        .modal-body {
+            padding: 20px;
         }
 
         /* Form Elements */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
 
-        .form-group label {
+        .form-label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-            color: var(--fantasy-gold);
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        .form-group input, .form-group textarea, .form-group select {
+        .form-input {
             width: 100%;
-            padding: 1rem;
-            border-radius: 12px;
-            border: 2px solid transparent;
-            font-family: inherit;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            background-color: var(--youtube-dark-secondary);
+            border: 1px solid var(--youtube-dark-tertiary);
+            border-radius: 8px;
             color: inherit;
+            font-size: 14px;
+            transition: var(--transition);
         }
 
-        .form-group input:focus, 
-        .form-group textarea:focus, 
-        .form-group select:focus {
+        .light-mode .form-input {
+            background-color: var(--youtube-light);
+            border-color: var(--youtube-light-tertiary);
+        }
+
+        .form-input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: var(--border-glow);
+            border-color: var(--youtube-red);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--youtube-dark-secondary);
+            border: 1px solid var(--youtube-dark-tertiary);
+            border-radius: 8px;
+            color: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .light-mode .form-textarea {
+            background-color: var(--youtube-light);
+            border-color: var(--youtube-light-tertiary);
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--youtube-red);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--youtube-dark-secondary);
+            border: 1px solid var(--youtube-dark-tertiary);
+            border-radius: 8px;
+            color: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .light-mode .form-select {
+            background-color: var(--youtube-light);
+            border-color: var(--youtube-light-tertiary);
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--youtube-red);
+        }
+
+        .form-hint {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--youtube-text-gray);
+        }
+
+        .thumbnail-preview {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
         }
 
         /* Buttons */
         .btn {
-            padding: 1rem 2rem;
+            padding: 10px 24px;
+            border-radius: 20px;
             border: none;
-            border-radius: 12px;
-            font-weight: 700;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
+            font-size: 14px;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-color: var(--youtube-red);
             color: white;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.4);
+            background-color: #cc0000;
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #666, #999);
-            color: white;
+            background-color: var(--youtube-dark-tertiary);
+            color: inherit;
         }
 
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #26a69a);
-            color: white;
+        .light-mode .btn-secondary {
+            background-color: var(--youtube-light-tertiary);
         }
 
-        /* Video Player Page */
-        .video-player-container {
-            max-width: 1200px;
-            margin: 1.5rem auto;
-            padding: 0 1.5rem;
+        .btn-secondary:hover {
+            opacity: 0.8;
         }
 
-        .video-player-wrapper {
-            width: 100%;
-            position: relative;
-            background: #000;
-            border-radius: var(--radius);
-            overflow: hidden;
-            border: 3px solid var(--fantasy-gold);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-        }
-
-        .drive-player {
-            width: 100%;
-            height: 600px;
-            border: none;
-        }
-
-        @media (max-width: 768px) {
-            .drive-player {
-                height: 300px;
-            }
-        }
-
-        /* Video Player Ad */
-        .player-ad {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(192, 192, 192, 0.1));
-            border: 2px dashed var(--fantasy-gold);
-            text-align: center;
-        }
-
-        .player-ad h3 {
-            color: var(--fantasy-gold);
-            margin-bottom: 1rem;
-        }
-
-        /* Admin Portal */
+        /* Admin Panel */
         .admin-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 14, 23, 0.98);
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 3000;
-            padding: 1rem;
         }
 
         .admin-panel {
-            width: 95%;
-            max-width: 1200px;
+            background-color: var(--youtube-dark);
+            border-radius: 12px;
+            max-width: 1000px;
+            width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            border-radius: var(--radius);
-            padding: 2rem;
-            background: var(--dark-card);
-            border: 3px solid var(--fantasy-gold);
-            box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
+        }
+
+        .light-mode .admin-panel {
+            background-color: var(--youtube-light);
         }
 
         .admin-tabs {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 3px solid var(--fantasy-silver);
-            padding-bottom: 1rem;
-            flex-wrap: wrap;
+            gap: 4px;
+            padding: 16px;
+            border-bottom: 1px solid var(--youtube-dark-tertiary);
+        }
+
+        .light-mode .admin-tabs {
+            border-bottom: 1px solid var(--youtube-light-tertiary);
         }
 
         .admin-tab {
-            padding: 1rem 2rem;
+            padding: 10px 20px;
             background: none;
             border: none;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 12px;
-            transition: var(--transition);
             color: inherit;
-            border: 2px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition);
         }
 
         .admin-tab:hover {
-            border-color: var(--fantasy-gold);
+            background-color: var(--youtube-dark-tertiary);
+        }
+
+        .light-mode .admin-tab:hover {
+            background-color: var(--youtube-light-tertiary);
         }
 
         .admin-tab.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-color: var(--youtube-red);
             color: white;
-            border-color: var(--fantasy-gold);
         }
 
-        /* Ads Management */
-        .ads-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+        .admin-section {
+            display: none;
+            padding: 24px;
         }
 
-        .ad-manage-card {
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            border: 2px solid var(--fantasy-silver);
-            background: rgba(255, 255, 255, 0.05);
+        .admin-section.active {
+            display: block;
         }
 
-        .ad-status {
+        /* Loading Spinner */
+        .loading-spinner {
             display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
         }
 
-        .ad-status.active {
-            background: var(--success);
-            color: white;
-        }
-
-        .ad-status.inactive {
-            background: #666;
-            color: white;
-        }
-
-        .ad-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        /* Analytics Cards */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .analytics-card {
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            text-align: center;
-            border: 2px solid transparent;
-            transition: var(--transition);
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 212, 255, 0.2));
-        }
-
-        .analytics-card:hover {
-            border-color: var(--fantasy-gold);
-            transform: translateY(-5px);
-        }
-
-        /* Footer */
-        footer {
-            padding: 3rem 1.5rem;
-            text-align: center;
-            margin-top: 3rem;
-            border-top: 3px solid var(--fantasy-gold);
-        }
-
-        .light-mode footer {
-            background: linear-gradient(135deg, rgba(244, 241, 255, 0.9), rgba(230, 225, 255, 0.9));
-        }
-
-        .dark-mode footer {
-            background: linear-gradient(135deg, rgba(26, 31, 53, 0.9), rgba(17, 24, 39, 0.9));
-        }
-
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .footer-logo {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        /* Mobile Menu */
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            nav ul {
-                position: fixed;
-                top: 70px;
-                left: 0;
-                width: 100%;
-                background: var(--dark-card);
-                flex-direction: column;
-                padding: 1rem;
-                display: none;
-                z-index: 1000;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            }
-
-            nav ul.show {
-                display: flex;
-            }
-
-            .nav-container {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .search-container {
-                order: 3;
-                width: 100%;
-                max-width: 100%;
-                margin: 1rem 0;
-            }
-
-            .categories-sidebar {
-                display: none;
-                width: 100%;
-                position: static;
-                max-height: none;
-            }
-
-            .categories-sidebar.show {
-                display: block;
-            }
-
-            .mobile-categories-toggle {
-                display: block;
-            }
-        }
-
-        /* Touch-friendly adjustments */
-        @media (max-width: 480px) {
-            .btn, .upload-btn {
-                padding: 0.8rem 1.5rem;
-                font-size: 0.9rem;
-            }
-
-            .modal-content, .admin-panel {
-                padding: 1.5rem;
-            }
-
-            .admin-tabs {
-                flex-direction: column;
-            }
-
-            .admin-tab {
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        /* Loading Animation */
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .loading {
-            animation: pulse 1.5s infinite;
-        }
-
-        /* Fantasy Badges */
-        .fantasy-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin: 0.2rem;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 60px 20px;
             grid-column: 1 / -1;
         }
 
-        .empty-state i {
-            font-size: 4rem;
-            color: var(--fantasy-gold);
-            margin-bottom: 1.5rem;
-            opacity: 0.7;
+        .empty-state-icon {
+            font-size: 48px;
+            color: var(--youtube-text-gray);
+            margin-bottom: 16px;
         }
 
-        /* Swipe indicators for mobile */
-        .swipe-hint {
-            display: none;
-            text-align: center;
-            padding: 1rem;
-            color: var(--fantasy-silver);
-            font-size: 0.9rem;
+        .empty-state-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 8px;
         }
 
-        @media (max-width: 768px) and (hover: none) {
-            .swipe-hint {
-                display: block;
+        .empty-state-description {
+            color: var(--youtube-text-gray);
+            margin-bottom: 24px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .video-player-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .related-videos {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 16px;
+            }
+            
+            .related-video-item {
+                flex-direction: column;
+            }
+            
+            .related-thumbnail {
+                width: 100%;
+                height: 180px;
             }
         }
 
-        /* Responsive Ad Adjustments */
         @media (max-width: 768px) {
-            .ad-card {
-                grid-column: span 1 !important;
+            .sidebar {
+                transform: translateX(-100%);
             }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header-center {
+                margin: 0 16px;
+                max-width: 400px;
+            }
+            
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-center {
+                display: none;
+            }
+            
+            .video-player-stats {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .stats-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .align-center {
+            align-items: center;
+        }
+
+        .gap-1 {
+            gap: 8px;
+        }
+
+        .gap-2 {
+            gap: 16px;
+        }
+
+        .mt-1 {
+            margin-top: 8px;
+        }
+
+        .mt-2 {
+            margin-top: 16px;
+        }
+
+        .mb-1 {
+            margin-bottom: 8px;
+        }
+
+        .mb-2 {
+            margin-bottom: 16px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .w-100 {
+            width: 100%;
         }
     </style>
 </head>
 <body class="dark-mode">
-    <!-- Fantasy Background Pattern -->
-    <div class="fantasy-pattern"></div>
+    <!-- Header Ad -->
+    <div class="ad-container header-ad">
+        <!-- AdSense Header Ad - REPLACE THIS WITH YOUR AD CODE -->
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXX"
+             data-ad-slot="1234567890"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
 
     <!-- Header -->
     <header>
-        <a href="#" class="logo" onclick="showHome(); return false;">
-            <i class="fas fa-crown"></i>Ray<span>vid</span>
-        </a>
+        <div class="header-left">
+            <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="#" class="logo" onclick="showHome(); return false;">
+                <i class="fab fa-youtube logo-icon"></i>
+                <span class="logo-text">Rayvid</span>
+            </a>
+        </div>
         
-        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-            <i class="fas fa-bars"></i>
-        </button>
-        
-        <div class="nav-container">
-            <!-- Search Bar -->
+        <div class="header-center">
             <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" id="search-input" 
-                       placeholder="Search mystical videos..."
-                       aria-label="Search videos">
+                       placeholder="Search videos..." aria-label="Search videos">
+                <button class="search-button" onclick="searchVideos(searchInput.value)" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
-            
-            <nav>
-                <ul id="mobile-menu">
-                    <li><a href="#" onclick="showHome(); return false;">
-                        <i class="fas fa-home"></i> Home
-                    </a></li>
-                    <li><button class="upload-btn" onclick="showUploadModal(); return false;">
-                        <i class="fas fa-upload"></i> Upload Video
-                    </button></li>
-                    <li><a href="#" onclick="showAdminPortal(); return false;">
-                        <i class="fas fa-shield-alt"></i> Admin
-                    </a></li>
-                    <li><button class="theme-toggle" onclick="toggleTheme(); return false;" aria-label="Toggle theme">
-                        <i class="fas fa-moon"></i>
-                    </button></li>
-                </ul>
-            </nav>
+        </div>
+        
+        <div class="header-right">
+            <button class="header-button" onclick="showUploadModal()" aria-label="Upload video">
+                <i class="fas fa-video"></i>
+            </button>
+            <button class="theme-toggle header-button" onclick="toggleTheme()" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="upload-btn" onclick="showUploadModal()">
+                <i class="fas fa-upload"></i> Upload
+            </button>
+            <div class="user-avatar" onclick="showAdminPortal()" role="button" tabindex="0">
+                A
+            </div>
         </div>
     </header>
 
-    <!-- Mobile Categories Toggle -->
-    <button class="mobile-categories-toggle" onclick="toggleCategories()">
-        <i class="fas fa-filter"></i> Browse Realms
-    </button>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <a href="#" class="sidebar-item active" onclick="showHome(); return false;">
+            <i class="fas fa-home sidebar-icon"></i>
+            <span class="sidebar-text">Home</span>
+        </a>
+        <a href="#" class="sidebar-item" onclick="setCategory('Entertainment'); return false;">
+            <i class="fas fa-film sidebar-icon"></i>
+            <span class="sidebar-text">Entertainment</span>
+        </a>
+        <a href="#" class="sidebar-item" onclick="setCategory('Gaming'); return false;">
+            <i class="fas fa-gamepad sidebar-icon"></i>
+            <span class="sidebar-text">Gaming</span>
+        </a>
+        <a href="#" class="sidebar-item" onclick="setCategory('Music'); return false;">
+            <i class="fas fa-music sidebar-icon"></i>
+            <span class="sidebar-text">Music</span>
+        </a>
+        <a href="#" class="sidebar-item" onclick="setCategory('Education'); return false;">
+            <i class="fas fa-graduation-cap sidebar-icon"></i>
+            <span class="sidebar-text">Education</span>
+        </a>
+        
+        <!-- Sidebar Ad -->
+        <div class="sidebar-ad ad-container">
+            <!-- AdSense Sidebar Ad - REPLACE THIS WITH YOUR AD CODE -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXX"
+                 data-ad-slot="0987654321"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-item" onclick="showAdminPortal()">
+            <i class="fas fa-cog sidebar-icon"></i>
+            <span class="sidebar-text">Admin Portal</span>
+        </div>
+    </nav>
 
     <!-- Main Content -->
-    <div class="container">
-        <!-- Categories Sidebar -->
-        <aside class="categories-sidebar" role="complementary" aria-label="Video categories">
-            <h3 class="categories-title"><i class="fas fa-dragon"></i> Realms</h3>
-            <ul class="categories-list" id="categories-list">
-                <!-- Categories will be dynamically loaded -->
-            </ul>
-        </aside>
-
-        <!-- Main Video Content -->
-        <main role="main">
-            <div class="search-results-info hidden" id="search-results-info">
-                <h3>Search Results for: "<span id="search-query"></span>"</h3>
-                <p>Found <span id="results-count">0</span> mystical videos</p>
+    <main class="main-container">
+        <div class="main-content" id="main-content">
+            <!-- Categories Bar -->
+            <div class="categories-bar" id="categories-bar">
+                <!-- Categories will be loaded here -->
             </div>
             
-            <!-- Swipe Hint for Mobile -->
-            <div class="swipe-hint">
-                <i class="fas fa-arrows-alt-h"></i> Swipe to explore more videos
+            <!-- Video Grid Ad -->
+            <div class="video-grid-ad ad-container">
+                <!-- AdSense Video Grid Ad - REPLACE THIS WITH YOUR AD CODE -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXX"
+                     data-ad-slot="1122334455"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
             </div>
             
+            <!-- Video Grid -->
             <div class="video-grid" id="video-grid">
-                <!-- Videos and Ads will be loaded here by JavaScript -->
+                <!-- Videos will be loaded here -->
             </div>
             
             <!-- Empty State -->
             <div class="empty-state hidden" id="empty-state">
-                <i class="fas fa-hat-wizard"></i>
-                <h3>The Realm is Empty</h3>
-                <p>No mystical videos found. Be the first to share your enchanted content!</p>
-                <button class="btn btn-success mt-1" onclick="showUploadModal()">
-                    <i class="fas fa-wand-magic-sparkles"></i> Upload Video
+                <div class="empty-state-icon">
+                    <i class="fas fa-video-slash"></i>
+                </div>
+                <h3 class="empty-state-title">No videos found</h3>
+                <p class="empty-state-description">Try a different search or upload your own video!</p>
+                <button class="btn btn-primary" onclick="showUploadModal()">
+                    <i class="fas fa-upload"></i> Upload Video
                 </button>
             </div>
-        </main>
+        </div>
+    </main>
+
+    <!-- Video Player Page (Hidden by Default) -->
+    <div class="video-player-container hidden" id="video-player-page">
+        <div class="video-player-content">
+            <div class="player-section">
+                <button class="btn btn-secondary" onclick="showHome()">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </button>
+                
+                <div class="video-player-wrapper mt-2">
+                    <iframe class="drive-player" id="drive-player" frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen
+                            title="Video Player"></iframe>
+                </div>
+                
+                <!-- Video Player Ad -->
+                <div class="player-ad ad-container">
+                    <!-- AdSense Player Ad - REPLACE THIS WITH YOUR AD CODE -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXX"
+                         data-ad-slot="5566778899"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+                
+                <div class="video-player-info">
+                    <h1 class="video-player-title" id="video-title">Video Title</h1>
+                    
+                    <div class="video-player-stats">
+                        <div class="stats-left">
+                            <span id="view-count">0 views</span>
+                            <span id="upload-date">Today</span>
+                        </div>
+                        <div class="stats-right">
+                            <button class="action-button">
+                                <i class="fas fa-thumbs-up"></i> Like
+                            </button>
+                            <button class="action-button">
+                                <i class="fas fa-thumbs-down"></i> Dislike
+                            </button>
+                            <button class="action-button">
+                                <i class="fas fa-share"></i> Share
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="channel-info">
+                        <div class="channel-info-left">
+                            <div class="channel-avatar" id="channel-avatar">U</div>
+                            <div>
+                                <div class="channel-name" id="uploader-name-display">Uploader Name</div>
+                                <div class="video-stats" id="subscriber-count">1K subscribers</div>
+                            </div>
+                        </div>
+                        <button class="channel-subscribe">Subscribe</button>
+                    </div>
+                    
+                    <div class="video-description" id="video-description">
+                        Video description will appear here. Click "Show more" to see the full description.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="related-videos" id="related-videos">
+                <!-- Related videos will be loaded here -->
+            </div>
+        </div>
     </div>
 
-    <!-- Upload Modal for Everyone -->
+    <!-- Upload Modal -->
     <div class="modal-overlay" id="upload-modal">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeUploadModal()">
-                <i class="fas fa-times"></i>
-            </button>
-            <h2><i class="fas fa-cloud-upload-alt"></i> Share Your Enchanted Video</h2>
-            
-            <form id="upload-form">
-                <div class="form-group">
-                    <label for="drive-link"><i class="fab fa-google-drive"></i> Google Drive Video Link *</label>
-                    <input type="url" id="drive-link" required 
-                           placeholder="https://drive.google.com/file/d/VIDEO_ID/view"
-                           aria-required="true">
-                    <small>Make sure your Google Drive file is set to "Anyone with the link can view"</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-title-input"><i class="fas fa-scroll"></i> Video Title *</label>
-                    <input type="text" id="video-title-input" required
-                           placeholder="Enter an enchanting title for your video"
-                           aria-required="true">
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-description-input"><i class="fas fa-book"></i> Lore (Description)</label>
-                    <textarea id="video-description-input" rows="3"
-                              placeholder="Tell the tale of your video content..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-category-input"><i class="fas fa-map"></i> Realm (Category) *</label>
-                    <select id="video-category-input" required aria-required="true">
-                        <option value="">Choose a realm</option>
-                        <option value="Fantasy">Fantasy Realms</option>
-                        <option value="Magic">Magic & Spells</option>
-                        <option value="Adventure">Heroic Adventures</option>
-                        <option value="Mythology">Ancient Mythology</option>
-                        <option value="Creatures">Mystical Creatures</option>
-                        <option value="Lore">World Lore</option>
-                        <option value="Art">Fantasy Art</option>
-                        <option value="Music">Enchanted Music</option>
-                        <option value="Other">Other Realm</option>
-                    </select>
-                </div>
-                
-                <div class="form-group" id="custom-category-group" style="display: none;">
-                    <label for="custom-category"><i class="fas fa-compass"></i> Name Your Realm *</label>
-                    <input type="text" id="custom-category" 
-                           placeholder="Enter your custom realm name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="thumbnail-url"><i class="fas fa-image"></i> Thumbnail Image URL</label>
-                    <input type="url" id="thumbnail-url" 
-                           placeholder="https://example.com/thumbnail.jpg">
-                    <small>Upload your thumbnail to any image hosting service</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="video-tags"><i class="fas fa-tags"></i> Magical Tags</label>
-                    <input type="text" id="video-tags" 
-                           placeholder="dragon, magic, adventure, fantasy, lore">
-                    <small>Add magical tags to help seekers find your video</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="uploader-name"><i class="fas fa-user-circle"></i> Your Name *</label>
-                    <input type="text" id="uploader-name" required 
-                           placeholder="Enter your name or mystical alias"
-                           aria-required="true">
-                </div>
-                
-                <button type="submit" class="btn btn-success" id="upload-submit-btn">
-                    <i class="fas fa-wand-magic-sparkles"></i> Enchant This Video
+            <div class="modal-header">
+                <h3 class="modal-title">Upload Video</h3>
+                <button class="modal-close" onclick="closeUploadModal()" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
                 </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Video Player Page -->
-    <div class="video-player-container hidden" id="video-player-page">
-        <button class="btn btn-secondary" onclick="showHome()">
-            <i class="fas fa-arrow-left"></i> Back to Realms
-        </button>
-        
-        <article class="video-player-wrapper mt-2" role="article">
-            <iframe class="drive-player" id="drive-player" frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen
-                    title="Video Player"></iframe>
-        </article>
-        
-        <!-- Video Player Ad -->
-        <div class="player-ad hidden" id="player-ad">
-            <h3><i class="fas fa-gem"></i> Sponsored by Our Patrons</h3>
-            <div id="ad-content"></div>
-        </div>
-        
-        <div class="video-details">
-            <h1 id="video-title">Video Title</h1>
-            <div class="d-flex align-center gap-1 mt-1 flex-wrap">
-                <div class="category-tag" id="video-category">Realm</div>
-                <span>Shared by: <strong id="uploader-name-display">Wizard</strong></span>
-            </div>
-            <p id="video-description" class="mt-2">Video description will appear here.</p>
-            
-            <div class="tags-container" id="video-tags-container">
-                <!-- Tags will be loaded here -->
             </div>
             
-            <div class="video-meta mt-2">
-                <span><i class="fas fa-eye"></i> <span id="view-count">0</span> views</span>
-                <span><i class="fas fa-hourglass"></i> <span id="upload-date">Today</span></span>
+            <div class="modal-body">
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label class="form-label" for="drive-link">Google Drive Video Link *</label>
+                        <input type="url" class="form-input" id="drive-link" required 
+                               placeholder="https://drive.google.com/file/d/VIDEO_ID/view"
+                               aria-required="true">
+                        <span class="form-hint">Make sure your Google Drive file is set to "Anyone with the link can view"</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="video-title-input">Video Title *</label>
+                        <input type="text" class="form-input" id="video-title-input" required
+                               placeholder="Enter an engaging title for your video"
+                               aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="video-description-input">Description</label>
+                        <textarea class="form-textarea" id="video-description-input" rows="3"
+                                  placeholder="Describe your video content..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="video-category-input">Category *</label>
+                        <select class="form-select" id="video-category-input" required aria-required="true">
+                            <option value="">Select a category</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Education">Education</option>
+                            <option value="Gaming">Gaming</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Music">Music</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Tutorial">Tutorial</option>
+                            <option value="Other">Other (specify below)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group hidden" id="custom-category-group">
+                        <label class="form-label" for="custom-category">Custom Category Name *</label>
+                        <input type="text" class="form-input" id="custom-category" 
+                               placeholder="Enter your custom category name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="thumbnail-url">Thumbnail Image URL</label>
+                        <input type="url" class="form-input" id="thumbnail-url" 
+                               placeholder="https://example.com/thumbnail.jpg">
+                        <span class="form-hint">Upload your thumbnail to any image hosting service (like Imgur) and paste the direct link</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <img id="thumbnail-preview" class="thumbnail-preview" alt="Thumbnail Preview">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="video-tags">Tags (comma separated)</label>
+                        <input type="text" class="form-input" id="video-tags" 
+                               placeholder="funny, tutorial, gaming, vlog, music">
+                        <span class="form-hint">Add relevant tags to help users find your video (max 10 tags)</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="uploader-name">Your Name *</label>
+                        <input type="text" class="form-input" id="uploader-name" required 
+                               placeholder="Enter your name or channel name"
+                               aria-required="true">
+                    </div>
+                    
+                    <div class="d-flex gap-1 justify-between mt-2">
+                        <button type="button" class="btn btn-secondary w-100" onclick="closeUploadModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary w-100" id="upload-submit-btn">
+                            <i class="fas fa-upload"></i> Upload Video
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1232,140 +1394,58 @@
     <!-- Admin Portal -->
     <div class="admin-overlay" id="admin-overlay">
         <div class="admin-panel">
-            <!-- Password Prompt Screen -->
-            <div id="admin-password-prompt" class="password-prompt">
-                <h2><i class="fas fa-shield-alt"></i> Admin Portal</h2>
-                <p>Enter the enchanted password to continue:</p>
-                <input type="password" id="admin-password" class="password-input" 
-                       placeholder="Enter password" autocomplete="off" aria-label="Admin password">
-                <div class="d-flex gap-1 justify-between mt-2">
-                    <button class="btn btn-secondary" onclick="closeAdminPortal()">Cancel</button>
-                    <button class="btn btn-primary" onclick="verifyAdminPassword()">Enter Realm</button>
-                </div>
-                <p class="mt-1"><small>Hint: The password is "admin123"</small></p>
+            <div class="modal-header">
+                <h3 class="modal-title">Admin Portal</h3>
+                <button class="modal-close" onclick="closeAdminPortal()" aria-label="Close admin portal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
-            <!-- Admin Panel Content -->
-            <div id="admin-panel-content" class="hidden">
-                <div class="d-flex justify-between align-center mb-2">
-                    <h2><i class="fas fa-crown"></i> Realm Master Portal</h2>
-                    <button class="btn btn-secondary" onclick="closeAdminPortal()">
-                        <i class="fas fa-times"></i> Exit
-                    </button>
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchAdminTab('manage')">Manage Videos</button>
+                <button class="admin-tab" onclick="switchAdminTab('analytics')">Analytics</button>
+            </div>
+            
+            <div class="admin-section active" id="manage-section">
+                <h4 class="mb-2">Video Management</h4>
+                <div class="video-list" id="admin-video-list">
+                    <!-- Videos will be loaded here -->
                 </div>
-                
-                <div class="admin-tabs">
-                    <button class="admin-tab active" onclick="switchAdminTab('manage')">
-                        <i class="fas fa-video"></i> Manage Videos
-                    </button>
-                    <button class="admin-tab" onclick="switchAdminTab('ads')">
-                        <i class="fas fa-ad"></i> Ads Management
-                    </button>
-                    <button class="admin-tab" onclick="switchAdminTab('analytics')">
-                        <i class="fas fa-chart-bar"></i> Realm Analytics
-                    </button>
-                    <button class="admin-tab" onclick="switchAdminTab('settings')">
-                        <i class="fas fa-cog"></i> Realm Settings
-                    </button>
-                </div>
-                
-                <!-- Manage Videos Section -->
-                <div class="admin-section active" id="manage-section">
-                    <h3 class="mb-2"><i class="fas fa-film"></i> Manage Enchanted Videos</h3>
-                    <div class="video-list" id="admin-video-list">
-                        <!-- Videos will be loaded here -->
+            </div>
+            
+            <div class="admin-section" id="analytics-section">
+                <h4 class="mb-2">Analytics Dashboard</h4>
+                <div class="analytics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div style="background-color: var(--youtube-red); padding: 20px; border-radius: var(--radius); color: white; text-align: center;">
+                        <h4 style="margin-bottom: 8px; font-size: 14px;">Total Views</h4>
+                        <h2 style="font-size: 24px; margin: 0;" id="total-views">0</h2>
+                    </div>
+                    <div style="background-color: #065fd4; padding: 20px; border-radius: var(--radius); color: white; text-align: center;">
+                        <h4 style="margin-bottom: 8px; font-size: 14px;">Total Videos</h4>
+                        <h2 style="font-size: 24px; margin: 0;" id="total-videos">0</h2>
+                    </div>
+                    <div style="background-color: #606060; padding: 20px; border-radius: var(--radius); color: white; text-align: center;">
+                        <h4 style="margin-bottom: 8px; font-size: 14px;">Total Categories</h4>
+                        <h2 style="font-size: 24px; margin: 0;" id="total-categories">0</h2>
+                    </div>
+                    <div style="background-color: #00a2ff; padding: 20px; border-radius: var(--radius); color: white; text-align: center;">
+                        <h4 style="margin-bottom: 8px; font-size: 14px;">Active Uploaders</h4>
+                        <h2 style="font-size: 24px; margin: 0;" id="total-uploaders">0</h2>
                     </div>
                 </div>
                 
-                <!-- Ads Management Section -->
-                <div class="admin-section" id="ads-section">
-                    <h3 class="mb-2"><i class="fas fa-gem"></i> Ads Management</h3>
-                    <button class="btn btn-success mb-2" onclick="showAdForm()">
-                        <i class="fas fa-plus"></i> Create New Ad
-                    </button>
-                    
-                    <div class="ads-grid" id="ads-grid">
-                        <!-- Ads will be loaded here -->
-                    </div>
-                </div>
-                
-                <!-- Analytics Section -->
-                <div class="admin-section" id="analytics-section">
-                    <h3 class="mb-2"><i class="fas fa-chart-line"></i> Realm Analytics</h3>
-                    
-                    <div class="analytics-grid">
-                        <div class="analytics-card">
-                            <h4>Total Views</h4>
-                            <h2 id="total-views">0</h2>
-                        </div>
-                        <div class="analytics-card">
-                            <h4>Total Videos</h4>
-                            <h2 id="total-videos">0</h2>
-                        </div>
-                        <div class="analytics-card">
-                            <h4>Total Realms</h4>
-                            <h2 id="total-categories">0</h2>
-                        </div>
-                        <div class="analytics-card">
-                            <h4>Active Wizards</h4>
-                            <h2 id="total-uploaders">0</h2>
-                        </div>
-                    </div>
-                    
-                    <h4 class="mt-2">Most Popular Videos</h4>
+                <div class="admin-video-item" style="background-color: var(--youtube-dark-secondary); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                    <h5 style="margin-bottom: 12px;">Most Popular Videos</h5>
                     <div id="popular-videos-list">
                         <!-- Popular videos will be loaded here -->
-                    </div>
-                </div>
-                
-                <!-- Settings Section -->
-                <div class="admin-section" id="settings-section">
-                    <h3 class="mb-2"><i class="fas fa-cogs"></i> Realm Settings</h3>
-                    
-                    <div class="form-group">
-                        <label for="admin-password-change">Change Admin Password</label>
-                        <input type="password" id="admin-password-change" placeholder="New password">
-                        <button class="btn btn-primary mt-1" onclick="updateAdminPassword()">
-                            <i class="fas fa-key"></i> Update Password
-                        </button>
-                    </div>
-                    
-                    <div class="form-group mt-2">
-                        <label for="ad-frequency">Ad Frequency (videos between ads)</label>
-                        <input type="number" id="ad-frequency" min="1" max="20" value="5">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="theme-settings">Realm Theme Settings</label>
-                        <select id="theme-settings" onchange="updateThemeSettings()">
-                            <option value="auto">Automatic (System)</option>
-                            <option value="dark">Dark Realm</option>
-                            <option value="light">Light Realm</option>
-                        </select>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer role="contentinfo">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <i class="fas fa-crown"></i>Ray<span>vid</span>
-            </div>
-            <p style="margin: 1rem 0;">A mystical realm for sharing enchanted videos. Powered by ancient magic and modern technology.</p>
-            
-            <div class="fantasy-badge">Fantasy Realm</div>
-            <div class="fantasy-badge">Ad-Free Option</div>
-            <div class="fantasy-badge">Magic Powered</div>
-            
-            <p class="mt-2">© 2026 Rayvid Realm. All rights reserved.</p>
-        </div>
-    </footer>
-
     <script>
-        // Enhanced Firebase Configuration
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
             authDomain: "rayvid-c074a.firebaseapp.com",
@@ -1380,40 +1460,25 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Realm Data Storage
+        // Initial Data Storage
         let videos = [];
-        let ads = [];
         let adminPassword = "admin123";
         let currentVideoId = null;
         let currentCategory = "all";
         let searchQuery = "";
-        let adFrequency = 5; // Show ad after every 5 videos
 
-        // Fantasy-themed default thumbnails
-        const fantasyThumbnails = {
-            "Fantasy": "https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Magic": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Adventure": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Mythology": "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Creatures": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Lore": "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Art": "https://images.unsplash.com/photo-1543857778-c4a1a569e388?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+        // Default thumbnails for each category (YouTube-like thumbnails)
+        const defaultThumbnails = {
+            "Entertainment": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Education": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Gaming": "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Technology": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
             "Music": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "Other": "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            "default": "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-        };
-
-        // Category icons for fantasy theme
-        const categoryIcons = {
-            "Fantasy": "fa-dragon",
-            "Magic": "fa-wand-magic-sparkles",
-            "Adventure": "fa-helmet-battle",
-            "Mythology": "fa-monument",
-            "Creatures": "fa-paw",
-            "Lore": "fa-scroll",
-            "Art": "fa-palette",
-            "Music": "fa-music",
-            "Other": "fa-compass"
+            "Sports": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Comedy": "https://images.unsplash.com/photo-1545239351-ef35f43d514b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Tutorial": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Other": "https://images.unsplash.com/photo-1574717024453-1f2b07e6c3e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "default": "https://images.unsplash.com/photo-1536240478700-b869070f9279?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
         };
 
         // DOM Elements
@@ -1422,22 +1487,17 @@
         const adminOverlay = document.getElementById('admin-overlay');
         const uploadModal = document.getElementById('upload-modal');
         const searchInput = document.getElementById('search-input');
-        const categoriesList = document.getElementById('categories-list');
-        const searchResultsInfo = document.getElementById('search-results-info');
+        const categoriesBar = document.getElementById('categories-bar');
         const emptyState = document.getElementById('empty-state');
-        const mobileMenu = document.getElementById('mobile-menu');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
 
-        // Initialize the realm
+        // Initialize the app
         document.addEventListener('DOMContentLoaded', async function() {
             await loadVideosFromFirestore();
-            await loadAdsFromFirestore();
-            renderVideoGridWithAds();
+            renderVideoGrid();
+            updateCategoriesBar();
             setupEventListeners();
-            updateCategories();
-            updateAnalytics();
-            
-            // Load settings from localStorage
-            loadSettings();
             
             // Set up search with debounce
             let searchTimeout;
@@ -1448,75 +1508,41 @@
                 }, 300);
             });
             
-            // Setup real-time listeners
-            setupRealtimeListeners();
-            
-            // Add touch events for mobile
-            setupTouchEvents();
-        });
-
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle('show');
-        }
-
-        // Categories toggle for mobile
-        function toggleCategories() {
-            const sidebar = document.querySelector('.categories-sidebar');
-            sidebar.classList.toggle('show');
-        }
-
-        // Load settings from localStorage
-        function loadSettings() {
+            // Check for saved theme
             const savedTheme = localStorage.getItem('theme');
             if(savedTheme === 'light') {
-                document.body.classList.remove('dark-mode');
-                document.body.classList.add('light-mode');
-                document.querySelector('.theme-toggle i').classList.remove('fa-moon');
-                document.querySelector('.theme-toggle i').classList.add('fa-sun');
+                toggleTheme();
             }
             
-            const savedAdFreq = localStorage.getItem('adFrequency');
-            if(savedAdFreq) {
-                adFrequency = parseInt(savedAdFreq);
+            // Real-time listener for video updates
+            setupRealtimeListener();
+            
+            // Update analytics
+            updateAnalytics();
+            
+            // Initialize AdSense ads
+            initializeAdSense();
+        });
+
+        // Initialize AdSense Ads
+        function initializeAdSense() {
+            // Push ads to AdSense (this should run after AdSense script loads)
+            if (typeof adsbygoogle !== 'undefined') {
+                // You can push specific ads here if needed
+                // (adsbygoogle = window.adsbygoogle || []).push({});
+                console.log('AdSense initialized');
             }
         }
 
-        // Setup touch events for mobile
-        function setupTouchEvents() {
-            let touchStartX = 0;
-            let touchEndX = 0;
-            
-            document.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            });
-            
-            document.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            });
-            
-            function handleSwipe() {
-                const swipeThreshold = 50;
-                const diff = touchEndX - touchStartX;
-                
-                if(Math.abs(diff) > swipeThreshold) {
-                    if(diff > 0) {
-                        // Swipe right - could be used for navigation
-                    } else {
-                        // Swipe left
-                    }
-                }
-            }
+        // Toggle Sidebar (for mobile)
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
         }
 
-        // Theme Toggle with fantasy animation
+        // Theme Toggle
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.querySelector('.theme-toggle i');
-            const themeSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-300.mp3');
-            themeSound.volume = 0.3;
-            themeSound.play().catch(e => console.log("Audio play failed:", e));
             
             if(body.classList.contains('dark-mode')) {
                 body.classList.remove('dark-mode');
@@ -1533,251 +1559,177 @@
             localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
         }
 
-        // Load videos from Firestore
+        // Load videos from Firebase Firestore
         async function loadVideosFromFirestore() {
             try {
-                const snapshot = await db.collection("videos").orderBy("createdAt", "desc").get();
+                const videosCollection = db.collection("videos");
+                const snapshot = await videosCollection.orderBy("createdAt", "desc").get();
+                
                 videos = [];
                 snapshot.forEach(doc => {
                     const videoData = doc.data();
                     videoData.firebaseId = doc.id;
                     videos.push(videoData);
                 });
-                console.log(`Loaded ${videos.length} enchanted videos`);
+                
+                console.log(`Loaded ${videos.length} videos from Firestore`);
                 return true;
+                
             } catch (error) {
-                console.error('Error loading videos:', error);
+                console.error('Error loading videos from Firestore:', error);
                 videos = [];
                 return false;
             }
         }
 
-        // Load ads from Firestore
-        async function loadAdsFromFirestore() {
-            try {
-                const snapshot = await db.collection("ads").where("active", "==", true).get();
-                ads = [];
-                snapshot.forEach(doc => {
-                    const adData = doc.data();
-                    adData.firebaseId = doc.id;
-                    ads.push(adData);
+        // Set up real-time Firestore listener
+        function setupRealtimeListener() {
+            db.collection("videos")
+                .orderBy("createdAt", "desc")
+                .onSnapshot((snapshot) => {
+                    loadVideosFromFirestore().then(() => {
+                        renderVideoGrid();
+                        updateCategoriesBar();
+                        updateAnalytics();
+                    });
+                }, (error) => {
+                    console.error("Error in real-time listener: ", error);
                 });
-                console.log(`Loaded ${ads.length} active ads`);
-                return true;
-            } catch (error) {
-                console.error('Error loading ads:', error);
-                ads = [];
-                return false;
-            }
         }
 
-        // Save video to Firestore
+        // Save video to Firebase Firestore
         async function saveVideoToFirestore(videoData) {
             try {
+                const videosCollection = db.collection("videos");
+                
                 videoData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                 videoData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
                 videoData.views = 0;
                 
-                const docRef = await db.collection("videos").add(videoData);
+                const docRef = await videosCollection.add(videoData);
+                console.log("Video saved with ID: ", docRef.id);
+                
                 videoData.firebaseId = docRef.id;
                 
-                // Play success sound
-                const successSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3');
-                successSound.volume = 0.3;
-                successSound.play().catch(e => console.log("Audio play failed:", e));
-                
                 return { success: true, id: docRef.id };
+                
             } catch (error) {
-                console.error('Error saving video:', error);
+                console.error('Error saving video to Firestore:', error);
                 return { success: false, error: error };
             }
         }
 
-        // Save ad to Firestore
-        async function saveAdToFirestore(adData) {
+        // Delete video from Firebase Firestore
+        async function deleteVideoFromFirestore(videoId) {
             try {
-                adData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                adData.active = true;
-                
-                const docRef = await db.collection("ads").add(adData);
-                adData.firebaseId = docRef.id;
-                
-                return { success: true, id: docRef.id };
+                await db.collection("videos").doc(videoId).delete();
+                console.log("Video deleted successfully: ", videoId);
+                return { success: true };
             } catch (error) {
-                console.error('Error saving ad:', error);
+                console.error('Error deleting video from Firestore:', error);
                 return { success: false, error: error };
             }
         }
 
-        // Setup real-time listeners
-        function setupRealtimeListeners() {
-            // Videos listener
-            db.collection("videos")
-                .orderBy("createdAt", "desc")
-                .onSnapshot((snapshot) => {
-                    videos = [];
-                    snapshot.forEach(doc => {
-                        const videoData = doc.data();
-                        videoData.firebaseId = doc.id;
-                        videos.push(videoData);
-                    });
-                    renderVideoGridWithAds();
-                    updateCategories();
-                    updateAnalytics();
+        // Increment view count in Firebase
+        async function incrementViewCount(videoId) {
+            try {
+                const videoRef = db.collection("videos").doc(videoId);
+                await videoRef.update({
+                    views: firebase.firestore.FieldValue.increment(1),
+                    lastViewed: firebase.firestore.FieldValue.serverTimestamp()
                 });
-            
-            // Ads listener
-            db.collection("ads")
-                .where("active", "==", true)
-                .onSnapshot((snapshot) => {
-                    ads = [];
-                    snapshot.forEach(doc => {
-                        const adData = doc.data();
-                        adData.firebaseId = doc.id;
-                        ads.push(adData);
-                    });
-                    renderVideoGridWithAds();
-                });
+                return true;
+            } catch (error) {
+                console.error('Error incrementing view count:', error);
+                return false;
+            }
         }
 
-        // Render video grid with ads interspersed
-        function renderVideoGridWithAds(filteredVideos = null) {
+        // Get default thumbnail for a category
+        function getDefaultThumbnail(category) {
+            return defaultThumbnails[category] || defaultThumbnails.default;
+        }
+
+        // Format view count (like YouTube: 1K, 1M, etc.)
+        function formatViewCount(views) {
+            if (views >= 1000000) {
+                return (views / 1000000).toFixed(1) + 'M';
+            } else if (views >= 1000) {
+                return (views / 1000).toFixed(1) + 'K';
+            }
+            return views.toString();
+        }
+
+        // Format date (like YouTube: "2 days ago")
+        function formatUploadDate(timestamp) {
+            if (!timestamp) return 'Recently';
+            
+            const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) return '1 day ago';
+            if (diffDays < 7) return diffDays + ' days ago';
+            if (diffDays < 30) return Math.floor(diffDays / 7) + ' weeks ago';
+            if (diffDays < 365) return Math.floor(diffDays / 30) + ' months ago';
+            return Math.floor(diffDays / 365) + ' years ago';
+        }
+
+        // Render Video Grid - DURATION OVERLAY REMOVED
+        function renderVideoGrid(filteredVideos = null) {
             const videosToShow = filteredVideos || getFilteredVideos();
             videoGrid.innerHTML = '';
             
             if(videosToShow.length === 0) {
                 emptyState.classList.remove('hidden');
-                searchResultsInfo.classList.add('hidden');
                 return;
             }
             
             emptyState.classList.add('hidden');
             
-            // Get active ads
-            const activeAds = ads.filter(ad => ad.active);
-            
-            videosToShow.forEach((video, index) => {
-                // Insert ad after every adFrequency videos
-                if (index > 0 && index % adFrequency === 0 && activeAds.length > 0) {
-                    const randomAd = activeAds[Math.floor(Math.random() * activeAds.length)];
-                    const adCard = createAdCard(randomAd);
-                    videoGrid.appendChild(adCard);
-                }
+            videosToShow.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.setAttribute('role', 'article');
                 
-                const videoCard = createVideoCard(video);
+                // Get first letter of uploader name for avatar
+                const uploaderInitial = video.uploaderName ? video.uploaderName.charAt(0).toUpperCase() : 'U';
+                
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail-container">
+                        <img src="${video.thumbnail || getDefaultThumbnail(video.category)}" 
+                             alt="${video.title}" 
+                             class="video-thumbnail"
+                             onerror="this.src='${getDefaultThumbnail(video.category)}'">
+                        <!-- VIDEO DURATION OVERLAY HAS BEEN REMOVED FROM HERE -->
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-avatar">${uploaderInitial}</div>
+                        <div class="video-details">
+                            <h3 class="video-title" title="${video.title}">${video.title}</h3>
+                            <div class="channel-name">${video.uploaderName}</div>
+                            <div class="video-stats">
+                                <span>${formatViewCount(video.views || 0)} views</span>
+                                <span>•</span>
+                                <span>${formatUploadDate(video.createdAt)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                videoCard.addEventListener('click', () => playVideo(video.firebaseId));
+                videoCard.setAttribute('tabindex', '0');
+                videoCard.addEventListener('keypress', (e) => {
+                    if(e.key === 'Enter') playVideo(video.firebaseId);
+                });
+                
                 videoGrid.appendChild(videoCard);
             });
         }
 
-        // Create video card element
-        function createVideoCard(video) {
-            const videoCard = document.createElement('article');
-            videoCard.className = 'video-card';
-            videoCard.setAttribute('role', 'article');
-            videoCard.innerHTML = `
-                <div class="thumbnail-container">
-                    <img src="${video.thumbnail || getFantasyThumbnail(video.category)}" 
-                         alt="${video.title}" 
-                         class="thumbnail" 
-                         loading="lazy"
-                         onerror="this.src='${getFantasyThumbnail('default')}'">
-                    <div class="duration">${video.duration || '10:00'}</div>
-                </div>
-                <div class="video-info">
-                    <h3 class="video-title">${video.title}</h3>
-                    <div class="video-meta">
-                        <span><i class="fas fa-eye"></i> ${(video.views || 0).toLocaleString()}</span>
-                        <span class="category-tag">${video.category}</span>
-                    </div>
-                    ${video.tags && video.tags.length > 0 ? `
-                        <div class="tags-container">
-                            ${video.tags.slice(0, 3).map(tag => `<span class="fantasy-badge">${tag}</span>`).join('')}
-                        </div>
-                    ` : ''}
-                    <div class="uploader-info">
-                        <i class="fas fa-user-circle"></i> ${video.uploaderName}
-                    </div>
-                </div>
-            `;
-            
-            videoCard.addEventListener('click', () => playVideo(video.firebaseId));
-            videoCard.setAttribute('tabindex', '0');
-            videoCard.addEventListener('keypress', (e) => {
-                if(e.key === 'Enter') playVideo(video.firebaseId);
-            });
-            
-            return videoCard;
-        }
-
-        // Create ad card element
-        function createAdCard(ad) {
-            const adCard = document.createElement('div');
-            adCard.className = 'video-card ad-card';
-            adCard.innerHTML = `
-                <div class="ad-label">Sponsored</div>
-                <div class="thumbnail-container">
-                    <img src="${ad.imageUrl || getFantasyThumbnail('default')}" 
-                         alt="${ad.title}" 
-                         class="thumbnail"
-                         onerror="this.src='${getFantasyThumbnail('default')}'">
-                </div>
-                <div class="ad-content">
-                    <h4 class="ad-title">${ad.title}</h4>
-                    <p class="ad-description">${ad.description}</p>
-                    <button class="btn btn-primary" onclick="handleAdClick('${ad.firebaseId}', '${ad.link}')">
-                        <i class="fas fa-external-link-alt"></i> Learn More
-                    </button>
-                </div>
-            `;
-            
-            // Track ad impression
-            trackAdImpression(ad.firebaseId);
-            
-            return adCard;
-        }
-
-        // Handle ad click
-        function handleAdClick(adId, link) {
-            // Track click
-            trackAdClick(adId);
-            
-            // Open link in new tab
-            window.open(link, '_blank');
-            
-            // Play click sound
-            const clickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
-            clickSound.volume = 0.2;
-            clickSound.play().catch(e => console.log("Audio play failed:", e));
-        }
-
-        // Track ad impression
-        async function trackAdImpression(adId) {
-            try {
-                await db.collection("ads").doc(adId).update({
-                    impressions: firebase.firestore.FieldValue.increment(1)
-                });
-            } catch (error) {
-                console.error('Error tracking impression:', error);
-            }
-        }
-
-        // Track ad click
-        async function trackAdClick(adId) {
-            try {
-                await db.collection("ads").doc(adId).update({
-                    clicks: firebase.firestore.FieldValue.increment(1)
-                });
-            } catch (error) {
-                console.error('Error tracking click:', error);
-            }
-        }
-
-        // Get fantasy thumbnail
-        function getFantasyThumbnail(category) {
-            return fantasyThumbnails[category] || fantasyThumbnails.default;
-        }
-
-        // Get filtered videos
+        // Get filtered videos based on category and search
         function getFilteredVideos() {
             let filtered = videos;
             
@@ -1798,255 +1750,70 @@
             return filtered;
         }
 
-        // Update categories with fantasy icons
-        function updateCategories() {
-            categoriesList.innerHTML = '';
+        // Update Categories Bar
+        function updateCategoriesBar() {
+            categoriesBar.innerHTML = '';
             
             const categories = ["all", ...new Set(videos.map(video => video.category))];
-            const categoryCounts = {};
-            
-            videos.forEach(video => {
-                categoryCounts[video.category] = (categoryCounts[video.category] || 0) + 1;
-            });
             
             categories.forEach(category => {
-                const listItem = document.createElement('li');
-                const count = category === "all" ? videos.length : (categoryCounts[category] || 0);
-                const icon = category === "all" ? "fa-globe" : (categoryIcons[category] || "fa-compass");
+                const chip = document.createElement('button');
+                chip.className = `category-chip ${currentCategory === category ? 'active' : ''}`;
+                chip.textContent = category === "all" ? "All" : category;
                 
-                listItem.className = `category-item ${currentCategory === category ? 'active' : ''}`;
-                listItem.innerHTML = `
-                    <div class="d-flex align-center">
-                        <i class="fas ${icon} category-icon"></i>
-                        <span>${category === "all" ? "All Realms" : category}</span>
-                    </div>
-                    <span class="category-count">${count}</span>
-                `;
-                
-                listItem.addEventListener('click', () => {
+                chip.addEventListener('click', () => {
                     currentCategory = category;
-                    updateCategories();
-                    renderVideoGridWithAds();
+                    updateCategoriesBar();
+                    renderVideoGrid();
                     
                     if(searchQuery !== "") {
                         searchQuery = "";
                         searchInput.value = "";
-                        searchResultsInfo.classList.add('hidden');
                     }
                     
-                    // Close mobile categories if open
-                    if(window.innerWidth <= 768) {
-                        document.querySelector('.categories-sidebar').classList.remove('show');
-                    }
+                    // Update active sidebar item
+                    document.querySelectorAll('.sidebar-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    document.querySelector('.sidebar-item:nth-child(1)').classList.add('active');
                 });
                 
-                categoriesList.appendChild(listItem);
+                categoriesBar.appendChild(chip);
             });
         }
 
-        // Show upload modal
-        function showUploadModal() {
-            uploadModal.style.display = 'flex';
-            document.getElementById('video-title-input').focus();
-            mobileMenu.classList.remove('show');
-        }
-
-        // Close upload modal
-        function closeUploadModal() {
-            uploadModal.style.display = 'none';
-            document.getElementById('upload-form').reset();
-        }
-
-        // Show admin portal
-        function showAdminPortal() {
-            adminOverlay.style.display = 'flex';
-            document.getElementById('admin-password-prompt').classList.remove('hidden');
-            document.getElementById('admin-panel-content').classList.add('hidden');
-            document.getElementById('admin-password').value = '';
-            document.getElementById('admin-password').focus();
-            mobileMenu.classList.remove('show');
-        }
-
-        // Verify admin password
-        function verifyAdminPassword() {
-            const passwordInput = document.getElementById('admin-password').value;
+        // Set Category from sidebar
+        function setCategory(category) {
+            currentCategory = category;
+            updateCategoriesBar();
+            renderVideoGrid();
             
-            if(passwordInput === adminPassword) {
-                document.getElementById('admin-password-prompt').classList.add('hidden');
-                document.getElementById('admin-panel-content').classList.remove('hidden');
-                updateAdminVideoList();
-                updateAdminAds();
-                updateAnalytics();
-            } else {
-                alert('Incorrect enchanted password!');
-                document.getElementById('admin-password').value = '';
-                document.getElementById('admin-password').focus();
+            // Update active sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
+
+        // Search Videos
+        function searchVideos(query) {
+            searchQuery = query.toLowerCase().trim();
+            
+            if(searchQuery === "") {
+                renderVideoGrid();
+                updateCategoriesBar();
+                return;
             }
+            
+            const filteredVideos = getFilteredVideos();
+            
+            // Show search in title
+            document.title = `Search: ${query} - Rayvid`;
+            
+            renderVideoGrid(filteredVideos);
         }
 
-        // Close admin portal
-        function closeAdminPortal() {
-            adminOverlay.style.display = 'none';
-        }
-
-        // Switch admin tab
-        function switchAdminTab(tabName) {
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            document.querySelectorAll('.admin-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-section`).classList.add('active');
-        }
-
-        // Update admin video list
-        function updateAdminVideoList() {
-            const adminVideoList = document.getElementById('admin-video-list');
-            adminVideoList.innerHTML = '';
-            
-            videos.forEach(video => {
-                const videoItem = document.createElement('div');
-                videoItem.className = 'admin-video-item';
-                videoItem.innerHTML = `
-                    <h4>${video.title}</h4>
-                    <p>${video.category} • ${video.duration || '10:00'} • By: ${video.uploaderName}</p>
-                    <div class="d-flex justify-between align-center">
-                        <span><i class="fas fa-eye"></i> ${video.views || 0} views</span>
-                        <span>${video.createdAt ? new Date(video.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</span>
-                    </div>
-                    <div class="ad-actions">
-                        <button class="action-btn edit-btn" onclick="editVideo('${video.firebaseId}')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="action-btn delete-btn" onclick="deleteVideo('${video.firebaseId}')">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                `;
-                adminVideoList.appendChild(videoItem);
-            });
-        }
-
-        // Update admin ads
-        async function updateAdminAds() {
-            const adsGrid = document.getElementById('ads-grid');
-            adsGrid.innerHTML = '';
-            
-            try {
-                const snapshot = await db.collection("ads").get();
-                const allAds = [];
-                snapshot.forEach(doc => {
-                    const adData = doc.data();
-                    adData.firebaseId = doc.id;
-                    allAds.push(adData);
-                });
-                
-                allAds.forEach(ad => {
-                    const adCard = document.createElement('div');
-                    adCard.className = 'ad-manage-card';
-                    adCard.innerHTML = `
-                        <div class="d-flex justify-between align-center">
-                            <h4>${ad.title}</h4>
-                            <span class="ad-status ${ad.active ? 'active' : 'inactive'}">
-                                ${ad.active ? 'Active' : 'Inactive'}
-                            </span>
-                        </div>
-                        <p>${ad.description}</p>
-                        <div class="d-flex justify-between align-center">
-                            <small>Clicks: ${ad.clicks || 0} | Impressions: ${ad.impressions || 0}</small>
-                            <span>CTR: ${ad.impressions ? ((ad.clicks || 0) / ad.impressions * 100).toFixed(2) : 0}%</span>
-                        </div>
-                        <div class="ad-actions">
-                            <button class="action-btn edit-btn" onclick="toggleAdStatus('${ad.firebaseId}', ${!ad.active})">
-                                ${ad.active ? 'Deactivate' : 'Activate'}
-                            </button>
-                            <button class="action-btn delete-btn" onclick="deleteAd('${ad.firebaseId}')">
-                                Delete
-                            </button>
-                        </div>
-                    `;
-                    adsGrid.appendChild(adCard);
-                });
-            } catch (error) {
-                console.error('Error loading ads for admin:', error);
-            }
-        }
-
-        // Toggle ad status
-        async function toggleAdStatus(adId, newStatus) {
-            try {
-                await db.collection("ads").doc(adId).update({
-                    active: newStatus,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                updateAdminAds();
-            } catch (error) {
-                console.error('Error toggling ad status:', error);
-            }
-        }
-
-        // Delete ad
-        async function deleteAd(adId) {
-            if(confirm('Are you sure you want to delete this ad?')) {
-                try {
-                    await db.collection("ads").doc(adId).delete();
-                    updateAdminAds();
-                } catch (error) {
-                    console.error('Error deleting ad:', error);
-                }
-            }
-        }
-
-        // Show ad form
-        function showAdForm() {
-            const title = prompt('Enter ad title:');
-            if(!title) return;
-            
-            const description = prompt('Enter ad description:');
-            if(!description) return;
-            
-            const link = prompt('Enter ad link (URL):');
-            if(!link) return;
-            
-            const imageUrl = prompt('Enter image URL (optional):') || getFantasyThumbnail('default');
-            
-            const adData = {
-                title,
-                description,
-                link,
-                imageUrl,
-                active: true,
-                clicks: 0,
-                impressions: 0
-            };
-            
-            saveAdToFirestore(adData).then(result => {
-                if(result.success) {
-                    alert('Ad created successfully!');
-                    updateAdminAds();
-                } else {
-                    alert('Error creating ad. Please try again.');
-                }
-            });
-        }
-
-        // Update analytics
-        function updateAnalytics() {
-            const totalViews = videos.reduce((sum, video) => sum + (video.views || 0), 0);
-            const totalVideos = videos.length;
-            const uploaders = [...new Set(videos.map(video => video.uploaderName))];
-            const categories = [...new Set(videos.map(video => video.category))];
-            
-            document.getElementById('total-views').textContent = totalViews.toLocaleString();
-            document.getElementById('total-videos').textContent = totalVideos;
-            document.getElementById('total-uploaders').textContent = uploaders.length;
-            document.getElementById('total-categories').textContent = categories.length;
-        }
-
-        // Play video
+        // Play Video
         async function playVideo(videoId) {
             const video = videos.find(v => v.firebaseId === videoId);
             if(!video) return;
@@ -2055,23 +1822,11 @@
             
             // Update video info
             document.getElementById('video-title').textContent = video.title;
-            document.getElementById('video-category').textContent = video.category;
-            document.getElementById('video-description').textContent = video.description || 'No description provided.';
-            document.getElementById('view-count').textContent = ((video.views || 0) + 1).toLocaleString();
+            document.getElementById('view-count').textContent = formatViewCount((video.views || 0) + 1) + ' views';
+            document.getElementById('upload-date').textContent = formatUploadDate(video.createdAt);
             document.getElementById('uploader-name-display').textContent = video.uploaderName;
-            document.getElementById('upload-date').textContent = video.createdAt ? new Date(video.createdAt.seconds * 1000).toLocaleDateString() : 'Recently';
-            
-            // Update tags
-            const tagsContainer = document.getElementById('video-tags-container');
-            tagsContainer.innerHTML = '';
-            if(video.tags && video.tags.length > 0) {
-                video.tags.forEach(tag => {
-                    const tagElement = document.createElement('span');
-                    tagElement.className = 'fantasy-badge';
-                    tagElement.textContent = tag;
-                    tagsContainer.appendChild(tagElement);
-                });
-            }
+            document.getElementById('channel-avatar').textContent = video.uploaderName ? video.uploaderName.charAt(0).toUpperCase() : 'U';
+            document.getElementById('video-description').textContent = video.description || 'No description provided.';
             
             // Extract Drive ID
             let driveId = video.driveId;
@@ -2085,59 +1840,221 @@
             const drivePlayer = document.getElementById('drive-player');
             drivePlayer.src = driveUrl;
             
-            // Show video player ad
-            showVideoPlayerAd();
+            // Update page title
+            document.title = `${video.title} - Rayvid`;
             
             // Show video player, hide home
-            document.querySelector('.container').style.display = 'none';
+            mainContent.style.display = 'none';
             videoPlayerPage.classList.remove('hidden');
             
             // Increment view count
             await incrementViewCount(video.firebaseId);
             video.views = (video.views || 0) + 1;
+            
+            // Load related videos
+            loadRelatedVideos(video);
+            
+            // Update analytics
             updateAnalytics();
         }
 
-        // Show video player ad
-        function showVideoPlayerAd() {
-            const activeAds = ads.filter(ad => ad.active);
-            if(activeAds.length > 0) {
-                const randomAd = activeAds[Math.floor(Math.random() * activeAds.length)];
-                const playerAd = document.getElementById('player-ad');
-                const adContent = document.getElementById('ad-content');
-                
-                adContent.innerHTML = `
-                    <h4>${randomAd.title}</h4>
-                    <p>${randomAd.description}</p>
-                    <button class="btn btn-primary" onclick="handleAdClick('${randomAd.firebaseId}', '${randomAd.link}')">
-                        <i class="fas fa-external-link-alt"></i> Discover More
-                    </button>
+        // Load related videos
+        function loadRelatedVideos(currentVideo) {
+            const relatedVideosContainer = document.getElementById('related-videos');
+            relatedVideosContainer.innerHTML = '';
+            
+            // Filter videos from same category (excluding current video)
+            let relatedVideos = videos
+                .filter(v => v.firebaseId !== currentVideo.firebaseId && v.category === currentVideo.category)
+                .slice(0, 10);
+            
+            // If not enough from same category, add others
+            if(relatedVideos.length < 5) {
+                const otherVideos = videos
+                    .filter(v => v.firebaseId !== currentVideo.firebaseId && v.category !== currentVideo.category)
+                    .slice(0, 10 - relatedVideos.length);
+                relatedVideos = [...relatedVideos, ...otherVideos];
+            }
+            
+            relatedVideos.forEach(video => {
+                const relatedItem = document.createElement('div');
+                relatedItem.className = 'related-video-item';
+                relatedItem.innerHTML = `
+                    <img src="${video.thumbnail || getDefaultThumbnail(video.category)}" 
+                         alt="${video.title}" 
+                         class="related-thumbnail"
+                         onerror="this.src='${getDefaultThumbnail(video.category)}'">
+                    <div class="related-video-info">
+                        <h4 class="related-video-title" title="${video.title}">${video.title}</h4>
+                        <div class="related-channel-name">${video.uploaderName}</div>
+                        <div class="related-video-stats">
+                            ${formatViewCount(video.views || 0)} views • ${formatUploadDate(video.createdAt)}
+                        </div>
+                    </div>
                 `;
                 
-                playerAd.classList.remove('hidden');
-                trackAdImpression(randomAd.firebaseId);
-            }
+                relatedItem.addEventListener('click', () => playVideo(video.firebaseId));
+                
+                relatedVideosContainer.appendChild(relatedItem);
+            });
         }
 
-        // Show home
+        // Show Home
         function showHome() {
-            document.title = "Rayvid - Fantasy Video Realm";
-            document.querySelector('.container').style.display = 'flex';
+            document.title = "Rayvid - Free Video Sharing Platform";
+            mainContent.style.display = 'block';
             videoPlayerPage.classList.add('hidden');
+            
             document.getElementById('drive-player').src = '';
             
             if(searchQuery !== "") {
                 searchQuery = "";
                 searchInput.value = "";
-                searchResultsInfo.classList.add('hidden');
             }
             
-            renderVideoGridWithAds();
-            updateCategories();
-            mobileMenu.classList.remove('show');
+            renderVideoGrid();
+            updateCategoriesBar();
+            
+            // Close sidebar on mobile
+            if(window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+            }
         }
 
-        // Setup event listeners
+        // Show Upload Modal
+        function showUploadModal() {
+            uploadModal.style.display = 'flex';
+            document.getElementById('video-title-input').focus();
+            
+            // Close sidebar on mobile
+            if(window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+            }
+        }
+
+        // Close Upload Modal
+        function closeUploadModal() {
+            uploadModal.style.display = 'none';
+            document.getElementById('upload-form').reset();
+            document.getElementById('thumbnail-preview').style.display = 'none';
+            document.getElementById('custom-category-group').classList.add('hidden');
+            
+            const submitBtn = document.getElementById('upload-submit-btn');
+            submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+            submitBtn.disabled = false;
+        }
+
+        // Show Admin Portal
+        function showAdminPortal() {
+            const password = prompt("Enter admin password:", "");
+            if(password === adminPassword) {
+                adminOverlay.style.display = 'flex';
+                updateAdminVideoList();
+                updateAnalytics();
+                
+                // Close sidebar on mobile
+                if(window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            } else if(password !== null) {
+                alert("Incorrect password!");
+            }
+        }
+
+        // Close Admin Portal
+        function closeAdminPortal() {
+            adminOverlay.style.display = 'none';
+        }
+
+        // Switch Admin Tab
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-section`).classList.add('active');
+        }
+
+        // Update Admin Video List
+        function updateAdminVideoList() {
+            const adminVideoList = document.getElementById('admin-video-list');
+            adminVideoList.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'admin-video-item';
+                videoItem.style.cssText = 'background-color: var(--youtube-dark-secondary); padding: 16px; border-radius: 8px; margin-bottom: 12px;';
+                videoItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <h5 style="margin-bottom: 8px; font-size: 14px;">${video.title}</h5>
+                            <div style="display: flex; gap: 12px; font-size: 12px; color: var(--youtube-text-gray);">
+                                <span>${video.category}</span>
+                                <span>•</span>
+                                <span>${video.uploaderName}</span>
+                                <span>•</span>
+                                <span>${formatViewCount(video.views || 0)} views</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="action-button" style="font-size: 12px; padding: 6px 12px;" onclick="editVideo('${video.firebaseId}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-button" style="font-size: 12px; padding: 6px 12px; background-color: #cc0000;" onclick="deleteVideo('${video.firebaseId}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                adminVideoList.appendChild(videoItem);
+            });
+        }
+
+        // Update Analytics
+        function updateAnalytics() {
+            const totalViews = videos.reduce((sum, video) => sum + (video.views || 0), 0);
+            const totalVideos = videos.length;
+            const uploaders = [...new Set(videos.map(video => video.uploaderName))];
+            const categories = [...new Set(videos.map(video => video.category))];
+            
+            document.getElementById('total-views').textContent = formatViewCount(totalViews);
+            document.getElementById('total-videos').textContent = totalVideos;
+            document.getElementById('total-uploaders').textContent = uploaders.length;
+            document.getElementById('total-categories').textContent = categories.length;
+            
+            // Update popular videos
+            const popularVideosList = document.getElementById('popular-videos-list');
+            popularVideosList.innerHTML = '';
+            
+            const popularVideos = [...videos]
+                .sort((a, b) => (b.views || 0) - (a.views || 0))
+                .slice(0, 3);
+            
+            popularVideos.forEach(video => {
+                const popularItem = document.createElement('div');
+                popularItem.style.cssText = 'display: flex; gap: 12px; padding: 12px; background-color: var(--youtube-dark-tertiary); border-radius: 8px; margin-bottom: 8px;';
+                popularItem.innerHTML = `
+                    <img src="${video.thumbnail || getDefaultThumbnail(video.category)}" 
+                         alt="${video.title}" 
+                         style="width: 80px; height: 60px; border-radius: 4px; object-fit: cover;"
+                         onerror="this.src='${getDefaultThumbnail(video.category)}'">
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; font-weight: 500; margin-bottom: 4px;">${video.title.substring(0, 40)}${video.title.length > 40 ? '...' : ''}</div>
+                        <div style="font-size: 11px; color: var(--youtube-text-gray);">
+                            ${video.uploaderName} • ${formatViewCount(video.views || 0)} views
+                        </div>
+                    </div>
+                `;
+                popularVideosList.appendChild(popularItem);
+            });
+        }
+
+        // Setup Event Listeners
         function setupEventListeners() {
             // Upload Form
             document.getElementById('upload-form').addEventListener('submit', async function(e) {
@@ -2146,7 +2063,7 @@
                 const submitBtn = document.getElementById('upload-submit-btn');
                 const originalBtnText = submitBtn.innerHTML;
                 
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enchanting...';
+                submitBtn.innerHTML = '<span class="loading-spinner"></span> Uploading...';
                 submitBtn.disabled = true;
                 
                 try {
@@ -2162,7 +2079,14 @@
                     const uploaderName = document.getElementById('uploader-name').value;
                     
                     if(!driveLink || !title || !category || !uploaderName) {
-                        alert('Please fill all required fields marked with *');
+                        alert('Please fill in all required fields marked with *');
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    
+                    if(categorySelect.value === "Other" && !document.getElementById('custom-category').value) {
+                        alert('Please enter a custom category name');
                         submitBtn.innerHTML = originalBtnText;
                         submitBtn.disabled = false;
                         return;
@@ -2183,17 +2107,17 @@
                     
                     const finalThumbnail = thumbnailUrl.trim() !== "" 
                         ? thumbnailUrl 
-                        : getFantasyThumbnail(category);
+                        : getDefaultThumbnail(category);
                     
                     const newVideo = {
-                        title,
-                        description,
-                        driveId,
-                        category,
+                        title: title,
+                        description: description,
+                        driveId: driveId,
+                        category: category,
                         duration: "10:00",
                         views: 0,
-                        uploaderName,
-                        tags,
+                        uploaderName: uploaderName,
+                        tags: tags,
                         thumbnail: finalThumbnail
                     };
                     
@@ -2202,129 +2126,83 @@
                     if(result.success) {
                         this.reset();
                         closeUploadModal();
-                        alert('Your enchanted video has been shared with the realm!');
+                        alert('Video uploaded successfully!');
                     } else {
-                        alert('Error sharing video. Please try again.');
+                        alert('Error uploading video. Please try again.');
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
                     }
                     
                 } catch (error) {
                     console.error('Upload error:', error);
-                    alert('A mystical error occurred. Please try again.');
+                    alert('An error occurred. Please try again.');
                     submitBtn.innerHTML = originalBtnText;
                     submitBtn.disabled = false;
                 }
             });
             
-            // Custom category toggle
+            // Show/hide custom category field
             document.getElementById('video-category-input').addEventListener('change', function() {
-                document.getElementById('custom-category-group').style.display = 
-                    this.value === "Other" ? "block" : "none";
+                const customCategoryGroup = document.getElementById('custom-category-group');
+                if(this.value === "Other") {
+                    customCategoryGroup.classList.remove('hidden');
+                } else {
+                    customCategoryGroup.classList.add('hidden');
+                }
+            });
+            
+            // Search on Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    searchVideos(this.value);
+                }
             });
         }
 
-        // Update admin password
-        function updateAdminPassword() {
-            const newPassword = document.getElementById('admin-password-change').value;
-            if(newPassword.length < 6) {
-                alert('Password must be at least 6 characters long');
-                return;
-            }
-            
-            adminPassword = newPassword;
-            alert('Admin password updated successfully!');
-            document.getElementById('admin-password-change').value = '';
-        }
-
-        // Update theme settings
-        function updateThemeSettings() {
-            const theme = document.getElementById('theme-settings').value;
-            if(theme === 'dark') {
-                document.body.classList.remove('light-mode');
-                document.body.classList.add('dark-mode');
-                document.querySelector('.theme-toggle i').classList.remove('fa-sun');
-                document.querySelector('.theme-toggle i').classList.add('fa-moon');
-            } else if(theme === 'light') {
-                document.body.classList.remove('dark-mode');
-                document.body.classList.add('light-mode');
-                document.querySelector('.theme-toggle i').classList.remove('fa-moon');
-                document.querySelector('.theme-toggle i').classList.add('fa-sun');
-            }
-            localStorage.setItem('theme', theme);
-        }
-
-        // Delete video
+        // Delete Video
         async function deleteVideo(videoId) {
-            if(confirm('Are you sure you want to delete this enchanted video?')) {
-                try {
-                    await db.collection("videos").doc(videoId).delete();
-                    alert('Video removed from the realm!');
-                } catch (error) {
-                    console.error('Error deleting video:', error);
+            if(confirm('Are you sure you want to delete this video?')) {
+                const result = await deleteVideoFromFirestore(videoId);
+                
+                if(result.success) {
+                    videos = videos.filter(video => video.firebaseId !== videoId);
+                    updateAdminVideoList();
+                    renderVideoGrid();
+                    updateCategoriesBar();
+                    updateAnalytics();
+                    
+                    alert('Video deleted successfully!');
+                } else {
                     alert('Error deleting video. Please try again.');
                 }
             }
         }
 
-        // Edit video
-        async function editVideo(videoId) {
+        // Edit Video (simplified version)
+        function editVideo(videoId) {
             const video = videos.find(v => v.firebaseId === videoId);
             if(!video) return;
             
             const newTitle = prompt('Edit video title:', video.title);
             if(newTitle === null) return;
             
-            const newCategory = prompt('Edit video realm (category):', video.category);
+            const newCategory = prompt('Edit video category:', video.category);
             if(newCategory === null) return;
             
-            const newDescription = prompt('Edit video lore (description):', video.description || '');
+            const newDescription = prompt('Edit video description:', video.description || '');
             
-            try {
-                await db.collection("videos").doc(videoId).update({
-                    title: newTitle,
-                    category: newCategory,
-                    description: newDescription,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                alert('Video updated in the realm!');
-            } catch (error) {
-                console.error('Error updating video:', error);
-                alert('Error updating video. Please try again.');
-            }
-        }
-
-        // Increment view count
-        async function incrementViewCount(videoId) {
-            try {
-                await db.collection("videos").doc(videoId).update({
-                    views: firebase.firestore.FieldValue.increment(1),
-                    lastViewed: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                return true;
-            } catch (error) {
-                console.error('Error incrementing view count:', error);
-                return false;
-            }
-        }
-
-        // Search videos
-        function searchVideos(query) {
-            searchQuery = query.toLowerCase().trim();
+            // Note: In a real app, you would update this in Firebase
+            // For now, we'll just update locally
+            video.title = newTitle;
+            video.category = newCategory;
+            video.description = newDescription;
             
-            if(searchQuery === "") {
-                searchResultsInfo.classList.add('hidden');
-                renderVideoGridWithAds();
-                updateCategories();
-                return;
-            }
+            updateAdminVideoList();
+            renderVideoGrid();
+            updateCategoriesBar();
+            updateAnalytics();
             
-            const filteredVideos = getFilteredVideos();
-            
-            document.getElementById('search-query').textContent = query;
-            document.getElementById('results-count').textContent = filteredVideos.length;
-            searchResultsInfo.classList.remove('hidden');
-            
-            renderVideoGridWithAds(filteredVideos);
+            alert('Video updated! (Note: Changes are local only in this demo)');
         }
     </script>
 </body>
