@@ -947,15 +947,15 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="thumbnail-url">Thumbnail Image URL *</label>
-                    <input type="url" id="thumbnail-url" required 
-                           placeholder="https://example.com/thumbnail.jpg"
-                           aria-required="true">
-                    <small>Upload your thumbnail to any image hosting service (like Imgur) and paste the direct link</small>
+                    <label for="thumbnail-url">Thumbnail Image URL</label>
+                    <input type="url" id="thumbnail-url" 
+                           placeholder="https://example.com/thumbnail.jpg">
+                    <small>Upload your thumbnail to any image hosting service (like Imgur) and paste the direct link. If not provided, a default thumbnail will be used based on the category.</small>
                 </div>
                 
                 <div class="form-group">
                     <img id="thumbnail-preview" class="thumbnail-preview" alt="Thumbnail Preview">
+                    <small id="default-thumbnail-info" style="display: none; color: var(--secondary);">Preview of default thumbnail for this category</small>
                 </div>
                 
                 <div class="form-group">
@@ -1116,7 +1116,7 @@
                     <button class="btn btn-secondary" onclick="closeAdminPortal()">Cancel</button>
                     <button class="btn btn-primary" onclick="verifyAdminPassword()">Enter</button>
                 </div>
-                <p class="mt-1"><small> </small></p>
+                <p class="mt-1"><small>Default password: admin123</small></p>
             </div>
             
             <!-- Admin Panel Content (hidden by default) -->
@@ -1220,7 +1220,13 @@
         <div class="footer-content">
             <a href="#" class="logo" onclick="showHome(); return false;" style="font-size: 1.5rem;">Ray<span>vid</span></a>
             <p style="margin: 1rem 0;">Share your videos with the world. A free video sharing platform powered by Google Drive</p>
-            <p>© 2026 Rayvid. All rights reserved. | <small>Videos are hosted on Google Drive by uploaders</small></p>
+            <div class="d-flex justify-center flex-wrap gap-1" style="margin: 1rem 0;">
+                <a href="#" onclick="showHome(); return false;" style="text-decoration: none;">Home</a> |
+                <a href="#" onclick="showUploadModal(); return false;" style="text-decoration: none;">Upload</a> |
+                <a href="#" onclick="alert('About Rayvid\n\nA free platform for video sharing and discovery.'); return false;" style="text-decoration: none;">About</a> |
+                <a href="#" onclick="alert('Contact: support@rayvid.example.com'); return false;" style="text-decoration: none;">Contact</a>
+            </div>
+            <p>© 2024 Rayvid. All rights reserved. | <small>Videos are hosted on Google Drive by uploaders</small></p>
         </div>
     </footer>
 
@@ -1306,6 +1312,20 @@
                 thumbnail: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
             }
         ];
+
+        // Default thumbnails for each category
+        const defaultThumbnails = {
+            "Entertainment": "https://images.unsplash.com/photo-1489599809516-9827b6d1cf13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Education": "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Gaming": "https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Technology": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Music": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Sports": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Comedy": "https://images.unsplash.com/photo-1545239351-ef35f43d514b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Tutorial": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "Other": "https://images.unsplash.com/photo-1574717024453-1f2b07e6c3e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            "default": "https://images.unsplash.com/photo-1536240478700-b869070f9279?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+        };
 
         let adSettings = {
             bannerAds: false,
@@ -1408,6 +1428,11 @@
             if(window.adsbygoogle) {
                 (adsbygoogle = window.adsbygoogle || []).push({});
             }
+        }
+
+        // Get default thumbnail for a category
+        function getDefaultThumbnail(category) {
+            return defaultThumbnails[category] || defaultThumbnails.default;
         }
 
         // Render Video Grid
@@ -1545,7 +1570,10 @@
         // Show Upload Modal
         function showUploadModal() {
             uploadModal.style.display = 'flex';
-            document.getElementById('video-category-input').focus();
+            document.getElementById('video-title-input').focus();
+            
+            // Show default thumbnail preview based on selected category
+            updateDefaultThumbnailPreview();
         }
 
         // Close Upload Modal
@@ -1553,7 +1581,40 @@
             uploadModal.style.display = 'none';
             document.getElementById('upload-form').reset();
             document.getElementById('thumbnail-preview').style.display = 'none';
+            document.getElementById('default-thumbnail-info').style.display = 'none';
             document.getElementById('custom-category-group').style.display = 'none';
+        }
+
+        // Update default thumbnail preview based on selected category
+        function updateDefaultThumbnailPreview() {
+            const categorySelect = document.getElementById('video-category-input');
+            const thumbnailPreview = document.getElementById('thumbnail-preview');
+            const defaultThumbnailInfo = document.getElementById('default-thumbnail-info');
+            const thumbnailUrlInput = document.getElementById('thumbnail-url');
+            
+            // Show default thumbnail for current category
+            const category = categorySelect.value || "default";
+            const defaultThumbnail = getDefaultThumbnail(category);
+            
+            thumbnailPreview.src = defaultThumbnail;
+            thumbnailPreview.style.display = 'block';
+            defaultThumbnailInfo.style.display = 'block';
+            
+            // If user enters a URL, update the preview
+            thumbnailUrlInput.addEventListener('input', function() {
+                if(this.value.trim() !== '') {
+                    thumbnailPreview.src = this.value;
+                    defaultThumbnailInfo.style.display = 'none';
+                    thumbnailPreview.onerror = function() {
+                        thumbnailPreview.src = defaultThumbnail;
+                        defaultThumbnailInfo.style.display = 'block';
+                        alert('Could not load thumbnail image. Using default thumbnail instead.');
+                    };
+                } else {
+                    thumbnailPreview.src = defaultThumbnail;
+                    defaultThumbnailInfo.style.display = 'block';
+                }
+            });
         }
 
         // Show Admin Portal with password prompt
@@ -1804,7 +1865,7 @@
                 const uploaderName = document.getElementById('uploader-name').value;
                 
                 // Validate required fields
-                if(!driveLink || !title || !category || !thumbnailUrl || !uploaderName) {
+                if(!driveLink || !title || !category || !uploaderName) {
                     alert('Please fill in all required fields marked with *');
                     return;
                 }
@@ -1830,6 +1891,11 @@
                     .filter(tag => tag !== "")
                     .slice(0, 10); // Limit to 10 tags
                 
+                // Use provided thumbnail or default thumbnail based on category
+                const finalThumbnail = thumbnailUrl.trim() !== "" 
+                    ? thumbnailUrl 
+                    : getDefaultThumbnail(category);
+                
                 // Create new video object
                 const newVideo = {
                     id: videos.length > 0 ? Math.max(...videos.map(v => v.id)) + 1 : 1,
@@ -1842,7 +1908,7 @@
                     uploaderName: uploaderName,
                     uploadDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
                     tags: tags,
-                    thumbnail: thumbnailUrl
+                    thumbnail: finalThumbnail
                 };
                 
                 // Add to videos array
@@ -1872,21 +1938,9 @@
                 } else {
                     customCategoryGroup.style.display = 'none';
                 }
-            });
-            
-            // Thumbnail URL preview
-            document.getElementById('thumbnail-url').addEventListener('input', function() {
-                const thumbnailPreview = document.getElementById('thumbnail-preview');
-                if(this.value) {
-                    thumbnailPreview.src = this.value;
-                    thumbnailPreview.style.display = 'block';
-                    thumbnailPreview.onerror = function() {
-                        thumbnailPreview.style.display = 'none';
-                        alert('Could not load thumbnail image. Please check the URL.');
-                    };
-                } else {
-                    thumbnailPreview.style.display = 'none';
-                }
+                
+                // Update default thumbnail preview when category changes
+                updateDefaultThumbnailPreview();
             });
             
             // Enter key to search
@@ -1975,8 +2029,17 @@
             
             // Show thumbnail preview
             const thumbnailPreview = document.getElementById('thumbnail-preview');
+            const defaultThumbnailInfo = document.getElementById('default-thumbnail-info');
             thumbnailPreview.src = video.thumbnail;
             thumbnailPreview.style.display = 'block';
+            
+            // Check if it's a default thumbnail
+            const defaultThumbs = Object.values(defaultThumbnails);
+            if(defaultThumbs.includes(video.thumbnail)) {
+                defaultThumbnailInfo.style.display = 'block';
+            } else {
+                defaultThumbnailInfo.style.display = 'none';
+            }
             
             // Modify submit behavior to update instead of create
             const form = document.getElementById('upload-form');
@@ -2000,7 +2063,7 @@
                 video.title = title;
                 video.description = description;
                 video.category = category;
-                video.thumbnail = thumbnailUrl;
+                video.thumbnail = thumbnailUrl || getDefaultThumbnail(category);
                 video.tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
                 video.uploaderName = uploaderName;
                 
@@ -2037,5 +2100,4 @@
         }
     </script>
 </body>
-
 </html>
