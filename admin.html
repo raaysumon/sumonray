@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RayVid Admin Portal</title>
+    <title>RayVid Admin Dashboard</title>
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -13,412 +14,882 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f0f0f;
-            color: #fff;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
         }
 
-        .admin-header {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 20px 30px;
+        /* Admin Navigation */
+        .admin-nav {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid #ff0000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .admin-logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .admin-logo h1 {
-            color: #fff;
-            font-size: 28px;
-        }
-
-        .admin-logo span {
-            color: #ff0000;
-        }
-
-        .admin-badge {
-            background-color: #ff0000;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
+        .admin-nav h1 {
+            font-size: 1.8rem;
             font-weight: bold;
+            background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .admin-controls {
+        .admin-auth {
             display: flex;
-            gap: 15px;
             align-items: center;
+            gap: 1.5rem;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
             font-weight: 500;
         }
 
-        .btn-primary {
-            background-color: #ff0000;
-            color: white;
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00b4db;
         }
 
-        .btn-secondary {
-            background-color: #373737;
-            color: white;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .user-info {
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        .admin-container {
-            padding: 30px;
-            min-height: calc(100vh - 90px);
-        }
-
-        /* Admin Tabs */
-        .admin-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            border-bottom: 2px solid #303030;
-            padding-bottom: 10px;
-        }
-
-        .admin-tab {
-            padding: 12px 25px;
-            background-color: #2a2a2a;
+        .admin-button {
+            padding: 0.75rem 1.5rem;
             border: none;
-            color: #aaa;
-            border-radius: 8px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
         }
 
-        .admin-tab:hover {
-            background-color: #3a3a3a;
-        }
-
-        .admin-tab.active {
-            background-color: #ff0000;
+        .admin-sign-out {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
             color: white;
         }
 
-        /* Admin Content */
-        .admin-content {
+        .admin-sign-out:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+        }
+
+        .back-to-site {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-site:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Admin Layout */
+        .admin-layout {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 2rem 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h3 {
+            color: white;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #00b4db;
+        }
+
+        .menu-item.active {
+            background: rgba(0, 180, 219, 0.2);
+            border-left-color: #00b4db;
+            font-weight: 600;
+        }
+
+        .menu-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .admin-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             display: none;
         }
 
-        .admin-content.active {
+        .admin-section.active {
             display: block;
+            animation: fadeIn 0.5s ease;
         }
 
-        /* Dashboard */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-header h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-            padding: 25px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
             text-align: center;
-            border: 1px solid #333;
+            transition: transform 0.3s ease;
         }
 
-        .stat-icon {
-            font-size: 36px;
-            margin-bottom: 15px;
-            display: block;
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
 
-        .stat-number {
-            font-size: 36px;
+        .stat-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .stat-card p {
+            font-size: 2rem;
             font-weight: bold;
-            color: #ff0000;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #aaa;
-            font-size: 14px;
         }
 
         /* Tables */
-        .table-container {
-            background-color: #1f1f1f;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-
         .admin-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .admin-table th {
-            background-color: #2a2a2a;
-            color: #aaa;
-            font-weight: 500;
-            padding: 15px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 1rem;
             text-align: left;
-            border-bottom: 2px solid #ff0000;
+            font-weight: 600;
         }
 
         .admin-table td {
-            padding: 15px;
-            border-bottom: 1px solid #333;
-            color: #ddd;
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .admin-table tr:hover {
-            background-color: #2a2a2a;
+            background: #f8f9ff;
         }
 
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
+        /* Badges */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
-        .status-approved {
-            background-color: #28a745;
+        .badge-pending {
+            background: #ffa502;
             color: white;
         }
 
-        .status-pending {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .status-rejected {
-            background-color: #dc3545;
+        .badge-approved {
+            background: #4CAF50;
             color: white;
         }
 
+        .badge-rejected {
+            background: #ff4757;
+            color: white;
+        }
+
+        .badge-admin {
+            background: #00b4db;
+            color: white;
+        }
+
+        .badge-user {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 4px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
         }
 
-        /* Messages */
-        .message {
-            padding: 15px;
+        .btn-approve {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-reject {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #e68900;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #0b7dda;
+            transform: translateY(-2px);
+        }
+
+        /* Ad Settings */
+        .ad-controls {
+            display: grid;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .ad-toggle {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .ad-code-editor {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .ad-code-editor textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e6ff;
             border-radius: 8px;
-            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            min-height: 200px;
+            margin-bottom: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
         }
 
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .ad-code-editor textarea:focus {
+            border-color: #667eea;
         }
 
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .ad-preview {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 2rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9ff;
         }
 
-        .message.info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
+        /* Modal */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #aaa;
+        .admin-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        @media (max-width: 768px) {
-            .admin-header {
+        .close-admin-modal {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+
+        .close-admin-modal:hover {
+            color: #ff4757;
+        }
+
+        /* Loading Spinner */
+        .admin-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00b4db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .admin-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: #4CAF50;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .admin-notification.error {
+            background: #ff4757;
+        }
+
+        .admin-notification.warning {
+            background: #ffa502;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .admin-layout {
                 flex-direction: column;
-                gap: 20px;
-                text-align: center;
             }
             
-            .admin-tabs {
-                justify-content: center;
+            .admin-sidebar {
+                width: 100%;
+                padding: 1rem 0;
+            }
+            
+            .sidebar-header {
+                padding: 0 1rem 1rem;
+            }
+            
+            .menu-item {
+                padding: 0.75rem 1rem;
             }
             
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             }
-            
-            .admin-table th,
-            .admin-table td {
-                padding: 10px;
-                font-size: 14px;
-            }
-            
-            .action-buttons {
+        }
+
+        @media (max-width: 768px) {
+            .admin-nav {
                 flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .admin-auth {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .admin-main {
+                padding: 1rem;
+            }
+            
+            .admin-section {
+                padding: 1.5rem;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .admin-table {
+                display: block;
+                overflow-x: auto;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Admin Header -->
-    <header class="admin-header">
-        <div class="admin-logo">
-            <h1>RAY<span>VID</span> ADMIN</h1>
-            <span class="admin-badge">PORTAL</span>
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <h1>⚡ RayVid Admin Dashboard</h1>
+        <div class="admin-auth">
+            <div class="admin-user-info" id="adminUserInfo">
+                <span>Loading...</span>
+            </div>
+            <button class="admin-button admin-sign-out" onclick="signOut()" style="display: none;">
+                Sign Out
+            </button>
+            <a href="rayvid.html" class="back-to-site">← Back to Site</a>
         </div>
-        <div class="admin-controls">
-            <div class="user-info" id="userInfo">Loading user info...</div>
-            <button class="btn btn-primary" onclick="window.location.href='index.html'">← Back to Site</button>
-            <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
+    </nav>
+
+    <!-- Admin Layout -->
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Controls</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" onclick="showSection('dashboard')">
+                    <span class="menu-icon">📊</span>
+                    <span>Dashboard</span>
+                </li>
+                <li class="menu-item" onclick="showSection('videos')">
+                    <span class="menu-icon">🎬</span>
+                    <span>Video Management</span>
+                </li>
+                <li class="menu-item" onclick="showSection('users')">
+                    <span class="menu-icon">👥</span>
+                    <span>User Management</span>
+                </li>
+                <li class="menu-item" onclick="showSection('ads')">
+                    <span class="menu-icon">📢</span>
+                    <span>Ad Management</span>
+                </li>
+                <li class="menu-item" onclick="showSection('analytics')">
+                    <span class="menu-icon">📈</span>
+                    <span>Analytics</span>
+                </li>
+            </ul>
         </div>
-    </header>
 
-    <!-- Admin Container -->
-    <div class="admin-container">
-        <!-- Messages -->
-        <div id="adminMessage" class="message"></div>
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="admin-section active">
+                <div class="section-header">
+                    <h2>📊 Dashboard Overview</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="refreshStats()" class="btn btn-edit">🔄 Refresh</button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Videos</h3>
+                        <p id="totalVideos">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Pending Approval</h3>
+                        <p id="pendingVideos">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Approved Videos</h3>
+                        <p id="approvedVideos">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Users</h3>
+                        <p id="totalUsers">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Users</h3>
+                        <p id="activeUsers">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Ads Status</h3>
+                        <p id="adsStatus">Off</p>
+                    </div>
+                </div>
 
-        <!-- Admin Tabs -->
-        <div class="admin-tabs">
-            <button class="admin-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
-            <button class="admin-tab" onclick="switchTab('videos')">🎬 Videos</button>
-            <button class="admin-tab" onclick="switchTab('users')">👥 Users</button>
-        </div>
-
-        <!-- Dashboard Tab -->
-        <div id="dashboardTab" class="admin-content active">
-            <h2>📊 Platform Dashboard</h2>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-icon">📹</span>
-                    <div class="stat-number" id="totalVideos">0</div>
-                    <div class="stat-label">Total Videos</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">⏳</span>
-                    <div class="stat-number" id="pendingVideos">0</div>
-                    <div class="stat-label">Pending Approval</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">👥</span>
-                    <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label">Total Users</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">👁️</span>
-                    <div class="stat-number" id="totalViews">0</div>
-                    <div class="stat-label">Total Views</div>
+                <h3 style="margin: 2rem 0 1rem; color: #2c3e50;">📈 Recent Activity</h3>
+                <div id="recentActivity" style="background: #f8f9ff; padding: 1rem; border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <div class="admin-spinner"></div>
                 </div>
             </div>
 
-            <div class="table-container">
-                <h3>Recent Pending Videos</h3>
-                <table class="admin-table" id="pendingVideosTable">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Uploader</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="4" style="text-align: center; padding: 30px;">Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            <!-- Video Management Section -->
+            <div id="videosSection" class="admin-section">
+                <div class="section-header">
+                    <h2>🎬 Video Management</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <select id="videoFilter" onchange="filterVideos()" style="padding: 0.5rem; border-radius: 5px; border: 2px solid #e0e6ff;">
+                            <option value="all">All Videos</option>
+                            <option value="pending">Pending Approval</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <button onclick="refreshVideos()" class="btn btn-edit">🔄 Refresh</button>
+                    </div>
+                </div>
 
-        <!-- Videos Tab -->
-        <div id="videosTab" class="admin-content">
-            <h2>🎬 Video Management</h2>
-            
-            <div class="table-container">
-                <table class="admin-table" id="videosTable">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Uploader</th>
-                            <th>Status</th>
-                            <th>Views</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="6" style="text-align: center; padding: 40px;">Loading videos...</td></tr>
-                    </tbody>
-                </table>
+                <div id="videosList" style="min-height: 500px;">
+                    <div class="admin-spinner"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Users Tab -->
-        <div id="usersTab" class="admin-content">
-            <h2>👥 User Management</h2>
-            
-            <div class="table-container">
-                <table class="admin-table" id="usersTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Videos</th>
-                            <th>Role</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="6" style="text-align: center; padding: 40px;">Loading users...</td></tr>
-                    </tbody>
-                </table>
+            <!-- User Management Section -->
+            <div id="usersSection" class="admin-section">
+                <div class="section-header">
+                    <h2>👥 User Management</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="text" id="userSearch" placeholder="Search users..." style="padding: 0.5rem; border-radius: 5px; border: 2px solid #e0e6ff; width: 200px;">
+                        <button onclick="searchUsers()" class="btn btn-edit">🔍 Search</button>
+                        <button onclick="refreshUsers()" class="btn btn-edit">🔄 Refresh</button>
+                    </div>
+                </div>
+
+                <div id="usersList" style="min-height: 500px;">
+                    <div class="admin-spinner"></div>
+                </div>
+            </div>
+
+            <!-- Ad Management Section -->
+            <div id="adsSection" class="admin-section">
+                <div class="section-header">
+                    <h2>📢 AdSense Management</h2>
+                </div>
+
+                <div class="ad-controls">
+                    <div class="ad-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="adsToggle" onchange="toggleAds()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div>
+                            <h4>Enable Ads</h4>
+                            <p style="color: #666; font-size: 0.9rem;">Turn ads on/off for the entire site</p>
+                        </div>
+                        <span id="adsStatusBadge" class="badge badge-rejected" style="margin-left: auto;">Disabled</span>
+                    </div>
+
+                    <div class="ad-code-editor">
+                        <h3 style="margin-bottom: 1rem; color: #2c3e50;">AdSense Code</h3>
+                        <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Paste your Google AdSense code below. Make sure it includes the script tags.</p>
+                        <textarea id="adsenseCode" placeholder="<script async src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'></script>
+<!-- Your Ad Unit -->
+<ins class='adsbygoogle'
+     style='display:block'
+     data-ad-client='ca-pub-XXXXXXXXXXXXXXXX'
+     data-ad-slot='XXXXXXXXXX'
+     data-ad-format='auto'
+     data-full-width-responsive='true'></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>"></textarea>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button onclick="saveAdSettings()" class="btn btn-approve">💾 Save Settings</button>
+                            <button onclick="testAds()" class="btn btn-edit">🧪 Test Ads</button>
+                        </div>
+                    </div>
+
+                    <div class="ad-preview">
+                        <div id="adPreview">
+                            <p style="color: #999; text-align: center;">Ad preview will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analyticsSection" class="admin-section">
+                <div class="section-header">
+                    <h2>📈 Analytics</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <select id="analyticsPeriod" onchange="loadAnalytics()" style="padding: 0.5rem; border-radius: 5px; border: 2px solid #e0e6ff;">
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="365">Last year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Views</h3>
+                        <p id="totalViews">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Likes</h3>
+                        <p id="totalLikes">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Uploads</h3>
+                        <p id="totalUploads">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>New Users</h3>
+                        <p id="newUsers">0</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem; color: #2c3e50;">📊 Views Over Time</h3>
+                <div style="background: white; padding: 1rem; border-radius: 10px; border: 1px solid #e0e6ff;">
+                    <canvas id="viewsChart" width="400" height="200"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <!-- Video Detail Modal -->
+    <div class="admin-modal" id="videoDetailModal">
+        <div class="admin-modal-content">
+            <button class="close-admin-modal" onclick="closeVideoDetailModal()">&times;</button>
+            <h2 id="modalVideoTitle" style="color: #2c3e50; margin-bottom: 1rem;"></h2>
+            <div id="modalVideoPlayer" style="width: 100%; height: 300px; background: #000; border-radius: 10px; margin-bottom: 1rem;"></div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <h4 style="color: #666; margin-bottom: 0.5rem;">Uploader</h4>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <img id="modalUploaderAvatar" src="" alt="" style="width: 30px; height: 30px; border-radius: 50%;">
+                        <span id="modalUploaderName"></span>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color: #666; margin-bottom: 0.5rem;">Upload Date</h4>
+                    <p id="modalUploadDate"></p>
+                </div>
+                <div>
+                    <h4 style="color: #666; margin-bottom: 0.5rem;">Status</h4>
+                    <span id="modalVideoStatus" class="badge badge-pending">Pending</span>
+                </div>
+                <div>
+                    <h4 style="color: #666; margin-bottom: 0.5rem;">Stats</h4>
+                    <p>👁️ <span id="modalViews">0</span> | ❤️ <span id="modalLikes">0</span></p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #666; margin-bottom: 0.5rem;">Description</h4>
+                <p id="modalVideoDescription" style="background: #f8f9ff; padding: 1rem; border-radius: 8px;"></p>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #666; margin-bottom: 0.5rem;">Tags</h4>
+                <div id="modalVideoTags" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button onclick="approveVideo(currentModalVideoId)" class="btn btn-approve">✅ Approve</button>
+                <button onclick="rejectVideo(currentModalVideoId)" class="btn btn-reject">❌ Reject</button>
+                <button onclick="deleteVideo(currentModalVideoId)" class="btn btn-delete">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="admin-modal" id="userDetailModal">
+        <div class="admin-modal-content">
+            <button class="close-admin-modal" onclick="closeUserDetailModal()">&times;</button>
+            <h2 id="modalUserName" style="color: #2c3e50; margin-bottom: 1rem;"></h2>
+            
+            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+                <img id="modalUserAvatar" src="" alt="" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #667eea;">
+                <div>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>Email:</strong> <span id="modalUserEmail"></span></p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>Joined:</strong> <span id="modalUserJoined"></span></p>
+                    <p style="color: #666;"><strong>Role:</strong> <span id="modalUserRole" class="badge badge-user">User</span></p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="background: #f8f9ff; padding: 1rem; border-radius: 10px; text-align: center;">
+                    <h3 style="color: #667eea; font-size: 2rem; margin-bottom: 0.5rem;" id="modalUserVideos">0</h3>
+                    <p style="color: #666;">Videos Uploaded</p>
+                </div>
+                <div style="background: #f8f9ff; padding: 1rem; border-radius: 10px; text-align: center;">
+                    <h3 style="color: #667eea; font-size: 2rem; margin-bottom: 0.5rem;" id="modalUserLikes">0</h3>
+                    <p style="color: #666;">Total Likes</p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="color: #666; margin-bottom: 1rem;">Change Role</h4>
+                <div style="display: flex; gap: 1rem;">
+                    <select id="roleSelect" style="flex: 1; padding: 0.75rem; border: 2px solid #e0e6ff; border-radius: 8px;">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="moderator">Moderator</option>
+                    </select>
+                    <button onclick="updateUserRole()" class="btn btn-approve">Update Role</button>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button onclick="deleteUser(currentModalUserId)" class="btn btn-delete">🗑️ Delete User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="admin-notification" id="adminNotification"></div>
+
+    <!-- Firebase and Chart.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         // Firebase Configuration
@@ -433,96 +904,77 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let currentUser = null;
-        let isAdmin = false;
+        // Global Variables
+        let currentAdmin = null;
+        let currentModalVideoId = null;
+        let currentModalUserId = null;
+        let viewsChart = null;
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            setupAuthListener();
-        });
-
-        // Authentication
-        function setupAuthListener() {
-            auth.onAuthStateChanged(async (user) => {
-                currentUser = user;
-                
-                if (user) {
-                    console.log('Admin signed in:', user.email);
-                    
-                    // Check if user is admin
-                    await checkAdminStatus(user.uid);
-                    
-                    if (!isAdmin) {
-                        showMessage('You do not have admin privileges. Redirecting...', 'error');
-                        setTimeout(() => {
-                            window.location.href = 'index.html';
-                        }, 3000);
-                        return;
-                    }
-                    
-                    // Update UI
-                    document.getElementById('userInfo').textContent = 
-                        `👑 ${user.displayName || user.email} (Admin)`;
-                    
-                    // Load dashboard
-                    loadDashboard();
-                    
-                } else {
-                    // Redirect to main site if not signed in
-                    window.location.href = 'index.html';
-                }
+        // Auth Functions
+        function signOut() {
+            auth.signOut().then(() => {
+                showNotification('Successfully signed out!', 'success');
+                window.location.href = 'rayvid.html';
+            }).catch(error => {
+                showNotification('Sign out failed.', 'error');
             });
         }
 
-        async function checkAdminStatus(uid) {
+        // Check Admin Access
+        async function checkAdminAccess(user) {
+            if (!user) {
+                window.location.href = 'rayvid.html';
+                return false;
+            }
+            
             try {
-                const userDoc = await db.collection('users').doc(uid).get();
-                if (userDoc.exists) {
-                    isAdmin = userDoc.data().isAdmin || false;
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().role === 'admin') {
+                    currentAdmin = user;
+                    updateAdminUI(user);
+                    loadDashboardStats();
+                    return true;
+                } else {
+                    showNotification('Access denied. Admin privileges required.', 'error');
+                    setTimeout(() => window.location.href = 'rayvid.html', 2000);
+                    return false;
                 }
             } catch (error) {
-                console.error('Error checking admin status:', error);
-                isAdmin = false;
+                console.error("Admin check error:", error);
+                return false;
             }
         }
 
-        function signOut() {
-            auth.signOut()
-                .then(() => {
-                    window.location.href = 'index.html';
-                })
-                .catch(error => {
-                    console.error('Sign out error:', error);
-                    showMessage('Sign out failed', 'error');
-                });
+        function updateAdminUI(user) {
+            document.getElementById('adminUserInfo').innerHTML = `
+                <img src="${user.photoURL}" alt="${user.displayName}" class="admin-avatar">
+                <span>${user.displayName} (Admin)</span>
+            `;
+            document.querySelector('.admin-sign-out').style.display = 'block';
         }
 
-        // Tab Navigation
-        function switchTab(tabName) {
-            // Remove active class from all tabs
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.classList.remove('active');
+        // Section Navigation
+        function showSection(sectionId) {
+            // Update menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
             });
+            event.target.closest('.menu-item').classList.add('active');
             
-            // Hide all content
-            document.querySelectorAll('.admin-content').forEach(content => {
-                content.classList.remove('active');
+            // Show selected section
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
             });
+            document.getElementById(sectionId + 'Section').classList.add('active');
             
-            // Add active class to clicked tab
-            event.target.classList.add('active');
-            
-            // Show selected content
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            
-            // Load tab data
-            switch(tabName) {
+            // Load section data
+            switch(sectionId) {
                 case 'dashboard':
-                    loadDashboard();
+                    loadDashboardStats();
                     break;
                 case 'videos':
                     loadVideos();
@@ -530,360 +982,764 @@
                 case 'users':
                     loadUsers();
                     break;
+                case 'ads':
+                    loadAdSettings();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    break;
             }
         }
 
         // Dashboard Functions
-        async function loadDashboard() {
+        async function loadDashboardStats() {
             try {
-                showMessage('Loading dashboard...', 'info');
-                
-                // Load statistics
-                await loadStatistics();
-                
-                // Load pending videos
-                await loadPendingVideos();
-                
-                // Clear message
-                document.getElementById('adminMessage').className = 'message';
-                
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-                showMessage('Failed to load dashboard', 'error');
-            }
-        }
-
-        async function loadStatistics() {
-            try {
-                // Total videos
+                // Load total videos
                 const videosSnapshot = await db.collection('videos').get();
                 document.getElementById('totalVideos').textContent = videosSnapshot.size;
                 
-                // Pending videos
-                const pendingVideos = videosSnapshot.docs.filter(doc => !doc.data().isApproved);
-                document.getElementById('pendingVideos').textContent = pendingVideos.length;
+                // Load pending videos
+                const pendingSnapshot = await db.collection('videos')
+                    .where('approved', '==', false)
+                    .where('rejected', '!=', true)
+                    .get();
+                document.getElementById('pendingVideos').textContent = pendingSnapshot.size;
                 
-                // Total users
+                // Load approved videos
+                const approvedSnapshot = await db.collection('videos')
+                    .where('approved', '==', true)
+                    .get();
+                document.getElementById('approvedVideos').textContent = approvedSnapshot.size;
+                
+                // Load total users
                 const usersSnapshot = await db.collection('users').get();
                 document.getElementById('totalUsers').textContent = usersSnapshot.size;
                 
-                // Total views
-                let totalViews = 0;
-                videosSnapshot.forEach(doc => {
-                    totalViews += doc.data().views || 0;
-                });
-                document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+                // Load active users (last 7 days)
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                const activeSnapshot = await db.collection('users')
+                    .where('lastLogin', '>=', weekAgo)
+                    .get();
+                document.getElementById('activeUsers').textContent = activeSnapshot.size;
+                
+                // Load ads status
+                const adDoc = await db.collection('settings').doc('ads').get();
+                const adsStatus = adDoc.exists && adDoc.data().enabled ? 'On' : 'Off';
+                document.getElementById('adsStatus').textContent = adsStatus;
+                
+                // Load recent activity
+                loadRecentActivity();
                 
             } catch (error) {
-                console.error('Error loading statistics:', error);
+                console.error("Error loading stats:", error);
+                showNotification('Error loading dashboard stats', 'error');
             }
         }
 
-        async function loadPendingVideos() {
+        async function loadRecentActivity() {
+            const activityDiv = document.getElementById('recentActivity');
             try {
-                const pendingVideosTable = document.getElementById('pendingVideosTable').getElementsByTagName('tbody')[0];
-                pendingVideosTable.innerHTML = '';
-                
-                const snapshot = await db.collection('videos')
-                    .where('isApproved', '==', false)
-                    .orderBy('createdAt', 'desc')
-                    .limit(10)
+                // Get recent videos
+                const videosSnapshot = await db.collection('videos')
+                    .orderBy('uploadedAt', 'desc')
+                    .limit(5)
                     .get();
                 
-                if (snapshot.empty) {
-                    pendingVideosTable.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px;">No pending videos</td></tr>';
-                    return;
+                // Get recent users
+                const usersSnapshot = await db.collection('users')
+                    .orderBy('createdAt', 'desc')
+                    .limit(5)
+                    .get();
+                
+                let html = '<div style="width: 100%;">';
+                
+                if (!videosSnapshot.empty) {
+                    html += '<h4 style="color: #2c3e50; margin-bottom: 1rem;">🎬 Recent Videos</h4>';
+                    html += '<ul style="list-style: none; padding: 0; margin-bottom: 2rem;">';
+                    
+                    videosSnapshot.forEach(doc => {
+                        const video = doc.data();
+                        const date = video.uploadedAt?.toDate();
+                        const status = video.approved ? '✅ Approved' : video.rejected ? '❌ Rejected' : '⏳ Pending';
+                        
+                        html += `
+                            <li style="padding: 0.75rem; background: #f8f9ff; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>${video.title}</strong><br>
+                                    <small style="color: #666;">By ${video.uploaderName} • ${date?.toLocaleDateString()}</small>
+                                </div>
+                                <span class="badge ${video.approved ? 'badge-approved' : video.rejected ? 'badge-rejected' : 'badge-pending'}">
+                                    ${status}
+                                </span>
+                            </li>
+                        `;
+                    });
+                    
+                    html += '</ul>';
                 }
                 
-                snapshot.forEach(doc => {
-                    const video = doc.data();
-                    const row = document.createElement('tr');
+                if (!usersSnapshot.empty) {
+                    html += '<h4 style="color: #2c3e50; margin-bottom: 1rem;">👥 Recent Users</h4>';
+                    html += '<ul style="list-style: none; padding: 0;">';
                     
-                    row.innerHTML = `
-                        <td>${video.title}</td>
-                        <td>${video.userEmail}</td>
-                        <td>${formatDate(video.createdAt)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-success btn-sm" onclick="approveVideo('${doc.id}')">Approve</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteVideo('${doc.id}')">Delete</button>
-                            </div>
-                        </td>
-                    `;
+                    usersSnapshot.forEach(doc => {
+                        const user = doc.data();
+                        const date = user.createdAt?.toDate();
+                        
+                        html += `
+                            <li style="padding: 0.75rem; background: #f8f9ff; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 1rem;">
+                                <img src="${user.photoURL}" alt="${user.displayName}" style="width: 30px; height: 30px; border-radius: 50%;">
+                                <div>
+                                    <strong>${user.displayName}</strong><br>
+                                    <small style="color: #666;">${user.email} • ${date?.toLocaleDateString()}</small>
+                                </div>
+                                <span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}" style="margin-left: auto;">
+                                    ${user.role}
+                                </span>
+                            </li>
+                        `;
+                    });
                     
-                    pendingVideosTable.appendChild(row);
-                });
+                    html += '</ul>';
+                }
+                
+                html += '</div>';
+                activityDiv.innerHTML = html;
                 
             } catch (error) {
-                console.error('Error loading pending videos:', error);
+                console.error("Error loading activity:", error);
+                activityDiv.innerHTML = '<p style="color: #ff4757; text-align: center;">Error loading activity</p>';
             }
         }
 
-        // Video Management
+        function refreshStats() {
+            loadDashboardStats();
+            showNotification('Dashboard refreshed', 'success');
+        }
+
+        // Video Management Functions
         async function loadVideos() {
+            const filter = document.getElementById('videoFilter').value;
+            const videosList = document.getElementById('videosList');
+            
             try {
-                const videosTable = document.getElementById('videosTable').getElementsByTagName('tbody')[0];
-                videosTable.innerHTML = '';
+                let query = db.collection('videos').orderBy('uploadedAt', 'desc');
                 
-                const snapshot = await db.collection('videos')
-                    .orderBy('createdAt', 'desc')
-                    .limit(50)
-                    .get();
+                switch(filter) {
+                    case 'pending':
+                        query = query.where('approved', '==', false).where('rejected', '!=', true);
+                        break;
+                    case 'approved':
+                        query = query.where('approved', '==', true);
+                        break;
+                    case 'rejected':
+                        query = query.where('rejected', '==', true);
+                        break;
+                    // 'all' shows all videos
+                }
+                
+                const snapshot = await query.limit(50).get();
                 
                 if (snapshot.empty) {
-                    videosTable.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No videos found</td></tr>';
+                    videosList.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <h3>No videos found</h3>
+                            <p>Try changing the filter</p>
+                        </div>
+                    `;
                     return;
                 }
                 
+                let html = `
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Uploader</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Views/Likes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
                 snapshot.forEach(doc => {
                     const video = doc.data();
-                    const row = document.createElement('tr');
+                    const date = video.uploadedAt?.toDate();
+                    const status = video.approved ? 'Approved' : video.rejected ? 'Rejected' : 'Pending';
+                    const statusClass = video.approved ? 'badge-approved' : video.rejected ? 'badge-rejected' : 'badge-pending';
                     
-                    row.innerHTML = `
-                        <td>${video.title}</td>
-                        <td>${video.userEmail}</td>
-                        <td>
-                            <span class="status-badge ${video.isApproved ? 'status-approved' : 'status-pending'}">
-                                ${video.isApproved ? '✓ Approved' : '⏳ Pending'}
-                            </span>
-                        </td>
-                        <td>${video.views || 0}</td>
-                        <td>${formatDate(video.createdAt)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                ${!video.isApproved ? 
-                                    `<button class="btn btn-success btn-sm" onclick="approveVideo('${doc.id}')">Approve</button>` : 
-                                    `<button class="btn btn-warning btn-sm" onclick="disapproveVideo('${doc.id}')">Disapprove</button>`
-                                }
-                                <button class="btn btn-primary btn-sm" onclick="viewVideo('${doc.id}')">View</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteVideo('${doc.id}')">Delete</button>
-                            </div>
-                        </td>
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${video.title}</strong><br>
+                                <small style="color: #666;">${video.description?.substring(0, 50) || 'No description'}...</small>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img src="${video.uploaderPhoto}" alt="${video.uploaderName}" style="width: 24px; height: 24px; border-radius: 50%;">
+                                    ${video.uploaderName}
+                                </div>
+                            </td>
+                            <td>${date?.toLocaleDateString()}</td>
+                            <td><span class="badge ${statusClass}">${status}</span></td>
+                            <td>👁️ ${video.views || 0} | ❤️ ${video.likes || 0}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button onclick="viewVideoDetails('${doc.id}')" class="btn btn-edit btn-sm">👁️ View</button>
+                                    ${!video.approved && !video.rejected ? `
+                                        <button onclick="approveVideo('${doc.id}')" class="btn btn-approve btn-sm">✅ Approve</button>
+                                        <button onclick="rejectVideo('${doc.id}')" class="btn btn-reject btn-sm">❌ Reject</button>
+                                    ` : ''}
+                                    <button onclick="deleteVideo('${doc.id}')" class="btn btn-delete btn-sm">🗑️ Delete</button>
+                                </div>
+                            </td>
+                        </tr>
                     `;
-                    
-                    videosTable.appendChild(row);
                 });
                 
+                html += '</tbody></table>';
+                videosList.innerHTML = html;
+                
             } catch (error) {
-                console.error('Error loading videos:', error);
-                showMessage('Failed to load videos', 'error');
+                console.error("Error loading videos:", error);
+                videosList.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #ff4757;">
+                        <h3>Error loading videos</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
+        }
+
+        function filterVideos() {
+            loadVideos();
+        }
+
+        function refreshVideos() {
+            loadVideos();
+            showNotification('Videos list refreshed', 'success');
+        }
+
+        async function viewVideoDetails(videoId) {
+            currentModalVideoId = videoId;
+            
+            try {
+                const videoDoc = await db.collection('videos').doc(videoId).get();
+                const video = videoDoc.data();
+                
+                if (!video) {
+                    showNotification('Video not found', 'error');
+                    return;
+                }
+                
+                // Update modal content
+                document.getElementById('modalVideoTitle').textContent = video.title;
+                document.getElementById('modalUploaderName').textContent = video.uploaderName;
+                document.getElementById('modalUploaderAvatar').src = video.uploaderPhoto;
+                document.getElementById('modalUploadDate').textContent = video.uploadedAt?.toDate().toLocaleString();
+                document.getElementById('modalVideoDescription').textContent = video.description || 'No description';
+                document.getElementById('modalViews').textContent = video.views || 0;
+                document.getElementById('modalLikes').textContent = video.likes || 0;
+                
+                // Update status badge
+                const statusBadge = document.getElementById('modalVideoStatus');
+                statusBadge.textContent = video.approved ? 'Approved' : video.rejected ? 'Rejected' : 'Pending';
+                statusBadge.className = 'badge ' + (video.approved ? 'badge-approved' : video.rejected ? 'badge-rejected' : 'badge-pending');
+                
+                // Update tags
+                const tagsDiv = document.getElementById('modalVideoTags');
+                tagsDiv.innerHTML = '';
+                if (video.tags && video.tags.length > 0) {
+                    video.tags.forEach(tag => {
+                        tagsDiv.innerHTML += `<span class="badge badge-user">${tag}</span>`;
+                    });
+                }
+                
+                // Update video player
+                const player = document.getElementById('modalVideoPlayer');
+                if (video.url.includes('drive.google.com')) {
+                    const fileId = video.url.match(/\/d\/(.+?)\//)?.[1] || video.url.match(/id=(.+?)(&|$)/)?.[1];
+                    player.innerHTML = `<iframe src="https://drive.google.com/file/d/${fileId}/preview" width="100%" height="100%" allowfullscreen></iframe>`;
+                } else if (video.url.includes('youtube.com') || video.url.includes('youtu.be')) {
+                    const videoId = video.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+                    player.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" width="100%" height="100%" allowfullscreen></iframe>`;
+                } else {
+                    player.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; font-size: 1.2rem;">🎬 Video Preview</div>`;
+                }
+                
+                // Show modal
+                document.getElementById('videoDetailModal').style.display = 'flex';
+                
+            } catch (error) {
+                console.error("Error loading video details:", error);
+                showNotification('Error loading video details', 'error');
+            }
+        }
+
+        function closeVideoDetailModal() {
+            document.getElementById('videoDetailModal').style.display = 'none';
         }
 
         async function approveVideo(videoId) {
             if (!confirm('Approve this video?')) return;
             
             try {
-                // First get the video to extract driveFileId
-                const videoDoc = await db.collection('videos').doc(videoId).get();
-                const videoData = videoDoc.data();
+                await db.collection('videos').doc(videoId).update({
+                    approved: true,
+                    rejected: false,
+                    approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedBy: currentAdmin.uid
+                });
                 
-                if (!videoData.driveFileId && videoData.driveLink) {
-                    // Extract file ID if not already stored
-                    const fileId = extractDriveFileId(videoData.driveLink);
-                    if (fileId) {
-                        // Update with driveFileId
-                        await db.collection('videos').doc(videoId).update({
-                            driveFileId: fileId,
-                            isApproved: true,
-                            approvedAt: new Date()
-                        });
-                    } else {
-                        await db.collection('videos').doc(videoId).update({
-                            isApproved: true,
-                            approvedAt: new Date()
-                        });
-                    }
-                } else {
-                    await db.collection('videos').doc(videoId).update({
-                        isApproved: true,
-                        approvedAt: new Date()
-                    });
-                }
-                
-                showMessage('✅ Video approved successfully!', 'success');
-                loadDashboard();
+                showNotification('Video approved successfully', 'success');
                 loadVideos();
+                loadDashboardStats();
+                closeVideoDetailModal();
                 
             } catch (error) {
-                console.error('Error approving video:', error);
-                showMessage('❌ Failed to approve video', 'error');
+                console.error("Error approving video:", error);
+                showNotification('Error approving video', 'error');
             }
         }
 
-        async function disapproveVideo(videoId) {
-            if (!confirm('Disapprove this video?')) return;
+        async function rejectVideo(videoId) {
+            const reason = prompt('Reason for rejection (optional):');
             
             try {
                 await db.collection('videos').doc(videoId).update({
-                    isApproved: false
+                    approved: false,
+                    rejected: true,
+                    rejectionReason: reason || '',
+                    rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    rejectedBy: currentAdmin.uid
                 });
                 
-                showMessage('✅ Video disapproved!', 'success');
+                showNotification('Video rejected', 'warning');
                 loadVideos();
+                loadDashboardStats();
+                closeVideoDetailModal();
                 
             } catch (error) {
-                console.error('Error disapproving video:', error);
-                showMessage('❌ Failed to disapprove video', 'error');
+                console.error("Error rejecting video:", error);
+                showNotification('Error rejecting video', 'error');
             }
         }
 
         async function deleteVideo(videoId) {
-            if (!confirm('⚠️ Delete this video permanently?')) return;
+            if (!confirm('Permanently delete this video?')) return;
             
             try {
                 await db.collection('videos').doc(videoId).delete();
-                
-                // Delete associated comments
-                const commentsSnapshot = await db.collection('comments')
-                    .where('videoId', '==', videoId)
-                    .get();
-                
-                const deletePromises = commentsSnapshot.docs.map(doc => doc.ref.delete());
-                await Promise.all(deletePromises);
-                
-                showMessage('🗑️ Video deleted successfully!', 'success');
-                loadDashboard();
+                showNotification('Video deleted successfully', 'success');
                 loadVideos();
+                loadDashboardStats();
+                closeVideoDetailModal();
                 
             } catch (error) {
-                console.error('Error deleting video:', error);
-                showMessage('❌ Failed to delete video', 'error');
+                console.error("Error deleting video:", error);
+                showNotification('Error deleting video', 'error');
             }
         }
 
-        function viewVideo(videoId) {
-            window.open(`watch.html?id=${videoId}`, '_blank');
-        }
-
-        // User Management
+        // User Management Functions
         async function loadUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const usersList = document.getElementById('usersList');
+            
             try {
-                const usersTable = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
-                usersTable.innerHTML = '';
-                
-                const snapshot = await db.collection('users')
-                    .orderBy('createdAt', 'desc')
-                    .limit(50)
-                    .get();
+                const snapshot = await db.collection('users').orderBy('createdAt', 'desc').limit(50).get();
                 
                 if (snapshot.empty) {
-                    usersTable.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No users found</td></tr>';
+                    usersList.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <h3>No users found</h3>
+                        </div>
+                    `;
                     return;
                 }
                 
-                snapshot.forEach(async (doc) => {
+                let html = `
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Joined</th>
+                                <th>Role</th>
+                                <th>Stats</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                snapshot.forEach(doc => {
                     const user = doc.data();
-                    const userId = doc.id;
+                    const date = user.createdAt?.toDate();
                     
-                    // Count user's videos
-                    const videosSnapshot = await db.collection('videos')
-                        .where('userId', '==', userId)
-                        .get();
+                    // Filter by search term
+                    if (searchTerm && 
+                        !user.displayName.toLowerCase().includes(searchTerm) && 
+                        !user.email.toLowerCase().includes(searchTerm)) {
+                        return;
+                    }
                     
-                    const row = document.createElement('tr');
-                    
-                    row.innerHTML = `
-                        <td>${user.displayName || 'User'}</td>
-                        <td>${user.email || 'No email'}</td>
-                        <td>${videosSnapshot.size}</td>
-                        <td>${user.isAdmin ? '<span style="color: gold;">👑 Admin</span>' : '<span style="color: #aaa;">👤 User</span>'}</td>
-                        <td>${formatDate(user.createdAt)}</td>
-                        <td>
-                            <div class="action-buttons">
-                                ${!user.isAdmin ? 
-                                    `<button class="btn btn-success btn-sm" onclick="makeAdmin('${userId}')">Make Admin</button>` :
-                                    `<button class="btn btn-danger btn-sm" onclick="removeAdmin('${userId}')">Remove Admin</button>`
-                                }
-                            </div>
-                        </td>
+                    html += `
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <img src="${user.photoURL}" alt="${user.displayName}" style="width: 32px; height: 32px; border-radius: 50%;">
+                                    <div>
+                                        <strong>${user.displayName}</strong><br>
+                                        <small style="color: #666;">ID: ${user.uid.substring(0, 8)}...</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${user.email}</td>
+                            <td>${date?.toLocaleDateString()}</td>
+                            <td><span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}">${user.role || 'user'}</span></td>
+                            <td>🎬 ${user.videosCount || 0} | ❤️ ${user.likesCount || 0}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button onclick="viewUserDetails('${doc.id}')" class="btn btn-edit btn-sm">👁️ View</button>
+                                    <button onclick="deleteUser('${doc.id}')" class="btn btn-delete btn-sm">🗑️ Delete</button>
+                                </div>
+                            </td>
+                        </tr>
                     `;
+                });
+                
+                html += '</tbody></table>';
+                usersList.innerHTML = html;
+                
+            } catch (error) {
+                console.error("Error loading users:", error);
+                usersList.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #ff4757;">
+                        <h3>Error loading users</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function searchUsers() {
+            loadUsers();
+        }
+
+        function refreshUsers() {
+            loadUsers();
+            showNotification('Users list refreshed', 'success');
+        }
+
+        async function viewUserDetails(userId) {
+            currentModalUserId = userId;
+            
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                const user = userDoc.data();
+                
+                if (!user) {
+                    showNotification('User not found', 'error');
+                    return;
+                }
+                
+                // Update modal content
+                document.getElementById('modalUserName').textContent = user.displayName;
+                document.getElementById('modalUserAvatar').src = user.photoURL;
+                document.getElementById('modalUserEmail').textContent = user.email;
+                document.getElementById('modalUserJoined').textContent = user.createdAt?.toDate().toLocaleDateString();
+                document.getElementById('modalUserVideos').textContent = user.videosCount || 0;
+                document.getElementById('modalUserLikes').textContent = user.likesCount || 0;
+                
+                // Update role badge
+                const roleBadge = document.getElementById('modalUserRole');
+                roleBadge.textContent = user.role || 'user';
+                roleBadge.className = 'badge ' + (user.role === 'admin' ? 'badge-admin' : 'badge-user');
+                
+                // Set role select
+                document.getElementById('roleSelect').value = user.role || 'user';
+                
+                // Show modal
+                document.getElementById('userDetailModal').style.display = 'flex';
+                
+            } catch (error) {
+                console.error("Error loading user details:", error);
+                showNotification('Error loading user details', 'error');
+            }
+        }
+
+        function closeUserDetailModal() {
+            document.getElementById('userDetailModal').style.display = 'none';
+        }
+
+        async function updateUserRole() {
+            const newRole = document.getElementById('roleSelect').value;
+            
+            try {
+                await db.collection('users').doc(currentModalUserId).update({
+                    role: newRole,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentAdmin.uid
+                });
+                
+                showNotification(`User role updated to ${newRole}`, 'success');
+                loadUsers();
+                closeUserDetailModal();
+                
+            } catch (error) {
+                console.error("Error updating role:", error);
+                showNotification('Error updating role', 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Permanently delete this user account? This action cannot be undone.')) return;
+            
+            try {
+                await db.collection('users').doc(userId).delete();
+                showNotification('User deleted successfully', 'success');
+                loadUsers();
+                loadDashboardStats();
+                closeUserDetailModal();
+                
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                showNotification('Error deleting user', 'error');
+            }
+        }
+
+        // Ad Management Functions
+        async function loadAdSettings() {
+            try {
+                const adDoc = await db.collection('settings').doc('ads').get();
+                
+                if (adDoc.exists) {
+                    const ads = adDoc.data();
                     
-                    usersTable.appendChild(row);
-                });
+                    // Update toggle
+                    document.getElementById('adsToggle').checked = ads.enabled || false;
+                    
+                    // Update status badge
+                    const statusBadge = document.getElementById('adsStatusBadge');
+                    statusBadge.textContent = ads.enabled ? 'Enabled' : 'Disabled';
+                    statusBadge.className = 'badge ' + (ads.enabled ? 'badge-approved' : 'badge-rejected');
+                    
+                    // Update code editor
+                    document.getElementById('adsenseCode').value = ads.code || '';
+                    
+                    // Update preview
+                    const previewDiv = document.getElementById('adPreview');
+                    if (ads.enabled && ads.code) {
+                        previewDiv.innerHTML = ads.code;
+                    } else {
+                        previewDiv.innerHTML = '<p style="color: #999; text-align: center;">Ad preview will appear here when ads are enabled</p>';
+                    }
+                }
                 
             } catch (error) {
-                console.error('Error loading users:', error);
-                showMessage('Failed to load users', 'error');
+                console.error("Error loading ad settings:", error);
+                showNotification('Error loading ad settings', 'error');
             }
         }
 
-        async function makeAdmin(userId) {
-            if (!confirm('Make this user an admin?')) return;
+        async function toggleAds() {
+            const enabled = document.getElementById('adsToggle').checked;
             
             try {
-                await db.collection('users').doc(userId).update({
-                    isAdmin: true
-                });
+                await db.collection('settings').doc('ads').set({
+                    enabled: enabled,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentAdmin.uid
+                }, { merge: true });
                 
-                showMessage('👑 User promoted to admin!', 'success');
-                loadUsers();
+                // Update status badge
+                const statusBadge = document.getElementById('adsStatusBadge');
+                statusBadge.textContent = enabled ? 'Enabled' : 'Disabled';
+                statusBadge.className = 'badge ' + (enabled ? 'badge-approved' : 'badge-rejected');
+                
+                showNotification(`Ads ${enabled ? 'enabled' : 'disabled'}`, 'success');
+                loadAdSettings();
                 
             } catch (error) {
-                console.error('Error making admin:', error);
-                showMessage('❌ Failed to make admin', 'error');
+                console.error("Error toggling ads:", error);
+                showNotification('Error updating ad settings', 'error');
             }
         }
 
-        async function removeAdmin(userId) {
-            if (!confirm('Remove admin privileges from this user?')) return;
+        async function saveAdSettings() {
+            const enabled = document.getElementById('adsToggle').checked;
+            const code = document.getElementById('adsenseCode').value;
             
             try {
-                await db.collection('users').doc(userId).update({
-                    isAdmin: false
-                });
+                await db.collection('settings').doc('ads').set({
+                    enabled: enabled,
+                    code: code,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentAdmin.uid
+                }, { merge: true });
                 
-                showMessage('✅ Admin privileges removed!', 'success');
-                loadUsers();
+                showNotification('Ad settings saved successfully', 'success');
+                loadAdSettings();
                 
             } catch (error) {
-                console.error('Error removing admin:', error);
-                showMessage('❌ Failed to remove admin', 'error');
+                console.error("Error saving ad settings:", error);
+                showNotification('Error saving ad settings', 'error');
             }
+        }
+
+        function testAds() {
+            const previewDiv = document.getElementById('adPreview');
+            const code = document.getElementById('adsenseCode').value;
+            
+            if (!code.trim()) {
+                previewDiv.innerHTML = '<p style="color: #ff4757; text-align: center;">Please enter AdSense code first</p>';
+                return;
+            }
+            
+            previewDiv.innerHTML = code;
+            showNotification('Ad preview updated', 'success');
+        }
+
+        // Analytics Functions
+        async function loadAnalytics() {
+            const period = parseInt(document.getElementById('analyticsPeriod').value);
+            
+            try {
+                // Calculate date range
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - period);
+                
+                // Get videos data for the period
+                const videosSnapshot = await db.collection('videos')
+                    .where('uploadedAt', '>=', startDate)
+                    .get();
+                
+                // Calculate totals
+                let totalViews = 0;
+                let totalLikes = 0;
+                let totalUploads = videosSnapshot.size;
+                
+                videosSnapshot.forEach(doc => {
+                    const video = doc.data();
+                    totalViews += video.views || 0;
+                    totalLikes += video.likes || 0;
+                });
+                
+                // Get new users for the period
+                const usersSnapshot = await db.collection('users')
+                    .where('createdAt', '>=', startDate)
+                    .get();
+                
+                const newUsers = usersSnapshot.size;
+                
+                // Update stats
+                document.getElementById('totalViews').textContent = totalViews;
+                document.getElementById('totalLikes').textContent = totalLikes;
+                document.getElementById('totalUploads').textContent = totalUploads;
+                document.getElementById('newUsers').textContent = newUsers;
+                
+                // Generate chart data
+                generateViewsChart(period);
+                
+            } catch (error) {
+                console.error("Error loading analytics:", error);
+                showNotification('Error loading analytics', 'error');
+            }
+        }
+
+        function generateViewsChart(period) {
+            const ctx = document.getElementById('viewsChart').getContext('2d');
+            
+            // Destroy existing chart
+            if (viewsChart) {
+                viewsChart.destroy();
+            }
+            
+            // Generate sample data (in real app, you would fetch this from Firestore)
+            const labels = [];
+            const data = [];
+            
+            for (let i = period - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                data.push(Math.floor(Math.random() * 100) + 20); // Random sample data
+            }
+            
+            viewsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Views',
+                        data: data,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Utility Functions
-        function extractDriveFileId(url) {
-            if (!url) return null;
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('adminNotification');
+            notification.textContent = message;
+            notification.className = `admin-notification ${type}`;
+            notification.style.display = 'block';
             
-            const patterns = [
-                /\/d\/([a-zA-Z0-9_-]+)/,
-                /\/file\/d\/([a-zA-Z0-9_-]+)/,
-                /id=([a-zA-Z0-9_-]+)/
-            ];
-            
-            for (const pattern of patterns) {
-                const match = url.match(pattern);
-                if (match && match[1]) {
-                    return match[1];
-                }
-            }
-            
-            return null;
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
         }
 
-        function formatDate(timestamp) {
-            if (!timestamp) return 'Unknown';
-            
-            try {
-                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleDateString();
-            } catch (error) {
-                return 'Invalid date';
+        // Initialize Admin Dashboard
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const isAdmin = await checkAdminAccess(user);
+                if (!isAdmin) return;
+            } else {
+                window.location.href = 'rayvid.html';
             }
-        }
+        });
 
-        function showMessage(message, type) {
-            const element = document.getElementById('adminMessage');
-            element.textContent = message;
-            element.className = `message ${type}`;
-            
-            if (type === 'success') {
-                setTimeout(() => {
-                    element.className = 'message';
-                }, 5000);
+        // Close modals on ESC key
+        document.onkeydown = function(evt) {
+            evt = evt || window.event;
+            if (evt.keyCode === 27) {
+                closeVideoDetailModal();
+                closeUserDetailModal();
             }
-        }
+        };
     </script>
 </body>
 </html>
