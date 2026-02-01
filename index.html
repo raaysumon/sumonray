@@ -3,654 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sumon Ray | Electronics & AI Engineer</title>
-    <meta name="description" content="Portfolio of Sumon Ray - Electronics and Communication Engineer from Khulna University">
-    <meta name="keywords" content="Sumon Ray, Electronics Engineer, AI, VLSI, Photonic Sensor, Sakura Science, Japan">
-    <meta name="author" content="Sumon Ray">
-
-    <!-- Tailwind CSS -->
+    <title>RayVid | Stream & Share</title>
     <script src="https://cdn.tailwindcss.com"></script>
-     
-
-    <!-- Particles.js -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
-    <!-- Font Awesome & Google Fonts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-   <!-- Your Custom CSS -->
-    <link rel="stylesheet" href="style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
-
-
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
+    <style>
+        body { background-color: #0f0f0f; color: white; scroll-behavior: smooth; }
+        .v-card:hover video { transform: scale(1.05); transition: 0.3s; }
+    </style>
 </head>
-
-<body class="relative">
-    <!-- Particle Background -->
-    <div id="particles-js"></div>
-
-    
-    
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 py-4 px-6 glass">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold gradient-text">SUMON RAY</a>
-            <div class="hidden md:flex space-x-8">
-                <a href="#home" class="hover:text-purple-300 transition-colors duration-300">Home</a>
-                <a href="#about" class="hover:text-cyan-300 transition-colors duration-300">About</a>
-                <a href="#projects" class="hover:text-emerald-300 transition-colors duration-300">Projects</a>
-                <a href="#research" class="hover:text-purple-300 transition-colors duration-300">Research</a>
-                <a href="#experience" class="hover:text-cyan-300 transition-colors duration-300">Experience</a>
-                <a href="#gallery" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">Gallery</a>
-                <a href="#contact" class="hover:text-emerald-300 transition-colors duration-300">Contact</a>
-                <a href="blog.html" class="hover:text-cyan-300 transition-colors duration-300">Blogs</a>
-				<a href="tool.html" class="hover:text-emerald-300 transition-colors duration-300">Tool</a>
-                <button id="modeToggle" class="hover:text-cyan-300 transition-colors duration-300">
-    <i class="fas fa-moon"></i>
-</button>
-
-            </div>
-            <button id="menuBtn" class="hover:text-purple-300 transition-colors duration-300">
-                <i class="fas fa-bars"></i>
-            </button>
+<body>
+    <nav class="sticky top-0 z-50 bg-[#0f0f0f]/90 backdrop-blur-md border-b border-gray-800 px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2 text-red-600 font-bold text-2xl">
+            <i class="fa-brands fa-youtube text-3xl"></i><span>RayVid</span>
         </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="md:hidden hidden mt-4 glass p-4 rounded-lg">
-            <div class="flex flex-col space-y-4">
-                <a href="#home" class="hover:text-purple-300 transition-colors">Home</a>
-                <a href="#about" class="hover:text-cyan-300 transition-colors">About</a>
-                <a href="#projects" class="hover:text-emerald-300 transition-colors">Projects</a>
-                <a href="#research" class="hover:text-purple-300 transition-colors">Research</a>
-                <a href="#experience" class="hover:text-cyan-300 transition-colors">Experience</a>
-				 <a href="#gallery" class="text-sm font-medium text-white hover:text-blue-400 transition-colors">Gallery</a>
-                <a href="#contact" class="hover:text-emerald-300 transition-colors">Contact</a>
-                <a href="blog.html" class="hover:text-purple-300 transition-colors">BLOGS</a>
-				<a href="tool.html" class="hover:text-emerald-300 transition-colors">TOOL</a>
-                <button id="modeToggle" class="hover:text-purple-300 transition-colors">
-    <i class="fas fa-moon"></i>
-</button>
-
-            </div>
-            <button id="menuBtn" class="hover:text-purple-300 transition-colors">
-                <i class="fas fa-bars"></i>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleModal()" class="hidden md:block bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm font-medium transition">
+                <i class="fa-solid fa-plus mr-2"></i>Upload
             </button>
+            <div id="auth-area">
+                <button onclick="login()" id="login-btn" class="border border-blue-500 text-blue-500 px-4 py-1.5 rounded-full hover:bg-blue-500 hover:text-white transition">Sign In</button>
+                <div id="user-profile" class="hidden items-center gap-3">
+                    <img id="user-pic" class="w-9 h-9 rounded-full border border-gray-700">
+                    <button onclick="logout()" class="text-xs text-gray-500 hover:text-white">Logout</button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6 py-20 text-center">
-            <div class="floating mb-8">
-                <img src="assets/images/portfolio/p1.jpg" 
-                     alt="Sumon Ray" 
-                     class="w-48 h-48 rounded-full mx-auto border-4 border-purple-500/30 shadow-2xl">
+    <main class="p-6 max-w-[1600px] mx-auto">
+        <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             </div>
-            
-            <h1 class="text-5xl md:text-7xl font-bold mb-4">
-                <span class="gradient-text">Sumon Ray</span>
-            </h1>
-            
-            <div class="typewriter text-2xl md:text-3xl mb-6 inline-block">
-                Aspiring researcher
-            </div>
-            
-            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-               Passionate about AI-driven biomedical and healthcare research
-            </p>
-            
-            
-            <div class="flex flex-wrap justify-center gap-4 mb-12">
-                <div class="glass px-6 py-3 rounded-full flex items-center space-x-2">
-                    <i class="fas fa-graduation-cap text-purple-400"></i>
-                    <span>Khulna University</span>
-                </div>
-                
-                <div class="glass px-6 py-3 rounded-full flex items-center space-x-2">
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <span>Sakura Science Exchange Program, Japan</span>
-                </div>
-            </div>
-            
-            <div class="flex justify-center space-x-6">
-                <a href="#contact" class="gradient-bg px-8 py-3 rounded-full font-semibold text-white glow hover:scale-105 transition-transform duration-300">
-                    Get In Touch
-                </a>
-                <a href="#projects" class="glass px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-colors duration-300">
-                    View Projects
-                </a>
-            </div>
-            
-            <!-- Social Icons -->
-            <div class="mt-12 flex justify-center space-x-6 text-2xl">
-                <a href="#" class="hover:text-purple-400 transition-colors"><i class="fab fa-linkedin"></i></a>
-                <a href="#" class="hover:text-gray-300 transition-colors"><i class="fab fa-github"></i></a>
-                <a href="#" class="hover:text-blue-400 transition-colors"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="hover:text-red-400 transition-colors"><i class="fab fa-youtube"></i></a>
-            </div>
-            
-            <!-- Scroll indicator -->
-            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-                <a href="#about" class="animate-bounce">
-                    <i class="fas fa-chevron-down text-2xl text-gray-400"></i>
-                </a>
-            </div>
-        </div>
-    </section>
+    </main>
 
-    <!-- About Section -->
-    <section id="about" class="py-20 section-hidden">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
-                <span class="gradient-underline">About Me</span>
-            </h2>
-            
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <div class="animated-border p-8">
-                        <p class="text-lg mb-6">
-                            Hello! I'm Sumon Ray, a nature lover who finds peace in greenery, sky, rivers, and sea. 
-                            Philosophy inspires me to think deeply and discover new perspectives on life.
-                        </p>
-                        <p class="text-lg mb-6">
-                            I earned my B.Sc in Electronics and Communication Engineering from Khulna University, 
-                            with academic focus on data science and photonics. My experience includes the Sakura Science 
-                            Exchange Program in Japan.
-                        </p>
-                        <p class="text-lg">
-                            I believe education, nature, and research together shape a complete human being.
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="space-y-8 ">
-                    <!-- Education Timeline -->
-                    <div class="glass p-6 rounded-xl">
-                        <h3 class="text-2xl font-bold mb-4 text-purple-300">Education</h3>
-                        <div class="space-y-4">
-                            <div class="border-l-4 border-purple-500 pl-4">
-                                <h4 class="font-bold">B.Sc Engg. in Electronics and Communication Engineering</h4>
-                                <p class="text-black-400">
-                       Khulna University - Sher-E-Bangla Rd, Khulna 9208 • 2025</p>
-                            </div>
-                            <div class="border-l-4 border-cyan-500 pl-4">
-                                <h4 class="font-bold">Higher Secondary Certificate in Science</h4>
-                                <p class="text-black-400">Govt. Sundarban Adarsha College - Khulna • 2019</p>
-                            </div>
-                            <div class="border-l-4 border-emerald-500 pl-4">
-                                <h4 class="font-bold">Secondary School Certificate in Science</h4>
-                                <p class="text-black-400">Khona K.B Secondary High School - Dacope, Khulna • 2017</p>
-                            </div>
-                            <div class="border-l-4 border-emerald-500 pl-4">
-                                <h4 class="font-bold">Junior School Certificate</h4>
-                                <p class="text-black-400"> Tildanga Junior High School - Dacope, Khulna • 2014</p>
-                            </div>
-                            <div class="border-l-4 border-emerald-500 pl-4">
-                                <h4 class="font-bold">Primary School Certificate </h4>
-                                <p class="text-black-400"> Govt. South Tildanga Primary School - Dacope, Khulna • 2011</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Skills -->
-                    <article class="mt-8 p-6 rounded-lg shadow-lg border border-gray-700">
-                <div class="flex ">
-            <div class="w-2/3">
-                <h3 class="text-2xl font-bold mb-4 text-purple-300">Skills</h3>
-                <ul class="text-md leading-relaxed list-disc list-inside">
-                    <li>
-                        <strong>Programming Languages:</strong> 
-                        <span class="blue-skill">C/C++</span>, 
-                        <span class="blue-skill">Python</span>, 
-                        <span class="blue-skill">Java</span>
-                    </li>
-                    <li>
-                        <strong>Data Science:</strong>
-                        <span class="blue-skill">NumPy</span>, 
-                        <span class="blue-skill">Pandas</span>, 
-                        <span class="blue-skill">Matplotlib</span>, 
-                        <span class="blue-skill">Seaborn</span>, 
-                        <span class="blue-skill">Scikit-Learn</span>
-                    </li>
-                    <li>
-                        <strong>Soft Skills:</strong> 
-                        <span class="blue-skill">Excellent Communication</span>, 
-                        <span class="blue-skill">Independent Work Proficiency</span>, 
-                        <span class="blue-skill">Deadline-Driven Effectiveness</span>
-                    </li>
-                    <li>
-                        <strong>Other:</strong>
-                        <span class="blue-skill">Android App Development (Java)</span>, 
-                        <span class="green-skill">Website Development (HTML, CSS, Javascript)</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="w-1/5 pl-6 border-l border-gray-700 ml-6">
-                <h4 class="font-semibold text-white mb-2">Skill Colour Indicator</h4>
-                <div class="flex items-center mb-2">
-                    <span class="glow-yellow text-xl mr-2">●</span>
-                    <span class="text-gray-300">Beginner</span>
-                </div>
-                <div class="flex items-center mb-2">
-                    <span class="glow-green text-xl mr-2">●</span>
-                    <span class="text-gray-300">Basic</span>
-                </div>
-                <div class="flex items-center">
-                    <span class="glow-blue text-xl mr-2">●</span>
-                    <span class="text-gray-300">Advanced</span>
-                </div>
-            </div>
-        </div>
- </article>          
-
-
-
-
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="py-20 section-hidden bg-gradient-to-b from-transparent to-slate-900/50">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
-                <span class="gradient-underline"> Projects</span>
-            </h2>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Project 1 -->
-                <div class="glass rounded-xl overflow-hidden card-hover bg-blue-950">
-                    <div class="p-6">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-shopping-cart text-white text-xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Smart Shopping Trolley System Using Android Application</h3>
-                        
-                    
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
-                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm">Hardware</span>
-                        </div>
-                        <a href="https://github.com/raaysumon/smarttrolley" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
-    Github Link
-    </a>
-                    </div>
-                </div>
-                
-                <!-- Project 2 -->
-                <div class="glass rounded-xl overflow-hidden card-hover bg-green-900">
-                    <div class="p-6">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-child text-white text-xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">RF Module and Smart Phone App Based Child Safety & Tracking System</h3>
-                
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
-                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">Child Safety</span>
-                        </div>
-                        			<a href="https://drive.google.com/file/d/1o_kBgtRnIICMuczB7izfLM_FmGF4obvI/view?usp=drive_link" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
-    Video Link
-    </a>
-                    </div>
-                </div>
-                
-                <!-- Project 3 -->
-                <div class="glass rounded-xl overflow-hidden card-hover bg-blue-950">
-                    <div class="p-6">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-brain text-white text-xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Machine Learning Based Thyroid Cancer Recurrence Prediction</h3>
-                        
-                         <p class="text-gray-400 text-sm"> This work is based on my Research Paper in thyroid cancer recurrence (May be published in IEEE Conference) </p>
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">ML</span>
-                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">Python</span>
-                        </div>
-                        <a href="https://thyroid-1-wm9x.onrender.com/" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
-    Website Link
-    </a>
-                    </div>
-                </div>
-
-                <!-- Project 1 -->
-                <div class="glass rounded-xl overflow-hidden card-hover bg-green-900">
-                    <div class="p-6">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                            <i class="fa-solid fa-cloud"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2"> Real-Time Temperature Monitoring Using Web-application</h3>
-                        
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Website</span>
-                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">API</span>
-
-                        </div>
-                        <a href="https://raaysumon.github.io/weather/" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
-    Website Link
-    </a>
-                    </div>
-                </div>
-                
-
-                <!-- Project 2 -->
-                <div class="glass rounded-xl overflow-hidden card-hover bg-blue-950">
-                    <div class="p-6">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                            <i class="fa-solid fa-headset"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Remote Health Monitoring System Using Android Application</h3>
-                        
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
-                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">IoT</span>
-                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm">Hardware</span>
-                        </div>
-                        <a href="https://github.com/raaysumon/aremotepatient" class="inline-block bg-yellow-400 text-gray-900 font-semibold px-4 py-2 rounded hover:bg-yellow-500 transition-colors duration-300">
-    Github Link
-    </a>
-                    </div>
-                </div>
-                
-
-                <!-- Project 3 -->
-                <div class="glass rounded-xl overflow-hidden card-hover bg-green-900">
-                    <div class="p-6">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                            <i class="fa-solid fa-water"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">IoT Based Smart Watering Device Using Android Application</h3>
-                        
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Android</span>
-                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">IoT</span>
-                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm">Hardware</span>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </section>
-
-    <!-- Research Section -->
-    <section id="research" class="py-20 section-hidden">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
-                <span class="gradient-underline">Research</span>
-            </h2>
-            
-            <div class="max-w-4xl mx-auto glass p-8 rounded-2xl">
-                <div class="flex items-start space-x-4">
-                    <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-microscope text-white text-2xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold mb-2">Undergraduate Thesis</h3>
-                        <h4 class="text-xl text-cyan-300 mb-4">Machine Learning Approach for Photonic Crystal Fiber Based Blood Glucose Sensor</h4>
-                        <p class="text-lg">
-                            Research focusing on developing advanced biosensors using photonic crystal fibers 
-                            combined with machine learning techniques for accurate blood glucose monitoring.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Experience Section -->
-    <section id="experience" class="py-20 section-hidden bg-gradient-to-b from-transparent to-slate-900/50">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
-                <span class="gradient-underline">Experience</span>
-            </h2>
-            
-            <div class="max-w-4xl mx-auto">
-                <!-- Japan Experience -->
-                <div class="glass p-8 rounded-2xl mb-8">
-                    <div class="flex items-center mb-6">
-                        
-                        <div>
-                            <h3 class="text-2xl font-bold">International Experience</h3>
-                            
-                        </div>
-                    </div>
-                    <p class="text-lg">
-                       Invited from Sakura Science Exchange Program, Japan.
-University of Yamanashi, 4 Chome-4-37 Takeda, Kofu, Yamanashi 400-0016, Japan.
-Administered by Japan Science and Technology Agency. I was one of the ten students who were selected for the prestigious program to engage in cutting-edge research collaborations. </p>
-
-<p class="text-gray-400 mb-4">DATE: January 28 to February 3 in 2024. 
-                    </p></p>
-                </div>
-                
-                <!-- Internships -->
-                <article class="glass p-8 rounded-2xl mb-8">
-                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Internship</h3>
-                    <p class="text-md text-gray-300 leading-relaxed">
-                        1. 2025 Aspire Leaders Program,Aspire Institute (Remote)
-						<p class="text-sm text-gray-400 mb-4">DATE: 29 May to August 01 in 2025</p>
-                    </p>
-					<p class="text-md text-gray-300 leading-relaxed">
-                        2. Bangladesh Cable Shilpa Limited, Shiromoni,Khulna,Bangladesh
-						<p class="text-sm text-gray-400 mb-4">DATE: 1 December to December 14 in 2023</p>
-                    </p>
-                </article>
-                    
-                     <article class="glass p-8 rounded-2xl mb-8">
-                    <h3 class="text-xl md:text-2xl font-semibold mb-2 text-white">Research Assistanship</h3>
-                    <p class="text-md text-gray-300 leading-relaxed">
-                      Research Assistantship, Research and innovation centre, khulna university; Supervised by Professor Dr. Md Mahbub Hossain, Professor, Khulna University, Khulna, ECE Discipline
-<p class="text-sm text-gray-400 mb-4">DATE:January 28 to February 3 in 2024</p>
-                    </p>
-                </article>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-     <!-- Gallery Section -->
-        <section id="gallery" class="mt-24 mb-24 mr-24 ml-24">
-            <div class="section-container">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Sakura Science Exchange Program, Japan</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
-                        </div>
-                    </div>
-					<div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/portfolio/p3.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Japan</span>
-                        </div>
-                    </div>
-					<div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/portfolio/p4.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Japan</span>
-                        </div>
-                    </div>
-                    <div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/portfolio/p5.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Japan</span>
-                        </div>
-                    </div>
-				<div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/portfolio/p2.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Japan</span>
-                        </div>
-                    </div>
-                    <div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/portfolio/p9.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Japan</span>
-                        </div>
-                    </div>
-                    
-                    </div>
-                </div>
-            </div>
-			
-			<div class="section-container mt-24 mb-20">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">University Life</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
-                        </div>
-                    </div>
-					<div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
-                        </div>
-                    </div>
-					<div class="relative group aspect-square rounded-lg overflow-hidden">
-                        <img src="assets/images/about/mountfujime.jpg" alt="Mount Fuji and Me" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span class="text-white text-lg font-bold">Mount Fuji and Me</span>
-                        </div>
-                    </div>
-				
-                    
-                    </div>
-                </div>
-            </div>
-        </section>
-    <!-- Contact Section -->
-   <section id="contact" class="py-20 section-hidden">
-    <div class="max-w-4xl mx-auto px-6">
-        <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
-            <span class="gradient-underline">Get In Touch</span>
-        </h2>
-        
-        <div class="glass rounded-2xl p-8">
-            <div class="grid md:grid-cols-2 gap-12">
-                <!-- Contact Info -->
-                <div>
-                    <h3 class="text-2xl font-bold mb-6">Let's Connect</h3>
-                    <div class="space-y-6">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center">
-                                <i class="fas fa-envelope text-white"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold">Email</h4>
-                                <p class="text-gray-400">raay.sumon@gmail.com</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center">
-                                <i class="fas fa-phone text-white"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold">Phone</h4>
-                                <p class="text-gray-400">+880 17714 82099</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center">
-                                <i class="fab fa-whatsapp text-white"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold">WhatsApp</h4>
-                                <p class="text-gray-400">+880 15678 54902</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact Form -->
-                <div>
-                    <h3 class="text-2xl font-bold mb-6">Send a Message</h3>
-                   <form id="contactForm" class="space-y-4">
-    <input type="text" name="name" placeholder="Your Name" required
-           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
-
-    <input type="email" name="email" placeholder="Your Email" required
-           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
-
-    <input type="text" name="subject" placeholder="Subject" required
-           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
-
-    <textarea name="message" rows="5" placeholder="Your Message" required
-              class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
-
-    <button id="submitBtn" type="submit"
-            class="w-full py-3 gradient-bg text-white font-bold rounded-xl glow transition-transform duration-300">
-        Send Message
-    </button>
-
-    <p id="formStatus" class="text-center text-sm mt-3"></p>
-</form>
-
-
-                    
-                    <p class="text-center text-gray-400 mt-8">
-                        Open to research collaborations, internships, and interesting projects
-                    </p>
-                </div>
+    <div id="uploadModal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
+        <div class="bg-[#1e1e1e] p-8 rounded-2xl w-full max-w-md border border-gray-800 shadow-2xl">
+            <h2 class="text-2xl font-bold mb-2">Share Video</h2>
+            <p class="text-gray-400 text-sm mb-6">Paste your Google Drive link below. Admin will review it shortly.</p>
+            <input type="text" id="vTitle" placeholder="Video Title" class="w-full bg-[#121212] border border-gray-700 rounded-lg p-3 mb-4 focus:border-red-500 outline-none">
+            <input type="text" id="vUrl" placeholder="Google Drive Link (Sharing: Anyone with link)" class="w-full bg-[#121212] border border-gray-700 rounded-lg p-3 mb-6 focus:border-red-500 outline-none">
+            <div class="flex gap-3">
+                <button onclick="submitVideo()" class="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold transition">Submit</button>
+                <button onclick="toggleModal()" class="flex-1 bg-gray-800 hover:bg-gray-700 py-3 rounded-xl font-bold transition">Cancel</button>
             </div>
         </div>
     </div>
-</section>
 
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
+            authDomain: "rayvid-c074a.firebaseapp.com",
+            projectId: "rayvid-c074a",
+            storageBucket: "rayvid-c074a.firebasestorage.app",
+            messagingSenderId: "970771885312",
+            appId: "1:970771885312:web:104ae741f28287a01ad7e5"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    <!-- Footer -->
-    <footer class="py-12 border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-6 text-center">
-            <h3 class="text-2xl font-bold gradient-text mb-4">Sumon Ray</h3>
-            <p class="text-gray-400 mb-8">Electronics Engineer • AI Researcher • Innovator</p>
-            
-            
-            
-         <a href="legal.html" style="color:#4da6ff; text-decoration:none;">Privacy Policy, Terms & Disclaimer</a>
-  </p>
-        </div>
-    </footer>
+        function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function logout() { auth.signOut(); }
+        function toggleModal() { 
+            if(!auth.currentUser) return alert("Please Login First!");
+            document.getElementById('uploadModal').classList.toggle('hidden'); 
+        }
 
-    <!-- Back to Top -->
-    <button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 gradient-bg rounded-full text-white shadow-lg hidden hover:scale-110 transition-transform">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+        auth.onAuthStateChanged(user => {
+            document.getElementById('login-btn').classList.toggle('hidden', user);
+            document.getElementById('user-profile').classList.toggle('hidden', !user);
+            if(user) document.getElementById('user-pic').src = user.photoURL;
+        });
 
+        async function submitVideo() {
+            const title = document.getElementById('vTitle').value;
+            const url = document.getElementById('vUrl').value;
+            if(!title || !url) return alert("Fill all fields");
+            await db.collection("pending_videos").add({
+                title, url, userName: auth.currentUser.displayName, 
+                userPic: auth.currentUser.photoURL, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("Sent for Approval!");
+            toggleModal();
+        }
 
-
-
-
-	
+        db.collection("videos").orderBy("createdAt", "desc").onSnapshot(snap => {
+            const grid = document.getElementById('video-grid');
+            grid.innerHTML = '';
+            snap.forEach(doc => {
+                const data = doc.data();
+                const streamUrl = data.url.replace('/view?usp=sharing', '').replace('file/d/', 'uc?export=download&id=');
+                grid.innerHTML += `
+                    <div class="v-card cursor-pointer group">
+                        <div class="overflow-hidden rounded-xl aspect-video bg-gray-900 border border-gray-800">
+                            <video src="${streamUrl}" class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="flex gap-3 mt-3">
+                            <img src="${data.userPic}" class="w-10 h-10 rounded-full border border-gray-800">
+                            <div>
+                                <h3 class="font-bold line-clamp-2 leading-tight">${data.title}</h3>
+                                <p class="text-gray-400 text-sm mt-1">${data.userName}</p>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        });
+    </script>
 </body>
-  <!-- Your JS -->
-    <script src="script.js"></script>
-</html> 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</html>
