@@ -1,103 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>RayVid — Watch Smarter</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Adsense -->
-<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
-
-<style>
-body{margin:0;font-family:Inter,Arial;background:#0f0f0f;color:#fff}
-header{display:flex;align-items:center;justify-content:space-between;
-padding:10px 20px;background:#121212;position:sticky;top:0;z-index:9}
-.logo{font-size:22px;font-weight:700;color:#ff0000}
-#user img{border-radius:50%;vertical-align:middle}
-#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-gap:20px;padding:20px}
-.card{background:#181818;border-radius:12px;overflow:hidden;cursor:pointer}
-.card iframe{width:100%;height:170px;border:none}
-.meta{padding:10px}
-.meta h4{margin:5px 0;font-size:16px}
-.meta p{font-size:13px;color:#aaa}
-.stats{font-size:12px;color:#888}
-button{background:#ff0000;color:#fff;border:none;
-padding:6px 12px;border-radius:6px;cursor:pointer}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RayVid | Your Video Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f0f0f; color: white; }
+        .video-card:hover { transform: translateY(-5px); transition: 0.3s; }
+        .glass-modal { background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px); }
+    </style>
 </head>
-
 <body>
+    <nav class="sticky top-0 z-50 bg-[#0f0f0f] border-b border-gray-800 px-4 py-2 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <i class="fa-solid fa-bars text-xl cursor-pointer p-2 hover:bg-gray-800 rounded-full"></i>
+            <div class="flex items-center gap-1 text-red-600 font-bold text-2xl tracking-tighter cursor-pointer" onclick="location.reload()">
+                <i class="fa-brands fa-youtube text-3xl"></i> <span>RayVid</span>
+            </div>
+        </div>
 
-<header>
-  <div class="logo">▶ RayVid</div>
-  <div id="user"></div>
-</header>
+        <div class="flex items-center gap-2 md:gap-6">
+            <button onclick="openUpload()" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm font-medium transition">
+                <i class="fa-solid fa-plus mr-1"></i> <span class="hidden md:inline">Upload</span>
+            </button>
+            <div id="auth-ui">
+                <button onclick="login()" id="login-btn" class="border border-blue-500 text-blue-500 px-4 py-1.5 rounded-full font-medium hover:bg-blue-500 hover:text-white transition">Sign In</button>
+                <div id="user-profile" class="hidden items-center gap-3">
+                    <img id="user-pic" class="w-8 h-8 rounded-full border border-gray-700">
+                    <button onclick="logout()" class="text-xs text-gray-500 hover:text-white">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<section id="grid"></section>
+    <main class="p-6">
+        <div class="max-w-5xl mx-auto h-24 bg-[#1a1a1a] rounded-lg mb-8 flex items-center justify-center border border-gray-800 text-gray-600">
+            AdSense Approved Area
+        </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+        <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            </div>
+    </main>
 
-<script>
-firebase.initializeApp({
- apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
- authDomain: "rayvid-c074a.firebaseapp.com",
- projectId: "rayvid-c074a"
-});
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-/* ---------- AUTH ---------- */
-auth.onAuthStateChanged(user=>{
- if(user){
-   document.getElementById("user").innerHTML=
-    `<img src="${user.photoURL}" width="32"> ${user.displayName}
-     <button onclick="logout()">Logout</button>`;
-   db.collection("users").doc(user.uid).set({
-     name:user.displayName,
-     email:user.email,
-     photo:user.photoURL
-   },{merge:true});
- }else{
-   document.getElementById("user").innerHTML=
-    `<button onclick="login()">Login</button>`;
- }
-});
-
-function login(){
- auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-}
-function logout(){auth.signOut();}
-
-/* ---------- VIDEOS ---------- */
-db.collection("videos")
-.orderBy("createdAt","desc")
-.onSnapshot(snap=>{
- const grid=document.getElementById("grid");
- grid.innerHTML="";
- snap.forEach(doc=>{
-  const v=doc.data();
-  grid.innerHTML+=`
-   <div class="card" onclick="view('${doc.id}')">
-    <iframe src="https://drive.google.com/file/d/${v.driveId}/preview"></iframe>
-    <div class="meta">
-      <h4>${v.title}</h4>
-      <p>${v.description}</p>
-      <div class="stats">👁 ${v.views||0} · 👍 ${v.likes||0}</div>
+    <div id="uploadModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80">
+        <div class="glass-modal p-8 rounded-2xl w-full max-w-md border border-gray-700">
+            <h2 class="text-2xl font-bold mb-4">Submit Video</h2>
+            <div class="space-y-4">
+                <input type="text" id="vTitle" placeholder="Video Title" class="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none focus:border-red-600">
+                <input type="text" id="vUrl" placeholder="Google Drive Link" class="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none focus:border-red-600">
+                <p class="text-xs text-gray-500">Note: Ensure Drive file is set to 'Anyone with the link'. Videos appear after admin approval.</p>
+                <div class="flex gap-2">
+                    <button onclick="submitToAdmin()" class="flex-1 bg-red-600 py-3 rounded-xl font-bold hover:bg-red-700 transition">Submit</button>
+                    <button onclick="closeUpload()" class="flex-1 bg-gray-800 py-3 rounded-xl font-bold hover:bg-gray-700 transition">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
-   </div>`;
- });
-});
 
-function view(id){
- db.collection("videos").doc(id)
- .update({views:firebase.firestore.FieldValue.increment(1)});
-}
-</script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
+            authDomain: "rayvid-c074a.firebaseapp.com",
+            projectId: "rayvid-c074a",
+            storageBucket: "rayvid-c074a.firebasestorage.app",
+            messagingSenderId: "970771885312",
+            appId: "1:970771885312:web:104ae741f28287a01ad7e5"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Auth Logic
+        function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function logout() { auth.signOut(); }
+        auth.onAuthStateChanged(user => {
+            const loginBtn = document.getElementById('login-btn');
+            const profile = document.getElementById('user-profile');
+            if (user) {
+                loginBtn.classList.add('hidden');
+                profile.classList.replace('hidden', 'flex');
+                document.getElementById('user-pic').src = user.photoURL;
+            } else {
+                loginBtn.classList.remove('hidden');
+                profile.classList.replace('flex', 'hidden');
+            }
+        });
+
+        // Modal Logic
+        function openUpload() { if(!auth.currentUser) { alert("Login first!"); return; } document.getElementById('uploadModal').classList.remove('hidden'); }
+        function closeUpload() { document.getElementById('uploadModal').classList.add('hidden'); }
+
+        async function submitToAdmin() {
+            const title = document.getElementById('vTitle').value;
+            const url = document.getElementById('vUrl').value;
+            if(!title || !url) return;
+            
+            await db.collection("pending_videos").add({
+                title, url, 
+                userName: auth.currentUser.displayName, 
+                userPic: auth.currentUser.photoURL,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("Submitted for approval!");
+            closeUpload();
+        }
+
+        // Fetch Approved Videos
+        db.collection("videos").orderBy("createdAt", "desc").onSnapshot(snap => {
+            const grid = document.getElementById('video-grid');
+            grid.innerHTML = '';
+            snap.forEach(doc => {
+                const data = doc.data();
+                // Drive Stream Converter
+                const streamUrl = data.url.replace('/view?usp=sharing', '').replace('file/d/', 'uc?export=download&id=');
+                grid.innerHTML += `
+                    <div class="video-card cursor-pointer group">
+                        <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-gray-800">
+                            <video src="${streamUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></video>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/40 transition">
+                                <i class="fa-solid fa-play text-4xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-3">
+                            <img src="${data.userPic}" class="w-9 h-9 rounded-full mt-1 border border-gray-800">
+                            <div>
+                                <h3 class="font-bold line-clamp-2 leading-tight">${data.title}</h3>
+                                <p class="text-gray-400 text-sm mt-1">${data.userName}</p>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        });
+    </script>
 </body>
 </html>
