@@ -3,66 +3,1170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RayVid | Your Video Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>StreamDrive - Video Streaming Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { background-color: #0f0f0f; color: white; }
-        .video-card:hover { transform: translateY(-5px); transition: 0.3s; }
-        .glass-modal { background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px); }
+        :root {
+            --primary: #ff4757;
+            --dark-bg: #1a1a2e;
+            --dark-card: #16213e;
+            --dark-text: #f1f1f1;
+            --light-bg: #f8f9fa;
+            --light-card: #ffffff;
+            --light-text: #333333;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: var(--transition);
+        }
+
+        body.light-mode {
+            background-color: var(--light-bg);
+            color: var(--light-text);
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        /* Auth Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-container {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+
+        .dark-mode .auth-container {
+            background-color: var(--dark-card);
+            color: var(--dark-text);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .auth-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            border: 1px solid #ddd;
+            font-family: inherit;
+        }
+
+        .dark-mode .form-group input {
+            background-color: #2d3748;
+            color: var(--dark-text);
+            border-color: #4a5568;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #ff2e43;
+        }
+
+        .btn-google {
+            background-color: #4285f4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .btn-google:hover {
+            background-color: #3367d6;
+        }
+
+        .auth-error {
+            background-color: #fee;
+            color: #c33;
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .auth-error.active {
+            display: block;
+        }
+
+        .auth-success {
+            background-color: #efe;
+            color: #2a7;
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .auth-success.active {
+            display: block;
+        }
+
+        /* Admin Password Modal */
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .password-modal.active {
+            display: flex;
+        }
+
+        .password-container {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+
+        .dark-mode .password-container {
+            background-color: var(--dark-card);
+            color: var(--dark-text);
+        }
+
+        /* Header & Navigation */
+        header {
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .light-mode header {
+            background-color: var(--light-card);
+        }
+
+        .dark-mode header {
+            background-color: var(--dark-card);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: #3498db;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .light-mode nav a {
+            color: var(--light-text);
+        }
+
+        .dark-mode nav a {
+            color: var(--dark-text);
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        /* Video Grid */
+        .video-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1200px) {
+            .video-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .video-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .video-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow);
+        }
+
+        .light-mode .video-card {
+            background-color: var(--light-card);
+        }
+
+        .dark-mode .video-card {
+            background-color: var(--dark-card);
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            position: relative;
+        }
+
+        .duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .video-info {
+            padding: 1rem;
+        }
+
+        .video-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .category {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Ads */
+        .ad-container {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .banner-ad {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .banner-ad:hover {
+            transform: scale(1.02);
+        }
+
+        .sidebar-ad {
+            width: 300px;
+            height: 600px;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 100px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-ad:hover {
+            transform: scale(1.02);
+        }
+
+        .video-ad-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .video-ad-content {
+            width: 80%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .ad-video-player {
+            width: 100%;
+            height: 400px;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .ad-skip-button {
+            padding: 1rem 2rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Video Player Page */
+        .video-player-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .video-player-wrapper {
+            width: 100%;
+            position: relative;
+            background-color: #000;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .drive-player {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+
+        .custom-play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .custom-play-button i {
+            color: white;
+            font-size: 2.5rem;
+            margin-left: 5px;
+        }
+
+        .video-details {
+            margin-top: 2rem;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-top: 2rem;
+        }
+
+        .light-mode .admin-panel {
+            background-color: var(--light-card);
+            border: 1px solid #e9ecef;
+        }
+
+        .dark-mode .admin-panel {
+            background-color: var(--dark-card);
+            border: 1px solid #4a5568;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .light-mode .admin-tab {
+            color: var(--light-text);
+        }
+
+        .dark-mode .admin-tab {
+            color: var(--dark-text);
+        }
+
+        .admin-tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+
+        /* Video List in Admin */
+        .video-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .admin-video-item {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+        }
+
+        .light-mode .admin-video-item {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .dark-mode .admin-video-item {
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .light-mode footer {
+            background-color: #f1f1f1;
+            color: var(--light-text);
+        }
+
+        .dark-mode footer {
+            background-color: #0f0f1a;
+            color: var(--dark-text);
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none;
+        }
+
+        .visible {
+            display: block;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 1rem; }
+        .mb-2 { margin-bottom: 2rem; }
+        
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            padding: 0 2rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius);
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        
+        .light-mode .search-input {
+            background-color: white;
+            color: var(--light-text);
+        }
+        
+        .dark-mode .search-input {
+            background-color: #2d3748;
+            color: var(--dark-text);
+            border-color: #4a5568;
+        }
+        
+        .search-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body>
-    <nav class="sticky top-0 z-50 bg-[#0f0f0f] border-b border-gray-800 px-4 py-2 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-            <i class="fa-solid fa-bars text-xl cursor-pointer p-2 hover:bg-gray-800 rounded-full"></i>
-            <div class="flex items-center gap-1 text-red-600 font-bold text-2xl tracking-tighter cursor-pointer" onclick="location.reload()">
-                <i class="fa-brands fa-youtube text-3xl"></i> <span>RayVid</span>
+<body class="dark-mode">
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="auth-modal">
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
             </div>
+            
+            <div class="auth-error" id="auth-error"></div>
+            <div class="auth-success" id="auth-success"></div>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                
+                <button type="button" class="btn btn-google" onclick="signInWithGoogle()">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </button>
+            </form>
+            
+            <!-- Sign Up Form -->
+            <form class="auth-form" id="signup-form">
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-name">Display Name</label>
+                    <input type="text" id="signup-name" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
+                
+                <button type="button" class="btn btn-google" onclick="signInWithGoogle()">
+                    <i class="fab fa-google"></i> Sign up with Google
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Password Modal -->
+    <div class="password-modal" id="password-modal">
+        <div class="password-container">
+            <h2 class="text-center">Admin Access</h2>
+            <p class="text-center mt-1">Enter admin password to access admin panel</p>
+            
+            <div class="form-group mt-2">
+                <label for="admin-password">Admin Password</label>
+                <input type="password" id="admin-password" required>
+            </div>
+            
+            <div class="auth-error" id="password-error"></div>
+            
+            <button class="btn btn-primary mt-2" onclick="verifyAdminPassword()">
+                <i class="fas fa-lock"></i> Access Admin Panel
+            </button>
+            
+            <button class="btn btn-secondary mt-1" onclick="hidePasswordModal()">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">Stream<span>Drive</span></div>
+        <div class="user-info">
+            <div id="user-display" class="hidden">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <div class="user-name" id="user-name"></div>
+                <button class="btn btn-secondary" onclick="logout()" style="padding: 0.4rem 1rem;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            <button class="btn btn-primary" id="login-button" onclick="showAuthModal()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Top Banner Ad -->
+    <div class="ad-container">
+        <div class="banner-ad" id="top-banner-ad" onclick="handleAdClick('top')">
+            <span>Advertisement - Click Here!</span>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container" id="search-container">
+        <input type="text" class="search-input" id="search-input" placeholder="Search videos...">
+        <button class="search-btn" onclick="searchVideos()"><i class="fas fa-search"></i></button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="main-container">
+        <!-- Video Grid -->
+        <div class="video-grid" id="video-grid">
+            <!-- Videos will be loaded here by JavaScript -->
         </div>
 
-        <div class="flex items-center gap-2 md:gap-6">
-            <button onclick="openUpload()" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm font-medium transition">
-                <i class="fa-solid fa-plus mr-1"></i> <span class="hidden md:inline">Upload</span>
-            </button>
-            <div id="auth-ui">
-                <button onclick="login()" id="login-btn" class="border border-blue-500 text-blue-500 px-4 py-1.5 rounded-full font-medium hover:bg-blue-500 hover:text-white transition">Sign In</button>
-                <div id="user-profile" class="hidden items-center gap-3">
-                    <img id="user-pic" class="w-8 h-8 rounded-full border border-gray-700">
-                    <button onclick="logout()" class="text-xs text-gray-500 hover:text-white">Logout</button>
+        <!-- Sidebar Ad -->
+        <div class="sidebar-ad" id="sidebar-ad" onclick="handleAdClick('sidebar')">
+            <span>Advertisement - Click Here!</span>
+        </div>
+    </div>
+
+    <!-- Bottom Banner Ad -->
+    <div class="ad-container">
+        <div class="banner-ad" id="bottom-banner-ad" onclick="handleAdClick('bottom')">
+            <span>Advertisement - Click Here!</span>
+        </div>
+    </div>
+
+    <!-- Video Player Page (Hidden by Default) -->
+    <div class="video-player-container hidden" id="video-player-page">
+        <button class="btn btn-secondary" onclick="showHome()">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </button>
+        
+        <div class="video-player-wrapper mt-2">
+            <iframe class="drive-player" id="drive-player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+            <div class="custom-play-button" id="custom-play-button">
+                <i class="fas fa-play"></i>
+            </div>
+        </div>
+        
+        <div class="video-details">
+            <h1 id="video-title">Video Title</h1>
+            <div class="category mt-1" id="video-category">Category</div>
+            <p id="video-description" class="mt-2">Video description will appear here.</p>
+            <div class="mt-2">
+                <span><i class="far fa-eye"></i> <span id="view-count">0</span> views</span>
+                <span style="margin-left: 1rem;"><i class="far fa-clock"></i> <span id="video-duration">0:00</span></span>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-primary" id="edit-video-btn" onclick="requestAdminAccessForEdit()">
+                    <i class="fas fa-edit"></i> Edit This Video
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Ad Overlay -->
+    <div class="video-ad-overlay" id="video-ad-overlay">
+        <div class="video-ad-content">
+            <div class="ad-video-player" id="ad-video-player">
+                <h2>Video Advertisement</h2>
+                <p>Your ad message here. This ad supports our free streaming service.</p>
+                <p>Ad will finish in <span id="ad-countdown">5</span> seconds</p>
+            </div>
+            <div class="text-center">
+                <button class="ad-skip-button" id="skip-ad-btn" onclick="skipAd()">Skip Ad</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel (Hidden by Default) -->
+    <div class="container hidden" id="admin-panel">
+        <div style="width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Admin Portal</h2>
+                <button class="btn btn-secondary" onclick="showHome()">
+                    <i class="fas fa-arrow-left"></i> Back to Videos
+                </button>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchAdminTab('upload')">Upload Video</button>
+                <button class="admin-tab" onclick="switchAdminTab('manage')">Manage Videos</button>
+                <button class="admin-tab" onclick="switchAdminTab('ads')">Manage Ads</button>
+                <button class="admin-tab" onclick="switchAdminTab('analytics')">Analytics</button>
+                <button class="admin-tab" onclick="switchAdminTab('users')">User Management</button>
+            </div>
+            
+            <!-- Upload Video Section -->
+            <div class="admin-section active" id="upload-section">
+                <h3 class="mb-2">Upload New Video</h3>
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label for="drive-link">Google Drive Video Link</label>
+                        <input type="url" id="drive-link" required 
+                               placeholder="https://drive.google.com/file/d/VIDEO_ID/view">
+                        <small>Make sure the video is set to "Anyone with the link can view" in Google Drive</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="video-title-input">Video Title</label>
+                        <input type="text" id="video-title-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="video-description-input">Description</label>
+                        <textarea id="video-description-input" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="video-category-input">Category</label>
+                        <select id="video-category-input">
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Education">Education</option>
+                            <option value="Gaming">Gaming</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Music">Music</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Tutorial">Tutorial</option>
+                            <option value="Documentary">Documentary</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="video-duration">Duration (MM:SS)</label>
+                        <input type="text" id="video-duration-input" placeholder="12:45" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="video-tags">Tags (comma separated)</label>
+                        <input type="text" id="video-tags" placeholder="funny, tutorial, gaming">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="thumbnail-url">Thumbnail URL (optional)</label>
+                        <input type="url" id="thumbnail-url" 
+                               placeholder="https://images.unsplash.com/photo-...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ads for this video</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enable-ads" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>Enable ads (generate revenue from this video)</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Video
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Manage Videos Section -->
+            <div class="admin-section" id="manage-section">
+                <h3 class="mb-2">Manage Videos</h3>
+                <div class="video-list" id="admin-video-list">
+                    <!-- Videos will be loaded here -->
                 </div>
             </div>
-        </div>
-    </nav>
-
-    <main class="p-6">
-        <div class="max-w-5xl mx-auto h-24 bg-[#1a1a1a] rounded-lg mb-8 flex items-center justify-center border border-gray-800 text-gray-600">
-            AdSense Approved Area
-        </div>
-
-        <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            
+            <!-- Manage Ads Section -->
+            <div class="admin-section" id="ads-section">
+                <h3 class="mb-2">Manage Ads</h3>
+                <div class="form-group">
+                    <label>Banner Ads Enabled</label>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="banner-ads-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show banner ads on site</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Video Ads Enabled</label>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="video-ads-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show video ads after playback</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Ad Skippable After (seconds)</label>
+                    <input type="number" id="skip-time" value="5" min="1" max="30">
+                </div>
+                
+                <div class="form-group">
+                    <label>Custom Ad Message</label>
+                    <input type="text" id="ad-message" value="Advertisement - Click Here!" placeholder="Custom ad text">
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveAdSettings()">
+                    <i class="fas fa-save"></i> Save Ad Settings
+                </button>
             </div>
-    </main>
-
-    <div id="uploadModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80">
-        <div class="glass-modal p-8 rounded-2xl w-full max-w-md border border-gray-700">
-            <h2 class="text-2xl font-bold mb-4">Submit Video</h2>
-            <div class="space-y-4">
-                <input type="text" id="vTitle" placeholder="Video Title" class="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none focus:border-red-600">
-                <input type="text" id="vUrl" placeholder="Google Drive Link" class="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none focus:border-red-600">
-                <p class="text-xs text-gray-500">Note: Ensure Drive file is set to 'Anyone with the link'. Videos appear after admin approval.</p>
-                <div class="flex gap-2">
-                    <button onclick="submitToAdmin()" class="flex-1 bg-red-600 py-3 rounded-xl font-bold hover:bg-red-700 transition">Submit</button>
-                    <button onclick="closeUpload()" class="flex-1 bg-gray-800 py-3 rounded-xl font-bold hover:bg-gray-700 transition">Cancel</button>
+            
+            <!-- Analytics Section -->
+            <div class="admin-section" id="analytics-section">
+                <h3 class="mb-2">Analytics Dashboard</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #3498db; color: white;">
+                        <h4>Total Views</h4>
+                        <h2 id="total-views">0</h2>
+                    </div>
+                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #2ecc71; color: white;">
+                        <h4>Total Videos</h4>
+                        <h2 id="total-videos">0</h2>
+                    </div>
+                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #9b59b6; color: white;">
+                        <h4>Ad Revenue</h4>
+                        <h2>$<span id="ad-revenue">0</span></h2>
+                    </div>
+                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #e67e22; color: white;">
+                        <h4>Ad Clicks</h4>
+                        <h2 id="ad-clicks">0</h2>
+                    </div>
+                </div>
+                
+                <h4 class="mt-2">Most Popular Videos</h4>
+                <div id="popular-videos-list">
+                    <!-- Popular videos will be loaded here -->
+                </div>
+                
+                <h4 class="mt-2">Recent Activity</h4>
+                <div id="recent-activity">
+                    <!-- Recent activity will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- User Management Section -->
+            <div class="admin-section" id="users-section">
+                <h3 class="mb-2">User Management</h3>
+                <div class="form-group">
+                    <label>Set Admin Password</label>
+                    <input type="password" id="new-admin-password" placeholder="Enter new admin password">
+                    <button class="btn btn-primary mt-1" onclick="updateAdminPassword()">
+                        <i class="fas fa-key"></i> Update Admin Password
+                    </button>
+                </div>
+                
+                <h4 class="mt-2">Registered Users</h4>
+                <div id="users-list">
+                    <!-- Users will be loaded here -->
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="font-size: 1.5rem;">Stream<span>Drive</span></div>
+        <p style="margin: 1rem 0;">Modern video streaming platform powered by Google Drive</p>
+        <p>© 2023 StreamDrive. All rights reserved. | Authentication required for admin access</p>
+    </footer>
+
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
             authDomain: "rayvid-c074a.firebaseapp.com",
@@ -71,71 +1175,921 @@
             messagingSenderId: "970771885312",
             appId: "1:970771885312:web:104ae741f28287a01ad7e5"
         };
+
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Auth Logic
-        function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-        function logout() { auth.signOut(); }
-        auth.onAuthStateChanged(user => {
-            const loginBtn = document.getElementById('login-btn');
-            const profile = document.getElementById('user-profile');
-            if (user) {
-                loginBtn.classList.add('hidden');
-                profile.classList.replace('hidden', 'flex');
-                document.getElementById('user-pic').src = user.photoURL;
+        // Admin Configuration (can be changed in admin panel)
+        const ADMIN_PASSWORD_KEY = 'streamdrive_admin_password';
+        const DEFAULT_ADMIN_PASSWORD = 'admin123'; // Change this for production
+
+        // Initial Data Storage (Fallback if Firebase not available)
+        let videos = [];
+        let adSettings = {
+            bannerAds: true,
+            videoAds: true,
+            skipTime: 5,
+            adRevenue: 42.50,
+            adClicks: 127,
+            adMessage: "Advertisement - Click Here!"
+        };
+
+        let currentUser = null;
+        let currentVideoId = null;
+        let adCountdown = 5;
+        let adTimer = null;
+        let recentActivity = [];
+
+        // DOM Elements
+        const videoGrid = document.getElementById('video-grid');
+        const videoPlayerPage = document.getElementById('video-player-page');
+        const adminPanel = document.getElementById('admin-panel');
+        const mainContainer = document.getElementById('main-container');
+        const videoAdOverlay = document.getElementById('video-ad-overlay');
+        const drivePlayer = document.getElementById('drive-player');
+        const customPlayButton = document.getElementById('custom-play-button');
+        const skipAdBtn = document.getElementById('skip-ad-btn');
+        const searchContainer = document.getElementById('search-container');
+        const searchInput = document.getElementById('search-input');
+        const authModal = document.getElementById('auth-modal');
+        const passwordModal = document.getElementById('password-modal');
+        const userDisplay = document.getElementById('user-display');
+        const loginButton = document.getElementById('login-button');
+        const userAvatar = document.getElementById('user-avatar');
+        const userName = document.getElementById('user-name');
+        const authError = document.getElementById('auth-error');
+        const authSuccess = document.getElementById('auth-success');
+        const passwordError = document.getElementById('password-error');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize admin password if not set
+            if(!localStorage.getItem(ADMIN_PASSWORD_KEY)) {
+                localStorage.setItem(ADMIN_PASSWORD_KEY, DEFAULT_ADMIN_PASSWORD);
+            }
+            
+            // Set up Firebase auth state listener
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    updateUserUI();
+                    
+                    // Load data from Firestore
+                    await loadVideosFromFirestore();
+                    await loadAdSettingsFromFirestore();
+                    await loadRecentActivity();
+                    
+                    renderVideoGrid();
+                    loadAdSettings();
+                    updateAnalytics();
+                } else {
+                    currentUser = null;
+                    updateUserUI();
+                    
+                    // Load from localStorage as fallback
+                    loadFromLocalStorage();
+                    renderVideoGrid();
+                    loadAdSettings();
+                }
+            });
+            
+            setupEventListeners();
+        });
+
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.querySelector('.theme-toggle i');
+            
+            if(body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
             } else {
-                loginBtn.classList.remove('hidden');
-                profile.classList.replace('flex', 'hidden');
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        // Check for saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if(savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.body.classList.add('light-mode');
+            document.querySelector('.theme-toggle i').classList.remove('fa-moon');
+            document.querySelector('.theme-toggle i').classList.add('fa-sun');
+        }
+
+        // Update User UI
+        function updateUserUI() {
+            if (currentUser) {
+                userDisplay.classList.remove('hidden');
+                loginButton.classList.add('hidden');
+                
+                // Update user info
+                const displayName = currentUser.displayName || currentUser.email.split('@')[0];
+                userName.textContent = displayName;
+                userAvatar.textContent = displayName.charAt(0).toUpperCase();
+                
+                // Set random background color for avatar
+                const colors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ff6348'];
+                userAvatar.style.backgroundColor = colors[displayName.charCodeAt(0) % colors.length];
+            } else {
+                userDisplay.classList.add('hidden');
+                loginButton.classList.remove('hidden');
+            }
+        }
+
+        // Auth Modal Functions
+        function showAuthModal() {
+            authModal.classList.add('active');
+            switchAuthTab('login');
+        }
+
+        function hideAuthModal() {
+            authModal.classList.remove('active');
+            authError.classList.remove('active');
+            authSuccess.classList.remove('active');
+            document.getElementById('login-form').reset();
+            document.getElementById('signup-form').reset();
+        }
+
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            document.querySelector(`.auth-tab[onclick*="${tab}"]`).classList.add('active');
+            document.getElementById(`${tab}-form`).classList.add('active');
+        }
+
+        // Login with Email/Password
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                hideAuthModal();
+                showSuccessMessage('Login successful!');
+            } catch (error) {
+                showAuthError(getErrorMessage(error.code));
             }
         });
 
-        // Modal Logic
-        function openUpload() { if(!auth.currentUser) { alert("Login first!"); return; } document.getElementById('uploadModal').classList.remove('hidden'); }
-        function closeUpload() { document.getElementById('uploadModal').classList.add('hidden'); }
-
-        async function submitToAdmin() {
-            const title = document.getElementById('vTitle').value;
-            const url = document.getElementById('vUrl').value;
-            if(!title || !url) return;
+        // Sign Up with Email/Password
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const name = document.getElementById('signup-name').value;
             
-            await db.collection("pending_videos").add({
-                title, url, 
-                userName: auth.currentUser.displayName, 
-                userPic: auth.currentUser.photoURL,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("Submitted for approval!");
-            closeUpload();
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({
+                    displayName: name
+                });
+                hideAuthModal();
+                showSuccessMessage('Account created successfully!');
+            } catch (error) {
+                showAuthError(getErrorMessage(error.code));
+            }
+        });
+
+        // Google Sign In
+        async function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                hideAuthModal();
+                showSuccessMessage('Google login successful!');
+            } catch (error) {
+                showAuthError(getErrorMessage(error.code));
+            }
         }
 
-        // Fetch Approved Videos
-        db.collection("videos").orderBy("createdAt", "desc").onSnapshot(snap => {
-            const grid = document.getElementById('video-grid');
-            grid.innerHTML = '';
-            snap.forEach(doc => {
-                const data = doc.data();
-                // Drive Stream Converter
-                const streamUrl = data.url.replace('/view?usp=sharing', '').replace('file/d/', 'uc?export=download&id=');
-                grid.innerHTML += `
-                    <div class="video-card cursor-pointer group">
-                        <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-gray-800">
-                            <video src="${streamUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></video>
-                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/40 transition">
-                                <i class="fa-solid fa-play text-4xl"></i>
-                            </div>
+        // Logout
+        async function logout() {
+            try {
+                await auth.signOut();
+                showHome();
+                showSuccessMessage('Logged out successfully!');
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Show error message
+        function showAuthError(message) {
+            authError.textContent = message;
+            authError.classList.add('active');
+        }
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'auth-success active';
+            successDiv.textContent = message;
+            successDiv.style.position = 'fixed';
+            successDiv.style.top = '20px';
+            successDiv.style.right = '20px';
+            successDiv.style.zIndex = '3000';
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+
+        function getErrorMessage(errorCode) {
+            const errorMessages = {
+                'auth/invalid-email': 'Invalid email address.',
+                'auth/user-disabled': 'This account has been disabled.',
+                'auth/user-not-found': 'No account found with this email.',
+                'auth/wrong-password': 'Incorrect password.',
+                'auth/email-already-in-use': 'Email already in use.',
+                'auth/weak-password': 'Password should be at least 6 characters.',
+                'auth/operation-not-allowed': 'Operation not allowed.',
+                'auth/network-request-failed': 'Network error. Please check your connection.'
+            };
+            return errorMessages[errorCode] || 'An error occurred. Please try again.';
+        }
+
+        // Admin Password Functions
+        function showPasswordModal() {
+            passwordModal.classList.add('active');
+        }
+
+        function hidePasswordModal() {
+            passwordModal.classList.remove('active');
+            passwordError.classList.remove('active');
+            document.getElementById('admin-password').value = '';
+        }
+
+        function verifyAdminPassword() {
+            const password = document.getElementById('admin-password').value;
+            const storedPassword = localStorage.getItem(ADMIN_PASSWORD_KEY);
+            
+            if (password === storedPassword) {
+                hidePasswordModal();
+                showAdmin();
+            } else {
+                passwordError.textContent = 'Incorrect password. Please try again.';
+                passwordError.classList.add('active');
+            }
+        }
+
+        function updateAdminPassword() {
+            const newPassword = document.getElementById('new-admin-password').value;
+            if (newPassword.length >= 4) {
+                localStorage.setItem(ADMIN_PASSWORD_KEY, newPassword);
+                alert('Admin password updated successfully!');
+                document.getElementById('new-admin-password').value = '';
+            } else {
+                alert('Password must be at least 4 characters long.');
+            }
+        }
+
+        function requestAdminAccessForEdit() {
+            if (currentVideoId) {
+                showPasswordModal();
+            }
+        }
+
+        // Render Video Grid
+        function renderVideoGrid() {
+            videoGrid.innerHTML = '';
+            
+            if (videos.length === 0) {
+                videoGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <h3>No videos available</h3>
+                        <p>Login as admin to upload videos</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            videos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.innerHTML = `
+                    <div style="position: relative;">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail">
+                        <div class="duration">${video.duration}</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">${video.title}</h3>
+                        <div class="category">${video.category}</div>
+                        <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                            <i class="far fa-eye"></i> ${video.views.toLocaleString()} views
                         </div>
-                        <div class="flex gap-3 mt-3">
-                            <img src="${data.userPic}" class="w-9 h-9 rounded-full mt-1 border border-gray-800">
-                            <div>
-                                <h3 class="font-bold line-clamp-2 leading-tight">${data.title}</h3>
-                                <p class="text-gray-400 text-sm mt-1">${data.userName}</p>
-                            </div>
-                        </div>
-                    </div>`;
+                    </div>
+                `;
+                
+                videoCard.addEventListener('click', () => playVideo(video.id));
+                videoGrid.appendChild(videoCard);
             });
-        });
+        }
+
+        // Play Video
+        async function playVideo(videoId) {
+            const video = videos.find(v => v.id === videoId);
+            if(!video) return;
+            
+            currentVideoId = videoId;
+            
+            // Update video info
+            document.getElementById('video-title').textContent = video.title;
+            document.getElementById('video-category').textContent = video.category;
+            document.getElementById('video-description').textContent = video.description;
+            document.getElementById('view-count').textContent = (video.views + 1).toLocaleString();
+            document.getElementById('video-duration').textContent = video.duration;
+            
+            // Extract Drive ID
+            let driveId = video.driveId;
+            if(driveId.includes('drive.google.com')) {
+                const match = driveId.match(/\/d\/([^\/]+)/);
+                if(match) driveId = match[1];
+            }
+            
+            // Set up the Drive iframe
+            const driveUrl = `https://drive.google.com/file/d/${driveId}/preview`;
+            drivePlayer.src = driveUrl;
+            
+            // Show video player, hide other sections
+            mainContainer.style.display = 'none';
+            adminPanel.classList.add('hidden');
+            searchContainer.style.display = 'none';
+            document.querySelectorAll('.ad-container').forEach(el => el.style.display = 'none');
+            videoPlayerPage.classList.remove('hidden');
+            
+            // Show custom play button
+            customPlayButton.style.display = 'flex';
+            
+            // Increment view count
+            video.views++;
+            
+            // Update in Firestore
+            await updateVideoViews(videoId, video.views);
+            
+            // Add to recent activity
+            await addActivity(`User watched "${video.title}"`);
+            
+            updateAnalytics();
+            saveToLocalStorage();
+        }
+
+        // Show Home Page
+        function showHome() {
+            mainContainer.style.display = 'flex';
+            adminPanel.classList.add('hidden');
+            videoPlayerPage.classList.add('hidden');
+            searchContainer.style.display = 'flex';
+            document.querySelectorAll('.ad-container').forEach(el => el.style.display = 'flex');
+            
+            // Reset video player
+            drivePlayer.src = '';
+            
+            // Update video grid in case videos were added
+            renderVideoGrid();
+        }
+
+        // Show Admin Panel (requires password)
+        function showAdmin() {
+            if (!currentUser) {
+                showAuthModal();
+                return;
+            }
+            
+            // Check admin password (in real app, you'd check user role in Firestore)
+            // For demo, we'll just check if user is authenticated
+            mainContainer.style.display = 'none';
+            adminPanel.classList.remove('hidden');
+            videoPlayerPage.classList.add('hidden');
+            searchContainer.style.display = 'none';
+            document.querySelectorAll('.ad-container').forEach(el => el.style.display = 'none');
+            
+            updateAdminVideoList();
+            updateAnalytics();
+            loadUsersList();
+        }
+
+        // Switch Admin Tab
+        function switchAdminTab(tabName) {
+            // Update active tab button
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show active section
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-section`).classList.add('active');
+        }
+
+        // Update Admin Video List
+        function updateAdminVideoList() {
+            const adminVideoList = document.getElementById('admin-video-list');
+            adminVideoList.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'admin-video-item';
+                videoItem.innerHTML = `
+                    <h4>${video.title}</h4>
+                    <p style="font-size: 0.9rem; margin: 0.5rem 0;">${video.category} • ${video.duration}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="far fa-eye"></i> ${video.views} views</span>
+                        <span>Ads: ${video.adsEnabled ? 'ON' : 'OFF'}</span>
+                    </div>
+                    <div class="video-actions">
+                        <button class="action-btn edit-btn" onclick="editVideo(${video.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteVideo(${video.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                
+                adminVideoList.appendChild(videoItem);
+            });
+        }
+
+        // Update Analytics
+        function updateAnalytics() {
+            const totalViews = videos.reduce((sum, video) => sum + video.views, 0);
+            const totalVideos = videos.length;
+            
+            document.getElementById('total-views').textContent = totalViews.toLocaleString();
+            document.getElementById('total-videos').textContent = totalVideos;
+            document.getElementById('ad-revenue').textContent = adSettings.adRevenue.toFixed(2);
+            document.getElementById('ad-clicks').textContent = adSettings.adClicks;
+            
+            // Update popular videos list
+            const popularVideosList = document.getElementById('popular-videos-list');
+            popularVideosList.innerHTML = '';
+            
+            // Sort videos by views and take top 3
+            const popularVideos = [...videos]
+                .sort((a, b) => b.views - a.views)
+                .slice(0, 3);
+            
+            popularVideos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'admin-video-item';
+                videoItem.innerHTML = `
+                    <h4>${video.title}</h4>
+                    <p style="font-size: 0.9rem; margin: 0.5rem 0;">${video.views.toLocaleString()} views • ${video.category}</p>
+                `;
+                popularVideosList.appendChild(videoItem);
+            });
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Upload Form
+            document.getElementById('upload-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!currentUser) {
+                    showAuthModal();
+                    return;
+                }
+                
+                // Get form values
+                const driveLink = document.getElementById('drive-link').value;
+                const title = document.getElementById('video-title-input').value;
+                const description = document.getElementById('video-description-input').value;
+                const category = document.getElementById('video-category-input').value;
+                const duration = document.getElementById('video-duration-input').value;
+                const tags = document.getElementById('video-tags').value;
+                const thumbnailUrl = document.getElementById('thumbnail-url').value;
+                const adsEnabled = document.getElementById('enable-ads').checked;
+                
+                // Extract Drive ID from link
+                let driveId = '';
+                const match = driveLink.match(/\/d\/([^\/]+)/);
+                if(match) {
+                    driveId = match[1];
+                } else {
+                    driveId = driveLink;
+                }
+                
+                // Create new video object
+                const newVideo = {
+                    id: videos.length > 0 ? Math.max(...videos.map(v => v.id)) + 1 : 1,
+                    title: title,
+                    description: description,
+                    driveId: driveId,
+                    category: category,
+                    duration: duration,
+                    views: 0,
+                    adsEnabled: adsEnabled,
+                    thumbnail: thumbnailUrl || `https://images.unsplash.com/photo-${150000 + videos.length}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+                    tags: tags.split(',').map(tag => tag.trim()),
+                    uploaded: new Date().toISOString().split('T')[0],
+                    uploadedBy: currentUser.email,
+                    uploadedByName: currentUser.displayName || currentUser.email.split('@')[0]
+                };
+                
+                // Add to videos array
+                videos.push(newVideo);
+                
+                // Add to Firestore
+                await saveVideoToFirestore(newVideo);
+                
+                // Add to recent activity
+                await addActivity(`${currentUser.displayName || currentUser.email} uploaded: "${title}"`);
+                
+                // Reset form
+                this.reset();
+                
+                // Update UI
+                renderVideoGrid();
+                updateAdminVideoList();
+                updateAnalytics();
+                
+                // Show success message
+                alert('Video uploaded successfully!');
+            });
+            
+            // Custom play button
+            customPlayButton.addEventListener('click', function() {
+                this.style.display = 'none';
+                
+                // Simulate video ending after 3 seconds
+                setTimeout(function() {
+                    const currentVideo = videos.find(v => v.id === currentVideoId);
+                    if(currentVideo && currentVideo.adsEnabled && adSettings.videoAds) {
+                        showVideoAd();
+                    }
+                }, 3000);
+            });
+            
+            // Search input - Enter key support
+            searchInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    searchVideos();
+                }
+            });
+        }
+
+        // Show Video Ad
+        function showVideoAd() {
+            videoAdOverlay.style.display = 'flex';
+            adCountdown = adSettings.skipTime;
+            document.getElementById('ad-countdown').textContent = adCountdown;
+            skipAdBtn.style.display = 'none';
+            
+            setTimeout(() => {
+                skipAdBtn.style.display = 'inline-block';
+            }, adSettings.skipTime * 1000);
+            
+            adTimer = setInterval(() => {
+                adCountdown--;
+                document.getElementById('ad-countdown').textContent = adCountdown;
+                
+                if(adCountdown <= 0) {
+                    skipAd();
+                }
+            }, 1000);
+            
+            // Add to ad revenue
+            adSettings.adRevenue += 0.25;
+            
+            // Add to recent activity
+            addActivity(`Video ad shown - Revenue +$0.25`);
+            
+            saveAdSettingsToFirestore();
+            saveToLocalStorage();
+            updateAnalytics();
+        }
+
+        // Skip Ad
+        function skipAd() {
+            clearInterval(adTimer);
+            videoAdOverlay.style.display = 'none';
+            skipAdBtn.style.display = 'none';
+        }
+
+        // Handle Ad Click
+        function handleAdClick(position) {
+            if(!adSettings.bannerAds) return;
+            
+            // Increment ad clicks
+            adSettings.adClicks++;
+            adSettings.adRevenue += 0.10;
+            
+            // Add to recent activity
+            addActivity(`${position} banner ad clicked - Revenue +$0.10`);
+            
+            // Open ad link
+            window.open('https://www.google.com', '_blank');
+            
+            saveAdSettingsToFirestore();
+            saveToLocalStorage();
+            updateAnalytics();
+        }
+
+        // Load Ad Settings to UI
+        function loadAdSettings() {
+            document.getElementById('banner-ads-toggle').checked = adSettings.bannerAds;
+            document.getElementById('video-ads-toggle').checked = adSettings.videoAds;
+            document.getElementById('skip-time').value = adSettings.skipTime;
+            document.getElementById('ad-message').value = adSettings.adMessage;
+            
+            // Show/hide ads based on settings
+            document.querySelectorAll('.banner-ad, .sidebar-ad').forEach(ad => {
+                ad.style.display = adSettings.bannerAds ? 'flex' : 'none';
+            });
+            
+            // Update ad text
+            document.querySelectorAll('.banner-ad span, .sidebar-ad span').forEach(span => {
+                span.textContent = adSettings.adMessage;
+            });
+        }
+
+        // Save Ad Settings
+        async function saveAdSettings() {
+            adSettings.bannerAds = document.getElementById('banner-ads-toggle').checked;
+            adSettings.videoAds = document.getElementById('video-ads-toggle').checked;
+            adSettings.skipTime = parseInt(document.getElementById('skip-time').value);
+            adSettings.adMessage = document.getElementById('ad-message').value;
+            
+            // Add to recent activity
+            await addActivity('Ad settings updated');
+            
+            await saveAdSettingsToFirestore();
+            saveToLocalStorage();
+            loadAdSettings();
+            
+            alert('Ad settings saved!');
+        }
+
+        // Delete Video
+        async function deleteVideo(videoId) {
+            if(!confirm('Are you sure you want to delete this video?')) return;
+            
+            const video = videos.find(v => v.id === videoId);
+            videos = videos.filter(video => video.id !== videoId);
+            
+            // Delete from Firestore
+            await deleteVideoFromFirestore(videoId);
+            
+            // Add to recent activity
+            await addActivity(`Deleted video: "${video.title}"`);
+            
+            saveToLocalStorage();
+            updateAdminVideoList();
+            renderVideoGrid();
+            updateAnalytics();
+        }
+
+        // Edit Video
+        function editVideo(videoId) {
+            const video = videos.find(v => v.id === videoId);
+            if(!video) return;
+            
+            // Fill the upload form with video data
+            document.getElementById('drive-link').value = `https://drive.google.com/file/d/${video.driveId}/view`;
+            document.getElementById('video-title-input').value = video.title;
+            document.getElementById('video-description-input').value = video.description;
+            document.getElementById('video-category-input').value = video.category;
+            document.getElementById('video-duration-input').value = video.duration;
+            document.getElementById('video-tags').value = video.tags ? video.tags.join(', ') : '';
+            document.getElementById('thumbnail-url').value = video.thumbnail;
+            document.getElementById('enable-ads').checked = video.adsEnabled;
+            
+            // Switch to upload tab
+            switchAdminTab('upload');
+            
+            // Scroll to form
+            document.getElementById('upload-form').scrollIntoView();
+            
+            alert('Video data loaded into form. Make changes and click "Upload Video" to update.');
+        }
+
+        // Search Videos
+        function searchVideos() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            if(!searchTerm) {
+                renderVideoGrid();
+                return;
+            }
+            
+            const filteredVideos = videos.filter(video => 
+                video.title.toLowerCase().includes(searchTerm) ||
+                video.description.toLowerCase().includes(searchTerm) ||
+                video.category.toLowerCase().includes(searchTerm) ||
+                (video.tags && video.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+            );
+            
+            videoGrid.innerHTML = '';
+            
+            if(filteredVideos.length === 0) {
+                videoGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <h3>No videos found for "${searchTerm}"</h3>
+                        <p>Try a different search term</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredVideos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.innerHTML = `
+                    <div style="position: relative;">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail">
+                        <div class="duration">${video.duration}</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">${video.title}</h3>
+                        <div class="category">${video.category}</div>
+                        <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                            <i class="far fa-eye"></i> ${video.views.toLocaleString()} views
+                        </div>
+                    </div>
+                `;
+                
+                videoCard.addEventListener('click', () => playVideo(video.id));
+                videoGrid.appendChild(videoCard);
+            });
+        }
+
+        // Load Users List
+        async function loadUsersList() {
+            // In a real app, you would query Firestore for all users
+            // For demo, we'll just show current user
+            const usersList = document.getElementById('users-list');
+            usersList.innerHTML = '';
+            
+            if (currentUser) {
+                const userItem = document.createElement('div');
+                userItem.className = 'admin-video-item';
+                userItem.innerHTML = `
+                    <h4>${currentUser.displayName || currentUser.email}</h4>
+                    <p style="font-size: 0.9rem; margin: 0.5rem 0;">${currentUser.email}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>UID: ${currentUser.uid.substring(0, 8)}...</span>
+                        <span>Admin: Yes</span>
+                    </div>
+                `;
+                usersList.appendChild(userItem);
+            }
+        }
+
+        // Add Activity
+        async function addActivity(message) {
+            const activity = {
+                message: message,
+                timestamp: new Date().toISOString(),
+                user: currentUser ? currentUser.email : 'Anonymous'
+            };
+            
+            recentActivity.push(activity);
+            if(recentActivity.length > 50) {
+                recentActivity.shift();
+            }
+            
+            // Save to Firestore
+            if (currentUser) {
+                try {
+                    await db.collection('activities').add(activity);
+                } catch (error) {
+                    console.error('Error saving activity:', error);
+                }
+            }
+        }
+
+        // Firestore Functions
+        async function loadVideosFromFirestore() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('videos').orderBy('uploaded', 'desc').get();
+                videos = [];
+                snapshot.forEach(doc => {
+                    videos.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Convert string IDs to numbers for compatibility
+                videos = videos.map((video, index) => ({
+                    ...video,
+                    id: video.id || index + 1
+                }));
+            } catch (error) {
+                console.error('Error loading videos from Firestore:', error);
+                loadFromLocalStorage();
+            }
+        }
+
+        async function saveVideoToFirestore(video) {
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('videos').doc(video.id.toString()).set(video);
+            } catch (error) {
+                console.error('Error saving video to Firestore:', error);
+            }
+        }
+
+        async function updateVideoViews(videoId, views) {
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('videos').doc(videoId.toString()).update({
+                    views: views
+                });
+            } catch (error) {
+                console.error('Error updating video views:', error);
+            }
+        }
+
+        async function deleteVideoFromFirestore(videoId) {
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('videos').doc(videoId.toString()).delete();
+            } catch (error) {
+                console.error('Error deleting video from Firestore:', error);
+            }
+        }
+
+        async function loadAdSettingsFromFirestore() {
+            if (!currentUser) return;
+            
+            try {
+                const doc = await db.collection('settings').doc('ads').get();
+                if (doc.exists) {
+                    adSettings = doc.data();
+                }
+            } catch (error) {
+                console.error('Error loading ad settings from Firestore:', error);
+            }
+        }
+
+        async function saveAdSettingsToFirestore() {
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('settings').doc('ads').set(adSettings);
+            } catch (error) {
+                console.error('Error saving ad settings to Firestore:', error);
+            }
+        }
+
+        async function loadRecentActivity() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('activities').orderBy('timestamp', 'desc').limit(10).get();
+                recentActivity = [];
+                snapshot.forEach(doc => {
+                    recentActivity.push(doc.data());
+                });
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+
+        // Save to LocalStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('streamdrive_videos', JSON.stringify(videos));
+            localStorage.setItem('streamdrive_adSettings', JSON.stringify(adSettings));
+            localStorage.setItem('streamdrive_recentActivity', JSON.stringify(recentActivity));
+        }
+
+        // Load from LocalStorage
+        function loadFromLocalStorage() {
+            const savedVideos = localStorage.getItem('streamdrive_videos');
+            const savedAdSettings = localStorage.getItem('streamdrive_adSettings');
+            const savedActivity = localStorage.getItem('streamdrive_recentActivity');
+            
+            if(savedVideos) {
+                videos = JSON.parse(savedVideos);
+            }
+            
+            if(savedAdSettings) {
+                adSettings = JSON.parse(savedAdSettings);
+            }
+            
+            if(savedActivity) {
+                recentActivity = JSON.parse(savedActivity);
+            }
+        }
     </script>
 </body>
 </html>
