@@ -721,7 +721,7 @@
 
         /* Utility Classes */
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         .visible {
@@ -877,25 +877,31 @@
     <!-- Header -->
     <header>
         <div class="logo">Stream<span>Drive</span></div>
-        <div class="user-info">
-            <div id="user-display" class="hidden">
-                <div class="user-avatar" id="user-avatar">U</div>
-                <div class="user-name" id="user-name"></div>
-                <button class="btn btn-secondary" onclick="logout()" style="padding: 0.4rem 1rem;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-            <button class="btn btn-primary" id="login-button" onclick="showAuthModal()">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
-            <button class="theme-toggle" onclick="toggleTheme()">
-                <i class="fas fa-moon"></i>
-            </button>
-        </div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="showHomePage()">Home</a></li>
+                <li><a href="#" onclick="requestAdminAccess()">Admin</a></li>
+                <li class="user-info">
+                    <div id="user-display" class="hidden">
+                        <div class="user-avatar" id="user-avatar">U</div>
+                        <div class="user-name" id="user-name"></div>
+                        <button class="btn btn-secondary" onclick="logout()" style="padding: 0.4rem 1rem;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                    <button class="btn btn-primary" id="login-button" onclick="showAuthModal()">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </li>
+            </ul>
+        </nav>
     </header>
 
     <!-- Top Banner Ad -->
-    <div class="ad-container">
+    <div class="ad-container" id="top-banner-container">
         <div class="banner-ad" id="top-banner-ad" onclick="handleAdClick('top')">
             <span>Advertisement - Click Here!</span>
         </div>
@@ -907,29 +913,31 @@
         <button class="search-btn" onclick="searchVideos()"><i class="fas fa-search"></i></button>
     </div>
 
-    <!-- Main Content -->
-    <div class="container" id="main-container">
-        <!-- Video Grid -->
-        <div class="video-grid" id="video-grid">
-            <!-- Videos will be loaded here by JavaScript -->
+    <!-- Main Content (Home Page) -->
+    <div id="home-page">
+        <div class="container">
+            <!-- Video Grid -->
+            <div class="video-grid" id="video-grid">
+                <!-- Videos will be loaded here by JavaScript -->
+            </div>
+
+            <!-- Sidebar Ad -->
+            <div class="sidebar-ad" id="sidebar-ad" onclick="handleAdClick('sidebar')">
+                <span>Advertisement - Click Here!</span>
+            </div>
         </div>
 
-        <!-- Sidebar Ad -->
-        <div class="sidebar-ad" id="sidebar-ad" onclick="handleAdClick('sidebar')">
-            <span>Advertisement - Click Here!</span>
-        </div>
-    </div>
-
-    <!-- Bottom Banner Ad -->
-    <div class="ad-container">
-        <div class="banner-ad" id="bottom-banner-ad" onclick="handleAdClick('bottom')">
-            <span>Advertisement - Click Here!</span>
+        <!-- Bottom Banner Ad -->
+        <div class="ad-container" id="bottom-banner-container">
+            <div class="banner-ad" id="bottom-banner-ad" onclick="handleAdClick('bottom')">
+                <span>Advertisement - Click Here!</span>
+            </div>
         </div>
     </div>
 
     <!-- Video Player Page (Hidden by Default) -->
     <div class="video-player-container hidden" id="video-player-page">
-        <button class="btn btn-secondary" onclick="showHome()">
+        <button class="btn btn-secondary" onclick="showHomePage()">
             <i class="fas fa-arrow-left"></i> Back to Home
         </button>
         
@@ -951,7 +959,7 @@
                 <span style="margin-left: 1rem;"><i class="far fa-clock"></i> <span id="video-duration">0:00</span></span>
             </div>
             <div class="mt-2">
-                <button class="btn btn-primary" id="edit-video-btn" onclick="requestAdminAccessForEdit()">
+                <button class="btn btn-primary" id="edit-video-btn" onclick="requestAdminAccess()">
                     <i class="fas fa-edit"></i> Edit This Video
                 </button>
             </div>
@@ -973,186 +981,188 @@
     </div>
 
     <!-- Admin Panel (Hidden by Default) -->
-    <div class="container hidden" id="admin-panel">
-        <div style="width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2>Admin Portal</h2>
-                <button class="btn btn-secondary" onclick="showHome()">
-                    <i class="fas fa-arrow-left"></i> Back to Videos
-                </button>
-            </div>
-            
-            <div class="admin-tabs">
-                <button class="admin-tab active" onclick="switchAdminTab('upload')">Upload Video</button>
-                <button class="admin-tab" onclick="switchAdminTab('manage')">Manage Videos</button>
-                <button class="admin-tab" onclick="switchAdminTab('ads')">Manage Ads</button>
-                <button class="admin-tab" onclick="switchAdminTab('analytics')">Analytics</button>
-                <button class="admin-tab" onclick="switchAdminTab('users')">User Management</button>
-            </div>
-            
-            <!-- Upload Video Section -->
-            <div class="admin-section active" id="upload-section">
-                <h3 class="mb-2">Upload New Video</h3>
-                <form id="upload-form">
-                    <div class="form-group">
-                        <label for="drive-link">Google Drive Video Link</label>
-                        <input type="url" id="drive-link" required 
-                               placeholder="https://drive.google.com/file/d/VIDEO_ID/view">
-                        <small>Make sure the video is set to "Anyone with the link can view" in Google Drive</small>
+    <div id="admin-page" class="hidden">
+        <div class="container">
+            <div style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Admin Portal</h2>
+                    <button class="btn btn-secondary" onclick="showHomePage()">
+                        <i class="fas fa-arrow-left"></i> Back to Videos
+                    </button>
+                </div>
+                
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('upload')">Upload Video</button>
+                    <button class="admin-tab" onclick="switchAdminTab('manage')">Manage Videos</button>
+                    <button class="admin-tab" onclick="switchAdminTab('ads')">Manage Ads</button>
+                    <button class="admin-tab" onclick="switchAdminTab('analytics')">Analytics</button>
+                    <button class="admin-tab" onclick="switchAdminTab('users')">User Management</button>
+                </div>
+                
+                <!-- Upload Video Section -->
+                <div class="admin-section active" id="upload-section">
+                    <h3 class="mb-2">Upload New Video</h3>
+                    <form id="upload-form">
+                        <div class="form-group">
+                            <label for="drive-link">Google Drive Video Link</label>
+                            <input type="url" id="drive-link" required 
+                                   placeholder="https://drive.google.com/file/d/VIDEO_ID/view">
+                            <small>Make sure the video is set to "Anyone with the link can view" in Google Drive</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="video-title-input">Video Title</label>
+                            <input type="text" id="video-title-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="video-description-input">Description</label>
+                            <textarea id="video-description-input" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="video-category-input">Category</label>
+                            <select id="video-category-input">
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Education">Education</option>
+                                <option value="Gaming">Gaming</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Music">Music</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Tutorial">Tutorial</option>
+                                <option value="Documentary">Documentary</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="video-duration">Duration (MM:SS)</label>
+                            <input type="text" id="video-duration-input" placeholder="12:45" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="video-tags">Tags (comma separated)</label>
+                            <input type="text" id="video-tags" placeholder="funny, tutorial, gaming">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="thumbnail-url">Thumbnail URL (optional)</label>
+                            <input type="url" id="thumbnail-url" 
+                                   placeholder="https://images.unsplash.com/photo-...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Ads for this video</label>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="enable-ads" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span>Enable ads (generate revenue from this video)</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Upload Video
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Manage Videos Section -->
+                <div class="admin-section" id="manage-section">
+                    <h3 class="mb-2">Manage Videos</h3>
+                    <div class="video-list" id="admin-video-list">
+                        <!-- Videos will be loaded here -->
                     </div>
-                    
+                </div>
+                
+                <!-- Manage Ads Section -->
+                <div class="admin-section" id="ads-section">
+                    <h3 class="mb-2">Manage Ads</h3>
                     <div class="form-group">
-                        <label for="video-title-input">Video Title</label>
-                        <input type="text" id="video-title-input" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="video-description-input">Description</label>
-                        <textarea id="video-description-input" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="video-category-input">Category</label>
-                        <select id="video-category-input">
-                            <option value="Entertainment">Entertainment</option>
-                            <option value="Education">Education</option>
-                            <option value="Gaming">Gaming</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Music">Music</option>
-                            <option value="Sports">Sports</option>
-                            <option value="Tutorial">Tutorial</option>
-                            <option value="Documentary">Documentary</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="video-duration">Duration (MM:SS)</label>
-                        <input type="text" id="video-duration-input" placeholder="12:45" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="video-tags">Tags (comma separated)</label>
-                        <input type="text" id="video-tags" placeholder="funny, tutorial, gaming">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="thumbnail-url">Thumbnail URL (optional)</label>
-                        <input type="url" id="thumbnail-url" 
-                               placeholder="https://images.unsplash.com/photo-...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Ads for this video</label>
+                        <label>Banner Ads Enabled</label>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <label class="toggle-switch">
-                                <input type="checkbox" id="enable-ads" checked>
+                                <input type="checkbox" id="banner-ads-toggle" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                            <span>Enable ads (generate revenue from this video)</span>
+                            <span>Show banner ads on site</span>
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload Video
-                    </button>
-                </form>
-            </div>
-            
-            <!-- Manage Videos Section -->
-            <div class="admin-section" id="manage-section">
-                <h3 class="mb-2">Manage Videos</h3>
-                <div class="video-list" id="admin-video-list">
-                    <!-- Videos will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Manage Ads Section -->
-            <div class="admin-section" id="ads-section">
-                <h3 class="mb-2">Manage Ads</h3>
-                <div class="form-group">
-                    <label>Banner Ads Enabled</label>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="banner-ads-toggle" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Show banner ads on site</span>
+                    <div class="form-group">
+                        <label>Video Ads Enabled</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="video-ads-toggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>Show video ads after playback</span>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Video Ads Enabled</label>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="video-ads-toggle" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Show video ads after playback</span>
+                    
+                    <div class="form-group">
+                        <label>Ad Skippable After (seconds)</label>
+                        <input type="number" id="skip-time" value="5" min="1" max="30">
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Ad Skippable After (seconds)</label>
-                    <input type="number" id="skip-time" value="5" min="1" max="30">
-                </div>
-                
-                <div class="form-group">
-                    <label>Custom Ad Message</label>
-                    <input type="text" id="ad-message" value="Advertisement - Click Here!" placeholder="Custom ad text">
-                </div>
-                
-                <button class="btn btn-primary" onclick="saveAdSettings()">
-                    <i class="fas fa-save"></i> Save Ad Settings
-                </button>
-            </div>
-            
-            <!-- Analytics Section -->
-            <div class="admin-section" id="analytics-section">
-                <h3 class="mb-2">Analytics Dashboard</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #3498db; color: white;">
-                        <h4>Total Views</h4>
-                        <h2 id="total-views">0</h2>
+                    
+                    <div class="form-group">
+                        <label>Custom Ad Message</label>
+                        <input type="text" id="ad-message" value="Advertisement - Click Here!" placeholder="Custom ad text">
                     </div>
-                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #2ecc71; color: white;">
-                        <h4>Total Videos</h4>
-                        <h2 id="total-videos">0</h2>
-                    </div>
-                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #9b59b6; color: white;">
-                        <h4>Ad Revenue</h4>
-                        <h2>$<span id="ad-revenue">0</span></h2>
-                    </div>
-                    <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #e67e22; color: white;">
-                        <h4>Ad Clicks</h4>
-                        <h2 id="ad-clicks">0</h2>
-                    </div>
-                </div>
-                
-                <h4 class="mt-2">Most Popular Videos</h4>
-                <div id="popular-videos-list">
-                    <!-- Popular videos will be loaded here -->
-                </div>
-                
-                <h4 class="mt-2">Recent Activity</h4>
-                <div id="recent-activity">
-                    <!-- Recent activity will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- User Management Section -->
-            <div class="admin-section" id="users-section">
-                <h3 class="mb-2">User Management</h3>
-                <div class="form-group">
-                    <label>Set Admin Password</label>
-                    <input type="password" id="new-admin-password" placeholder="Enter new admin password">
-                    <button class="btn btn-primary mt-1" onclick="updateAdminPassword()">
-                        <i class="fas fa-key"></i> Update Admin Password
+                    
+                    <button class="btn btn-primary" onclick="saveAdSettings()">
+                        <i class="fas fa-save"></i> Save Ad Settings
                     </button>
                 </div>
                 
-                <h4 class="mt-2">Registered Users</h4>
-                <div id="users-list">
-                    <!-- Users will be loaded here -->
+                <!-- Analytics Section -->
+                <div class="admin-section" id="analytics-section">
+                    <h3 class="mb-2">Analytics Dashboard</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #3498db; color: white;">
+                            <h4>Total Views</h4>
+                            <h2 id="total-views">0</h2>
+                        </div>
+                        <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #2ecc71; color: white;">
+                            <h4>Total Videos</h4>
+                            <h2 id="total-videos">0</h2>
+                        </div>
+                        <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #9b59b6; color: white;">
+                            <h4>Ad Revenue</h4>
+                            <h2>$<span id="ad-revenue">0</span></h2>
+                        </div>
+                        <div style="padding: 1.5rem; border-radius: var(--radius); background-color: #e67e22; color: white;">
+                            <h4>Ad Clicks</h4>
+                            <h2 id="ad-clicks">0</h2>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-2">Most Popular Videos</h4>
+                    <div id="popular-videos-list">
+                        <!-- Popular videos will be loaded here -->
+                    </div>
+                    
+                    <h4 class="mt-2">Recent Activity</h4>
+                    <div id="recent-activity">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- User Management Section -->
+                <div class="admin-section" id="users-section">
+                    <h3 class="mb-2">User Management</h3>
+                    <div class="form-group">
+                        <label>Set Admin Password</label>
+                        <input type="password" id="new-admin-password" placeholder="Enter new admin password">
+                        <button class="btn btn-primary mt-1" onclick="updateAdminPassword()">
+                            <i class="fas fa-key"></i> Update Admin Password
+                        </button>
+                    </div>
+                    
+                    <h4 class="mt-2">Registered Users</h4>
+                    <div id="users-list">
+                        <!-- Users will be loaded here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1181,11 +1191,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Admin Configuration (can be changed in admin panel)
+        // Admin Configuration
         const ADMIN_PASSWORD_KEY = 'streamdrive_admin_password';
-        const DEFAULT_ADMIN_PASSWORD = 'admin123'; // Change this for production
+        const DEFAULT_ADMIN_PASSWORD = 'admin123';
 
-        // Initial Data Storage (Fallback if Firebase not available)
+        // Initial Data Storage
         let videos = [];
         let adSettings = {
             bannerAds: true,
@@ -1203,10 +1213,10 @@
         let recentActivity = [];
 
         // DOM Elements
+        const homePage = document.getElementById('home-page');
         const videoGrid = document.getElementById('video-grid');
         const videoPlayerPage = document.getElementById('video-player-page');
-        const adminPanel = document.getElementById('admin-panel');
-        const mainContainer = document.getElementById('main-container');
+        const adminPage = document.getElementById('admin-page');
         const videoAdOverlay = document.getElementById('video-ad-overlay');
         const drivePlayer = document.getElementById('drive-player');
         const customPlayButton = document.getElementById('custom-play-button');
@@ -1220,7 +1230,6 @@
         const userAvatar = document.getElementById('user-avatar');
         const userName = document.getElementById('user-name');
         const authError = document.getElementById('auth-error');
-        const authSuccess = document.getElementById('auth-success');
         const passwordError = document.getElementById('password-error');
 
         // Initialize the app
@@ -1255,8 +1264,52 @@
                 }
             });
             
+            // Load initial data
+            loadInitialData();
             setupEventListeners();
+            
+            // Show home page by default
+            showHomePage();
         });
+
+        // Load initial data
+        function loadInitialData() {
+            // Sample videos if none exist
+            if (videos.length === 0) {
+                videos = [
+                    {
+                        id: 1,
+                        title: "Introduction to Web Development",
+                        description: "Learn the basics of HTML, CSS and JavaScript in this comprehensive tutorial.",
+                        driveId: "1WZQ_9cL-sfL2q5r6t8kYvxJy7NcHlMpB",
+                        category: "Education",
+                        duration: "12:45",
+                        views: 1250,
+                        adsEnabled: true,
+                        thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                        tags: ["web development", "tutorial", "coding"],
+                        uploaded: "2023-10-15",
+                        uploadedBy: "admin@streamdrive.com"
+                    },
+                    {
+                        id: 2,
+                        title: "Mountain Adventure Documentary",
+                        description: "Exploring the highest peaks and breathtaking landscapes of the Himalayas.",
+                        driveId: "1ABC123def456GHI789jkl",
+                        category: "Entertainment",
+                        duration: "24:30",
+                        views: 850,
+                        adsEnabled: true,
+                        thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                        tags: ["documentary", "adventure", "nature"],
+                        uploaded: "2023-10-10",
+                        uploadedBy: "admin@streamdrive.com"
+                    }
+                ];
+            }
+            
+            renderVideoGrid();
+        }
 
         // Theme Toggle
         function toggleTheme() {
@@ -1307,6 +1360,36 @@
             }
         }
 
+        // Page Navigation Functions
+        function showHomePage() {
+            homePage.classList.remove('hidden');
+            videoPlayerPage.classList.add('hidden');
+            adminPage.classList.add('hidden');
+            videoAdOverlay.classList.add('hidden');
+            
+            // Reset video player
+            drivePlayer.src = '';
+            
+            // Update video grid
+            renderVideoGrid();
+        }
+
+        function showVideoPlayerPage() {
+            homePage.classList.add('hidden');
+            videoPlayerPage.classList.remove('hidden');
+            adminPage.classList.add('hidden');
+        }
+
+        function showAdminPage() {
+            homePage.classList.add('hidden');
+            videoPlayerPage.classList.add('hidden');
+            adminPage.classList.remove('hidden');
+            
+            updateAdminVideoList();
+            updateAnalytics();
+            loadUsersList();
+        }
+
         // Auth Modal Functions
         function showAuthModal() {
             authModal.classList.add('active');
@@ -1316,7 +1399,6 @@
         function hideAuthModal() {
             authModal.classList.remove('active');
             authError.classList.remove('active');
-            authSuccess.classList.remove('active');
             document.getElementById('login-form').reset();
             document.getElementById('signup-form').reset();
         }
@@ -1379,7 +1461,7 @@
         async function logout() {
             try {
                 await auth.signOut();
-                showHome();
+                showHomePage();
                 showSuccessMessage('Logged out successfully!');
             } catch (error) {
                 console.error('Logout error:', error);
@@ -1422,6 +1504,14 @@
         }
 
         // Admin Password Functions
+        function requestAdminAccess() {
+            if (!currentUser) {
+                showAuthModal();
+            } else {
+                showPasswordModal();
+            }
+        }
+
         function showPasswordModal() {
             passwordModal.classList.add('active');
         }
@@ -1438,7 +1528,7 @@
             
             if (password === storedPassword) {
                 hidePasswordModal();
-                showAdmin();
+                showAdminPage();
             } else {
                 passwordError.textContent = 'Incorrect password. Please try again.';
                 passwordError.classList.add('active');
@@ -1453,12 +1543,6 @@
                 document.getElementById('new-admin-password').value = '';
             } else {
                 alert('Password must be at least 4 characters long.');
-            }
-        }
-
-        function requestAdminAccessForEdit() {
-            if (currentVideoId) {
-                showPasswordModal();
             }
         }
 
@@ -1523,12 +1607,8 @@
             const driveUrl = `https://drive.google.com/file/d/${driveId}/preview`;
             drivePlayer.src = driveUrl;
             
-            // Show video player, hide other sections
-            mainContainer.style.display = 'none';
-            adminPanel.classList.add('hidden');
-            searchContainer.style.display = 'none';
-            document.querySelectorAll('.ad-container').forEach(el => el.style.display = 'none');
-            videoPlayerPage.classList.remove('hidden');
+            // Show video player page
+            showVideoPlayerPage();
             
             // Show custom play button
             customPlayButton.style.display = 'flex';
@@ -1544,41 +1624,6 @@
             
             updateAnalytics();
             saveToLocalStorage();
-        }
-
-        // Show Home Page
-        function showHome() {
-            mainContainer.style.display = 'flex';
-            adminPanel.classList.add('hidden');
-            videoPlayerPage.classList.add('hidden');
-            searchContainer.style.display = 'flex';
-            document.querySelectorAll('.ad-container').forEach(el => el.style.display = 'flex');
-            
-            // Reset video player
-            drivePlayer.src = '';
-            
-            // Update video grid in case videos were added
-            renderVideoGrid();
-        }
-
-        // Show Admin Panel (requires password)
-        function showAdmin() {
-            if (!currentUser) {
-                showAuthModal();
-                return;
-            }
-            
-            // Check admin password (in real app, you'd check user role in Firestore)
-            // For demo, we'll just check if user is authenticated
-            mainContainer.style.display = 'none';
-            adminPanel.classList.remove('hidden');
-            videoPlayerPage.classList.add('hidden');
-            searchContainer.style.display = 'none';
-            document.querySelectorAll('.ad-container').forEach(el => el.style.display = 'none');
-            
-            updateAdminVideoList();
-            updateAnalytics();
-            loadUsersList();
         }
 
         // Switch Admin Tab
@@ -1637,22 +1682,24 @@
             
             // Update popular videos list
             const popularVideosList = document.getElementById('popular-videos-list');
-            popularVideosList.innerHTML = '';
-            
-            // Sort videos by views and take top 3
-            const popularVideos = [...videos]
-                .sort((a, b) => b.views - a.views)
-                .slice(0, 3);
-            
-            popularVideos.forEach(video => {
-                const videoItem = document.createElement('div');
-                videoItem.className = 'admin-video-item';
-                videoItem.innerHTML = `
-                    <h4>${video.title}</h4>
-                    <p style="font-size: 0.9rem; margin: 0.5rem 0;">${video.views.toLocaleString()} views • ${video.category}</p>
-                `;
-                popularVideosList.appendChild(videoItem);
-            });
+            if (popularVideosList) {
+                popularVideosList.innerHTML = '';
+                
+                // Sort videos by views and take top 3
+                const popularVideos = [...videos]
+                    .sort((a, b) => b.views - a.views)
+                    .slice(0, 3);
+                
+                popularVideos.forEach(video => {
+                    const videoItem = document.createElement('div');
+                    videoItem.className = 'admin-video-item';
+                    videoItem.innerHTML = `
+                        <h4>${video.title}</h4>
+                        <p style="font-size: 0.9rem; margin: 0.5rem 0;">${video.views.toLocaleString()} views • ${video.category}</p>
+                    `;
+                    popularVideosList.appendChild(videoItem);
+                });
+            }
         }
 
         // Setup Event Listeners
@@ -1720,7 +1767,7 @@
                 updateAnalytics();
                 
                 // Show success message
-                alert('Video uploaded successfully!');
+                showSuccessMessage('Video uploaded successfully!');
             });
             
             // Custom play button
@@ -1833,7 +1880,7 @@
             saveToLocalStorage();
             loadAdSettings();
             
-            alert('Ad settings saved!');
+            showSuccessMessage('Ad settings saved!');
         }
 
         // Delete Video
@@ -1853,6 +1900,8 @@
             updateAdminVideoList();
             renderVideoGrid();
             updateAnalytics();
+            
+            showSuccessMessage('Video deleted successfully!');
         }
 
         // Edit Video
@@ -1876,7 +1925,7 @@
             // Scroll to form
             document.getElementById('upload-form').scrollIntoView();
             
-            alert('Video data loaded into form. Make changes and click "Upload Video" to update.');
+            showSuccessMessage('Video data loaded into form. Make changes and click "Upload Video" to update.');
         }
 
         // Search Videos
@@ -1931,9 +1980,9 @@
 
         // Load Users List
         async function loadUsersList() {
-            // In a real app, you would query Firestore for all users
-            // For demo, we'll just show current user
             const usersList = document.getElementById('users-list');
+            if (!usersList) return;
+            
             usersList.innerHTML = '';
             
             if (currentUser) {
@@ -1980,19 +2029,15 @@
             
             try {
                 const snapshot = await db.collection('videos').orderBy('uploaded', 'desc').get();
-                videos = [];
-                snapshot.forEach(doc => {
-                    videos.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Convert string IDs to numbers for compatibility
-                videos = videos.map((video, index) => ({
-                    ...video,
-                    id: video.id || index + 1
-                }));
+                if (!snapshot.empty) {
+                    videos = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        videos.push({ id: parseInt(doc.id) || data.id, ...data });
+                    });
+                }
             } catch (error) {
                 console.error('Error loading videos from Firestore:', error);
-                loadFromLocalStorage();
             }
         }
 
