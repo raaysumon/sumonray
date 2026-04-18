@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শ্রী সুমনের জন্মকুষ্ঠী • পূর্ণ বৈদিক বিচার</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Playfair+Display:wght@700;900&display=swap');
+
+        body {
+            font-family: 'Noto Serif Bengali', serif;
+            background: linear-gradient(#0a0503, #2c1e12);
+            color: #f5e8c7;
+            line-height: 1.85;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sky {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% 25%, #1a2a44 0%, #0a0503 70%);
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 8px white;
+            animation: twinkle 4s infinite alternate;
+        }
+
+        header {
+            background: linear-gradient(to bottom, #9c2a2a, #6b1f1f);
+            text-align: center;
+            padding: 60px 20px 45px;
+            border-bottom: 12px double #d4af37;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.1rem;
+            color: #d4af37;
+            text-shadow: 0 0 30px #d4af37;
+        }
+
+        .birth-info {
+            font-size: 1.45rem;
+            color: #ffeb3b;
+            margin-top: 12px;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .kundli-card {
+            background: rgba(248,241,224,0.08);
+            border: 8px solid #d4af37;
+            border-radius: 22px;
+            padding: 35px;
+            margin-bottom: 45px;
+            box-shadow: 0 20px 55px rgba(0,0,0,0.75);
+        }
+
+        .section-title {
+            color: #d4af37;
+            font-size: 2.25rem;
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #d4af37;
+        }
+
+        /* জন্ম ছক */
+        .north-kundli {
+            background: #1a1208;
+            border: 10px solid #d4af37;
+            padding: 35px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .north-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            height: 460px;
+            border: 8px solid #9c2a2a;
+        }
+
+        .north-house {
+            border: 3px solid #d4af37;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            text-align: center;
+        }
+
+        .north-house .house-no {
+            font-size: 2.1rem;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .north-house .planets {
+            color: #ffeb3b;
+            font-size: 1.25rem;
+            margin-top: 10px;
+            line-height: 1.45;
+        }
+
+        .center-rashi {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15,10,5,0.95);
+            padding: 35px 50px;
+            border: 6px solid #d4af37;
+            border-radius: 50%;
+            text-align: center;
+            box-shadow: 0 0 45px #d4af37;
+        }
+
+        .highlight {
+            background: rgba(240,193,77,0.12);
+            border-left: 8px solid #d4af37;
+            padding: 22px;
+            margin: 25px 0;
+            border-radius: 12px;
+            font-size: 1.35rem;
+        }
+
+        .om-symbol {
+            font-size: 7.5rem;
+            text-align: center;
+            color: #d4af37;
+            margin: 50px 0 30px;
+        }
+
+        @keyframes twinkle {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sky" id="sky"></div>
+
+<header>
+    <h1>শ্রী সুমনের জন্মকুষ্ঠী</h1>
+    <div class="birth-info">
+        জন্ম: ৬ এপ্রিল ২০০০ (বৃহস্পতিবার) • ভোর ৪:০৫ মিনিট • খুলনা, বাংলাদেশ<br>
+        রাশি: মেষ • লগ্ন: কুম্ভ • নক্ষত্র: অশ্বিনী
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- জন্ম ছক -->
+    <div class="kundli-card north-kundli">
+        <div class="section-title">জন্ম ছক (উত্তর ভারতীয় স্টাইল)</div>
+        
+        <div class="north-grid">
+            <div class="north-house" style="grid-column:1; grid-row:1;">
+                <span class="house-no">১২</span>
+                <div class="planets">সূর্য<br>শুক্র</div>
+            </div>
+            <div class="north-house" style="grid-column:2; grid-row:1;">
+                <span class="house-no">১</span>
+                <div class="planets">চন্দ্র<br>মঙ্গল<br>বৃহস্পতি<br>শনি</div>
+            </div>
+            <div class="north-house" style="grid-column:3; grid-row:1;"><span class="house-no">২</span></div>
+            <div class="north-house" style="grid-column:4; grid-row:1;"><span class="house-no">৩</span></div>
+
+            <div class="north-house" style="grid-column:1; grid-row:2;">
+                <span class="house-no">১১</span>
+                <div class="planets">বুধ<br>লগ্ন</div>
+            </div>
+            <div class="north-house" style="grid-column:4; grid-row:2;">
+                <span class="house-no">৪</span>
+                <div class="planets">রাহু</div>
+            </div>
+
+            <div class="north-house" style="grid-column:1; grid-row:3;">
+                <span class="house-no">১০</span>
+                <div class="planets">কেতু</div>
+            </div>
+            <div class="north-house" style="grid-column:4; grid-row:3;"><span class="house-no">৫</span></div>
+
+            <div class="north-house" style="grid-column:1; grid-row:4;"><span class="house-no">৯</span></div>
+            <div class="north-house" style="grid-column:2; grid-row:4;"><span class="house-no">৮</span></div>
+            <div class="north-house" style="grid-column:3; grid-row:4;"><span class="house-no">৭</span></div>
+            <div class="north-house" style="grid-column:4; grid-row:4;"><span class="house-no">৬</span></div>
+        </div>
+
+        <div class="center-rashi">
+            <strong>রাশি</strong><br>
+            <span style="font-size:2.9rem; color:#ffeb3b;">মেষ</span><br>
+            অশ্বিনী নক্ষত্র
+        </div>
+    </div>
+
+    <!-- পূর্ণ জীবন বিচার -->
+    <div class="kundli-card">
+        <div class="section-title">জন্ম থেকে জীবনের শেষ পর্যন্ত পূর্ণ বিচার</div>
+
+        <h3 style="color:#ffeb3b; margin:30px 0 15px;">১. শৈশব ও কৈশোর (০–২০ বছর)</h3>
+        <p>সক্রিয়, খেলাধুলাপ্রিয় ও অ্যাডভেঞ্চারাস শৈশব। লেখাপড়ায় ভালো, প্রযুক্তি ও নতুন বিষয়ে আগ্রহ। ছোটখাটো স্বাস্থ্য সতর্কতা (মাথা, চোখ)।</p>
+
+        <h3 style="color:#ffeb3b; margin:30px 0 15px;">২. লেখাপড়া ও যৌবন (২০–৩০ বছর)</h3>
+        <p>উচ্চশিক্ষায় ভালো সাফল্য। ইঞ্জিনিয়ারিং, আইটি, ম্যানেজমেন্ট বা সৃজনশীল ক্ষেত্রে ভালো করবেন। ২২–২৮ বছর সংগ্রামের সময়।</p>
+
+        <h3 style="color:#ffeb3b; margin:30px 0 15px;">৩. চাকরি ও কর্মজীবন</h3>
+        <p>প্রথম স্থিতিশীলতা: ২৯ বছর বয়স<br>
+        সোনালী সময়: ৩৭–৪৮ বছর (সবচেয়ে ভালো ৪০–৪৫ বছর)<br>
+        সম্ভাব্য ক্ষেত্র: প্রযুক্তি, ইঞ্জিনিয়ারিং, উদ্যোক্তা, ম্যানেজমেন্ট।</p>
+
+        <h3 style="color:#ffeb3b; margin:30px 0 15px;">৪. অর্থনৈতিক অবস্থা</h3>
+        <p>প্রথম ৩০ বছর অস্থিরতা। স্থিতিশীলতা শুরু: ৩৪ বছর থেকে।<br>
+        সোনালী সময়: ৪০–৪৫ বছর। ৫০ বছরের পর স্থায়ী আরামদায়ক অবস্থা।</p>
+
+        <h3 style="color:#ffeb3b; margin:30px 0 15px;">৫. বিবাহ ও দাম্পত্য জীবন</h3>
+        <p>বিবাহ: ২৯ বছর (২৭.৫–৩১ বছরের মধ্যে)<br>
+        প্রথম ৪ বছর সমন্বয়। ৩৫ বছরের পর সুখী ও স্থিতিশীল দাম্পত্য। সন্তান ৩২–৩৬ বছরে সম্ভাবনা।</p>
+
+        <h3 style="color:#ffeb3b; margin:30px 0 15px;">৬. স্বাস্থ্য ও আয়ু</h3>
+        <p>আয়ু: ৭৬ বছর (৭১–৮১ বছরের মধ্যে)<br>
+        সতর্কতা: মাথা, চোখ, দুর্ঘটনা। বিশেষ যত্ন ২০২৬–২০২৮ ও ৪৩–৪৭ বছরে।</p>
+    </div>
+
+    <div class="kundli-card">
+        <div class="section-title">উপায় (Remedies)</div>
+        <p style="font-size:1.4rem;">
+            • হনুমান চালিসা নিয়মিত পাঠ করুন<br>
+            • গণেশ পূজা করুন ও অশ্বত্থ গাছে জল দিন<br>
+            • শনিবারে কালো তিল দান করুন<br>
+            • প্রতিদিন যোগ-ধ্যান করুন এবং রাগ নিয়ন্ত্রণ করুন
+        </p>
+    </div>
+
+    <div class="om-symbol">ॐ</div>
+
+    <p style="text-align:center; font-size:1.5rem; color:#ffeb3b; margin-bottom:50px;">
+        ধৈর্য, পরিশ্রম ও ভালো কর্ম দিয়ে জীবনকে সুন্দর করুন।<br>
+        আপনার ভবিষ্যৎ উজ্জ্বল হোক।
+    </p>
+
+</div>
+
+<script>
+    function createSky() {
+        const sky = document.querySelector('.sky');
+        for (let i = 0; i < 280; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 3.5 + 1.2;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.animationDelay = `-${Math.random() * 5}s`;
+            sky.appendChild(star);
+        }
+    }
+    window.onload = createSky;
+</script>
+</body>
+</html>
