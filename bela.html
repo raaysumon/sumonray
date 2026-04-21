@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty Roy - Personal & Academic Information</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #4a6bff, #6b8fff);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+        .section {
+            padding: 25px 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .section:last-child {
+            border-bottom: none;
+        }
+        h2 {
+            color: #4a6bff;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .info-item {
+            background: #f8f9ff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4a6bff;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+            font-size: 0.95em;
+        }
+        .value {
+            font-size: 1.1em;
+            margin-top: 5px;
+            word-break: break-all;
+        }
+        .bangla {
+            font-size: 1.15em;
+            line-height: 1.6;
+        }
+        button {
+            background: #4a6bff;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 8px;
+        }
+        button:hover {
+            background: #3b5be0;
+        }
+        .copy-all {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9ff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Beauty Roy</h1>
+        <p class="subtitle">Personal & Academic Profile</p>
+    </header>
+
+    <div class="section">
+        <h2>Personal Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">Name (English)</div>
+                <div class="value" id="name-en">Beauty Roy</div>
+                <button onclick="copyText('name-en')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Name (বাংলা)</div>
+                <div class="value bangla" id="name-bn">বিউটি রায়</div>
+                <button onclick="copyText('name-bn')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Father's Name</div>
+                <div class="value" id="father-en">Biswajit Roy</div>
+                <button onclick="copyText('father-en')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Father's Name (বাংলা)</div>
+                <div class="value bangla" id="father-bn">বিশ্বজিৎ রায়</div>
+                <button onclick="copyText('father-bn')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Mother's Name</div>
+                <div class="value" id="mother-en">Sharmila Roy</div>
+                <button onclick="copyText('mother-en')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Mother's Name (বাংলা)</div>
+                <div class="value bangla" id="mother-bn">শর্মিলা রায়</div>
+                <button onclick="copyText('mother-bn')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Date of Birth</div>
+                <div class="value" id="dob">28/11/2000</div>
+                <button onclick="copyText('dob')">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Permanent Address</h2>
+        <div class="info-item">
+            <div class="label">Address (English)</div>
+            <div class="value" id="address-en">Chara, Sachibunia, Chayghoria -9260, Batiaghata, Khulna</div>
+            <button onclick="copyText('address-en')">Copy</button>
+        </div>
+        <div class="info-item">
+            <div class="label">Address (বাংলা)</div>
+            <div class="value bangla" id="address-bn">চরা, সাচিবুনিয়া, চয়ঘরিয়া -৯২৬০, বাটিয়াঘাটা, খুলনা</div>
+            <button onclick="copyText('address-bn')">Copy</button>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">Post Office</div>
+                <div class="value" id="postoffice">Chayghoria (চয়ঘরিয়া)</div>
+                <button onclick="copyText('postoffice')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Post Code</div>
+                <div class="value" id="postcode">9260</div>
+                <button onclick="copyText('postcode')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">Upazilla</div>
+                <div class="value" id="upazilla">Batiaghata</div>
+                <button onclick="copyText('upazilla')">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Educational Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">School Name</div>
+                <div class="value" id="school">Jalma Chakrakhali Secondary School, Khulna</div>
+                <button onclick="copyText('school')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">College Name</div>
+                <div class="value" id="college">Govt. M. M. City College, Khulna</div>
+                <button onclick="copyText('college')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">University Name</div>
+                <div class="value" id="university">Khulna University</div>
+                <button onclick="copyText('university')">Copy</button>
+            </div>
+            
+            <div class="info-item">
+                <div class="label">SSC Roll</div>
+                <div class="value" id="ssc-roll">101789</div>
+                <button onclick="copyText('ssc-roll')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">SSC Registration No.</div>
+                <div class="value" id="ssc-reg">1413245254/2015-2016</div>
+                <button onclick="copyText('ssc-reg')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">SSC Passing Year</div>
+                <div class="value" id="ssc-year">2017</div>
+                <button onclick="copyText('ssc-year')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">SSC Group</div>
+                <div class="value" id="ssc-group">Science</div>
+                <button onclick="copyText('ssc-group')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">SSC GPA</div>
+                <div class="value" id="ssc-gpa">5.00</div>
+                <button onclick="copyText('ssc-gpa')">Copy</button>
+            </div>
+
+            <div class="info-item">
+                <div class="label">HSC Roll</div>
+                <div class="value" id="hsc-roll">200511</div>
+                <button onclick="copyText('hsc-roll')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">HSC Registration No.</div>
+                <div class="value" id="hsc-reg">1413245254/2017-2018</div>
+                <button onclick="copyText('hsc-reg')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">HSC Passing Year</div>
+                <div class="value" id="hsc-year">2019</div>
+                <button onclick="copyText('hsc-year')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">HSC Group</div>
+                <div class="value" id="hsc-group">Humanities</div>
+                <button onclick="copyText('hsc-group')">Copy</button>
+            </div>
+            <div class="info-item">
+                <div class="label">HSC GPA</div>
+                <div class="value" id="hsc-gpa">5.00</div>
+                <button onclick="copyText('hsc-gpa')">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-all">
+        <button onclick="copyAllInfo()" style="padding: 15px 30px; font-size: 1.1em;">
+            📋 Copy All Information at Once
+        </button>
+    </div>
+</div>
+
+<script>
+function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        const btns = document.querySelectorAll('button');
+        for (let btn of btns) {
+            if (btn.getAttribute('onclick') === `copyText('${id}')`) {
+                const originalText = btn.innerText;
+                btn.innerText = '✅ Copied!';
+                setTimeout(() => btn.innerText = originalText, 1500);
+            }
+        }
+    });
+}
+
+function copyAllInfo() {
+    let allInfo = `Name: Beauty Roy
+Father's Name: Biswajit Roy
+Mother's Name: Sharmila Roy
+Permanent Address: Chara, Sachibunia, Chayghoria -9260, Batiaghata, Khulna
+Post Office: Chayghoria (চয়ঘরিয়া)
+Post Code: 9260
+Name (Bangla): বিউটি রায়
+Father's Name (Bangla): বিশ্বজিৎ রায়
+Mother's Name (Bangla): শর্মিলা রায়
+Permanent Address (Bangla): চরা, সাচিবুনিয়া, চয়ঘরিয়া -৯২৬০, বাটিয়াঘাটা, খুলনা
+Date of Birth: 28/11/2000
+School: Jalma Chakrakhali Secondary School, Khulna
+College: Govt. M. M. City College, Khulna
+University: Khulna University
+SSC Roll: 101789
+SSC Passing Year: 2017
+SSC Group: Science
+SSC Registration Number: 1413245254/2015-2016
+SSC GPA: 5.00
+HSC Roll: 200511
+HSC Passing Year: 2019
+HSC Group: Humanities
+HSC Registration Number: 1413245254/2017-2018
+HSC GPA: 5.00`;
+
+    navigator.clipboard.writeText(allInfo).then(() => {
+        alert("✅ All information has been copied to clipboard!");
+    });
+}
+</script>
+
+</body>
+</html>
