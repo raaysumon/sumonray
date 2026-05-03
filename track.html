@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCS Time Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .time-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .time-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        /* Mobile improvements */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: auto;
+                height: auto;
+                z-index: 50;
+                border-top: 1px solid #e5e7eb;
+            }
+            .main-content {
+                padding-bottom: 100px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-cyan-50 min-h-screen">
+    <div class="max-w-screen-2xl mx-auto">
+        <!-- Top Header (Mobile + Desktop) -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+            <div class="px-4 md:px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">B</div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">BCS Tracker</h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div id="user-info" class="hidden items-center gap-2 text-sm">
+                        <span id="user-email" class="text-gray-600 text-xs md:text-sm"></span>
+                    </div>
+                    
+                    <button onclick="toggleTimer()" id="timer-btn"
+                            class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 md:px-6 md:py-3 rounded-2xl font-medium text-sm md:text-base transition-all active:scale-95">
+                        <i class="fa-solid fa-play"></i>
+                        <span id="timer-status" class="hidden md:inline">Start Timer</span>
+                    </button>
+                    
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-gray-600 p-2">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex flex-col md:flex-row">
+            <!-- Sidebar / Bottom Nav -->
+            <div id="sidebar" class="sidebar md:w-72 bg-white border-r border-gray-100 md:h-screen md:sticky md:top-16 overflow-auto">
+                <div class="p-4 md:p-6 space-y-6">
+                    <!-- Date Picker -->
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-medium">Date</label>
+                        <input type="date" id="selected-date" 
+                               class="w-full px-4 py-3.5 border border-gray-200 rounded-2xl focus:outline-none focus:border-indigo-500 text-base">
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-2 gap-3 md:block md:space-y-4">
+                        <div onclick="switchTab(0)" class="tab-btn cursor-pointer bg-indigo-50 border border-indigo-200 rounded-3xl p-4 md:p-5 active">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-xs text-indigo-600 font-medium">TODAY</p>
+                                    <p id="today-hours" class="text-3xl md:text-4xl font-bold text-gray-900 mt-1">0.0</p>
+                                    <p class="text-xs md:text-sm text-gray-500">hours</p>
+                                </div>
+                                <i class="fa-solid fa-clock text-3xl text-indigo-200"></i>
+                            </div>
+                        </div>
+
+                        <div onclick="switchTab(1)" class="tab-btn cursor-pointer bg-white border border-gray-100 hover:border-gray-200 rounded-3xl p-4 md:p-5">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 font-medium">WEEK</p>
+                                    <p id="week-hours" class="text-3xl md:text-4xl font-bold text-gray-900 mt-1">0.0</p>
+                                    <p class="text-xs md:text-sm text-gray-500">hours</p>
+                                </div>
+                                <i class="fa-solid fa-calendar-week text-3xl text-gray-200"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Session -->
+                    <div id="current-session" class="hidden bg-amber-50 border border-amber-200 rounded-3xl p-5">
+                        <p class="text-xs uppercase text-amber-600 font-medium mb-1">LIVE</p>
+                        <p id="current-task-name" class="font-semibold text-sm md:text-base">No task running</p>
+                        <p id="current-timer" class="font-mono text-3xl font-bold text-amber-700">00:00:00</p>
+                        <button onclick="stopCurrentTimer()" 
+                                class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-2xl text-sm font-medium">
+                            STOP SESSION
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 main-content p-4 md:p-8 pb-24 md:pb-8">
+                <!-- Tabs -->
+                <div class="flex border-b mb-6 overflow-x-auto hide-scroll">
+                    <button onclick="switchTab(0)" id="tab-0" 
+                            class="tab-button px-6 py-4 font-semibold border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap">Daily Log</button>
+                    <button onclick="switchTab(1)" id="tab-1" 
+                            class="tab-button px-6 py-4 font-semibold text-gray-500 whitespace-nowrap">History</button>
+                    <button onclick="switchTab(2)" id="tab-2" 
+                            class="tab-button px-6 py-4 font-semibold text-gray-500 whitespace-nowrap">Reports</button>
+                </div>
+
+                <!-- ==================== TAB 0: Daily Log ==================== -->
+                <div id="tab-content-0">
+                    <div class="bg-white rounded-3xl shadow-sm p-5 md:p-8 mb-8">
+                        <h2 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                            <i class="fa-solid fa-plus-circle text-indigo-500"></i>
+                            Add New Entry
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-2">Subject / Activity</label>
+                                <input id="activity" type="text" placeholder="e.g., English - Vocabulary" 
+                                       class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-2">Date</label>
+                                <input id="entry-date" type="date" 
+                                       class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 md:gap-6 mt-6">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-2">Hours</label>
+                                <input id="hours" type="number" step="0.25" value="1" min="0"
+                                       class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-2">Minutes</label>
+                                <input id="minutes" type="number" step="5" value="0" min="0" max="59"
+                                       class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-2">Notes</label>
+                                <input id="notes" type="text" placeholder="Optional note" 
+                                       class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <button onclick="addTimeEntry()" 
+                                class="mt-8 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-semibold text-lg active:scale-[0.985] transition-all">
+                            Save Entry
+                        </button>
+                    </div>
+
+                    <!-- Entries List -->
+                    <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
+                        <div class="px-5 md:px-8 py-6 border-b flex justify-between items-center bg-gray-50">
+                            <h3 class="font-semibold text-lg" id="selected-date-title">Today's Entries</h3>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500">TOTAL</p>
+                                <p id="daily-total" class="text-3xl md:text-4xl font-bold text-emerald-600">0h 0m</p>
+                            </div>
+                        </div>
+                        
+                        <div id="entries-list" class="divide-y min-h-[200px]">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== TAB 1: History ==================== -->
+                <div id="tab-content-1" class="hidden">
+                    <div class="bg-white rounded-3xl p-5 md:p-8">
+                        <h2 class="text-2xl font-semibold mb-6">Recent Activity</h2>
+                        <div id="history-list" class="space-y-4">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== TAB 2: Reports ==================== -->
+                <div id="tab-content-2" class="hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-3xl p-6 md:p-8">
+                            <h3 class="font-semibold mb-6">Weekly Hours</h3>
+                            <canvas id="weekly-chart" height="220"></canvas>
+                        </div>
+                        <div class="bg-white rounded-3xl p-6 md:p-8">
+                            <h3 class="font-semibold mb-6">Subject Breakdown</h3>
+                            <canvas id="subject-chart" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 md:right-6 md:left-auto bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50">
+        <i id="toast-icon" class="fa-solid"></i>
+        <span id="toast-message" class="text-sm"></span>
+    </div>
+
+    <script>
+        // Firebase Config (same as before)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
+            authDomain: "rayvid-c074a.firebaseapp.com",
+            projectId: "rayvid-c074a",
+            storageBucket: "rayvid-c074a.firebasestorage.app",
+            messagingSenderId: "970771885312",
+            appId: "1:970771885312:web:104ae741f28287a01ad7e5"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let timerInterval = null;
+        let timerStartTime = null;
+        let currentTimerTask = "";
+        let weeklyChartInstance = null;
+        let subjectChartInstance = null;
+
+        // Tailwind script already included
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast-icon').className = type === 'success' 
+                ? 'fa-solid fa-check-circle text-emerald-400' 
+                : 'fa-solid fa-triangle-exclamation text-amber-400';
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2800);
+        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-email').textContent = user.email || user.uid.substring(0,8) + "...";
+                document.getElementById('user-info').classList.remove('hidden');
+                loadAllData();
+            } else {
+                auth.signInAnonymously().catch(e => console.error(e));
+            }
+        });
+
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('selected-date');
+            const entryDate = document.getElementById('entry-date');
+            
+            dateInput.value = today;
+            entryDate.value = today;
+            
+            dateInput.addEventListener('change', () => {
+                loadDailyEntries();
+            });
+        }
+
+        async function addTimeEntry() {
+            if (!currentUser) return showToast("Authentication error", "error");
+
+            const activity = document.getElementById('activity').value.trim();
+            const dateStr = document.getElementById('entry-date').value;
+            const hours = parseFloat(document.getElementById('hours').value) || 0;
+            const minutes = parseFloat(document.getElementById('minutes').value) || 0;
+            const notes = document.getElementById('notes').value.trim();
+
+            if (!activity || !dateStr) {
+                return showToast("Activity and Date required!", "error");
+            }
+
+            try {
+                await db.collection('timeEntries').add({
+                    userId: currentUser.uid,
+                    activity,
+                    date: dateStr,
+                    hours: hours + (minutes / 60),
+                    notes,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showToast("Entry saved successfully ✓");
+                clearEntryForm();
+                loadDailyEntries();
+                loadHistory();
+                updateStats();
+            } catch (err) {
+                showToast("Failed to save", "error");
+                console.error(err);
+            }
+        }
+
+        function clearEntryForm() {
+            document.getElementById('activity').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('hours').value = '1';
+            document.getElementById('minutes').value = '0';
+        }
+
+        async function loadDailyEntries() {
+            if (!currentUser) return;
+            const date = document.getElementById('selected-date').value;
+            document.getElementById('selected-date-title').textContent = new Date(date).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+
+            const snap = await db.collection('timeEntries')
+                .where('userId','==', currentUser.uid)
+                .where('date','==', date)
+                .orderBy('timestamp','desc')
+                .get();
+
+            let total = 0;
+            let html = '';
+
+            if (snap.empty) {
+                html = `<div class="py-16 text-center text-gray-400">
+                    <i class="fa-solid fa-folder-open text-5xl mb-4"></i>
+                    <p class="text-sm">No entries yet</p>
+                </div>`;
+            } else {
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    total += d.hours;
+                    html += `
+                    <div class="px-5 py-5 flex justify-between items-center hover:bg-gray-50 group">
+                        <div class="flex-1">
+                            <div class="font-medium">${d.activity}</div>
+                            \( {d.notes ? `<div class="text-xs text-gray-500 line-clamp-1"> \){d.notes}</div>` : ''}
+                        </div>
+                        <div class="text-right w-20">
+                            <span class="font-semibold text-lg">${d.hours.toFixed(1)}h</span>
+                        </div>
+                        <button onclick="deleteEntry('${doc.id}')" class="ml-4 text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>`;
+                });
+            }
+
+            document.getElementById('entries-list').innerHTML = html;
+            const totalH = Math.floor(total);
+            const totalM = Math.round((total % 1) * 60);
+            document.getElementById('daily-total').innerHTML = `\( {totalH}h <span class="text-xl"> \){totalM}m</span>`;
+        }
+
+        async function deleteEntry(id) {
+            if (confirm("Delete entry?")) {
+                await db.collection('timeEntries').doc(id).delete();
+                loadDailyEntries();
+                loadHistory();
+                updateStats();
+            }
+        }
+
+        async function loadHistory() {
+            if (!currentUser) return;
+            const snap = await db.collection('timeEntries')
+                .where('userId','==', currentUser.uid)
+                .orderBy('date','desc')
+                .limit(12)
+                .get();
+
+            let html = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                html += `
+                <div class="flex items-center justify-between bg-gray-50 rounded-2xl px-5 py-4">
+                    <div>
+                        <div class="font-medium text-sm">${d.activity}</div>
+                        <div class="text-xs text-gray-500">${d.date}</div>
+                    </div>
+                    <div class="font-mono font-bold">${d.hours.toFixed(1)}h</div>
+                </div>`;
+            });
+            document.getElementById('history-list').innerHTML = html || `<p class="py-12 text-center text-gray-400">No history found</p>`;
+        }
+
+        async function updateStats() {
+            if (!currentUser) return;
+            const today = new Date().toISOString().split('T')[0];
+            const snap = await db.collection('timeEntries').where('userId','==',currentUser.uid).where('date','==',today).get();
+            let total = 0;
+            snap.forEach(doc => total += doc.data().hours);
+            document.getElementById('today-hours').textContent = total.toFixed(1);
+        }
+
+        function toggleTimer() {
+            if (timerInterval) {
+                stopCurrentTimer();
+            } else {
+                const task = prompt("What are you studying right now?", "BCS Preparation");
+                if (!task) return;
+                currentTimerTask = task;
+                timerStartTime = Date.now();
+                document.getElementById('current-task-name').textContent = task;
+                document.getElementById('current-session').classList.remove('hidden');
+                
+                const btn = document.getElementById('timer-btn');
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+                btn.classList.add('!bg-rose-600');
+                
+                timerInterval = setInterval(updateLiveTimer, 1000);
+            }
+        }
+
+        function updateLiveTimer() {
+            const elapsed = Math.floor((Date.now() - timerStartTime) / 1000);
+            const h = String(Math.floor(elapsed / 3600)).padStart(2,'0');
+            const m = String(Math.floor((elapsed % 3600)/60)).padStart(2,'0');
+            const s = String(elapsed % 60).padStart(2,'0');
+            document.getElementById('current-timer').textContent = `\( {h}: \){m}:${s}`;
+        }
+
+        async function stopCurrentTimer() {
+            if (!timerStartTime) return;
+            
+            const elapsedHours = (Date.now() - timerStartTime) / (1000 * 60 * 60);
+            const today = new Date().toISOString().split('T')[0];
+
+            try {
+                await db.collection('timeEntries').add({
+                    userId: currentUser.uid,
+                    activity: currentTimerTask,
+                    date: today,
+                    hours: elapsedHours,
+                    notes: "Timer session",
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showToast(`Saved ${elapsedHours.toFixed(2)} hours`);
+                resetTimerUI();
+                loadDailyEntries();
+                loadHistory();
+                updateStats();
+            } catch(e) { console.error(e); }
+        }
+
+        function resetTimerUI() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerStartTime = null;
+            document.getElementById('current-session').classList.add('hidden');
+            const btn = document.getElementById('timer-btn');
+            btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+            btn.classList.remove('!bg-rose-600');
+        }
+
+        function switchTab(n) {
+            document.querySelectorAll('.tab-button').forEach((btn,i) => {
+                if (i === n) btn.classList.add('border-b-2','border-indigo-600','text-indigo-600');
+                else btn.classList.remove('border-b-2','border-indigo-600','text-indigo-600');
+            });
+            
+            for (let i = 0; i < 3; i++) {
+                const el = document.getElementById(`tab-content-${i}`);
+                if (el) el.classList.toggle('hidden', i !== n);
+            }
+            
+            if (n === 2) setTimeout(renderCharts, 100);
+        }
+
+        function renderCharts() {
+            // Weekly Chart
+            const ctx1 = document.getElementById('weekly-chart');
+            if (weeklyChartInstance) weeklyChartInstance.destroy();
+            weeklyChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Sat','Sun','Mon','Tue','Wed','Thu','Fri'],
+                    datasets: [{ label: 'Hours', data: [5.5,3,6.5,4,7,5.2,4.8], backgroundColor: '#6366f1', borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }}}
+            });
+
+            // Subject Chart
+            const ctx2 = document.getElementById('subject-chart');
+            if (subjectChartInstance) subjectChartInstance.destroy();
+            subjectChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Math','English','GK','Bangla','Science'],
+                    datasets: [{ data: [28, 22, 18, 15, 17], backgroundColor: ['#4f46e5','#22c55e','#eab308','#ec4899','#06b67f'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function loadAllData() {
+            setDefaultDates();
+            loadDailyEntries();
+            loadHistory();
+            updateStats();
+            switchTab(0);
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', e => {
+            if (e.key === "Enter" && document.getElementById('activity') === document.activeElement) {
+                addTimeEntry();
+            }
+        });
+
+        window.onload = () => {
+            setDefaultDates();
+        };
+    </script>
+</body>
+</html>
