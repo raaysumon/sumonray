@@ -436,20 +436,51 @@ mentalAbility.forEach(lec => topicsDataRaw.push({ cat: "মানসিক দ�
         subjectProgressContainer.innerHTML = html;
     }
     
-    function renderTopicsList() {
-        let html = '';
-        for (let topic of allTopics) {
-            const isCompleted = completedIds.includes(topic.id);
-            const statusClass = isCompleted ? 'bg-green-100 border-green-200' : 'bg-white border-gray-200';
-            const statusText = isCompleted ? '<span class="text-green-700 text-xs font-medium bg-green-200 px-2 py-0.5 rounded-full"><i class="fas fa-check-circle"></i> সম্পন্ন</span>' : '<span class="text-amber-600 text-xs font-medium bg-amber-100 px-2 py-0.5 rounded-full"><i class="fas fa-hourglass-half"></i> অপঠিত</span>';
-            html += `<div class="${statusClass} border rounded-xl p-3 flex flex-wrap justify-between items-center gap-2">
-                        <div class="flex-1"><div class="flex gap-2 flex-wrap"><span class="text-xs font-mono text-gray-400">#${topic.id}</span><span class="badge-cat">${escapeHtml(topic.cat)}</span></div>
-                        <p class="text-sm font-medium text-gray-800 mt-1">${escapeHtml(topic.name.length > 80 ? topic.name.substring(0,80)+'...' : topic.name)}</p></div>
-                        <div>${statusText}</div>
-                    </div>`;
-        }
-        topicsListContainer.innerHTML = html;
+  function renderTopicsList() {
+    let html = '';
+    for (let topic of allTopics) {
+        const isCompleted = completedIds.includes(topic.id);
+        const statusClass = isCompleted ? 'bg-green-100 border-green-200' : 'bg-white border-gray-200 cursor-pointer hover:shadow-md transition';
+        const clickHandler = !isCompleted ? `onclick="selectTopicFromList(${topic.id})"` : '';
+        const statusText = isCompleted ? '<span class="text-green-700 text-xs font-medium bg-green-200 px-2 py-0.5 rounded-full"><i class="fas fa-check-circle"></i> সম্পন্ন</span>' : '<span class="text-amber-600 text-xs font-medium bg-amber-100 px-2 py-0.5 rounded-full"><i class="fas fa-hourglass-half"></i> অপঠিত</span>';
+        
+        html += `<div class="${statusClass} border rounded-xl p-3 flex flex-wrap justify-between items-center gap-2" ${clickHandler}>
+                    <div class="flex-1">
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="text-xs font-mono text-gray-400">#${topic.id}</span>
+                            <span class="badge-cat">${escapeHtml(topic.cat)}</span>
+                        </div>
+                        <p class="text-sm font-medium text-gray-800 mt-1">${escapeHtml(topic.name.length > 80 ? topic.name.substring(0,80)+'...' : topic.name)}</p>
+                    </div>
+                    <div>${statusText}</div>
+                </div>`;
     }
+    topicsListContainer.innerHTML = html;
+}
+
+// নতুন ফাংশন: তালিকা থেকে টপিক সিলেক্ট করলে সেটি কারেন্ট হবে
+window.selectTopicFromList = function(topicId) {
+    const selectedTopic = allTopics.find(t => t.id === topicId);
+    if (!selectedTopic) return;
+    if (completedIds.includes(selectedTopic.id)) {
+        alert("এই টপিক আগেই সম্পন্ন হয়েছে!");
+        return;
+    }
+    // ফিল্টারের সাথে মেলে কিনা চেক
+    if (currentFilter !== "ALL" && selectedTopic.cat !== currentFilter) {
+        if (confirm(`"${selectedTopic.cat}" বিষয়টি বর্তমান ফিল্টারের বাইরে। ফিল্টার পরিবর্তন করবেন?`)) {
+            currentFilter = selectedTopic.cat;
+            subjectFilterSelect.value = currentFilter;
+        } else {
+            return;
+        }
+    }
+    currentTopic = selectedTopic;
+    shuffleUsed = 0;  // ম্যানুয়ালি সিলেক্ট করলে শাফল কাউন্ট রিসেট
+    fullRender();
+    // স্ক্রিনের উপরে স্ক্রল করুন
+    document.getElementById('currentTopicContainer').scrollIntoView({ behavior: 'smooth' });
+};
     
     function fullRender() {
         const total = allTopics.length;
