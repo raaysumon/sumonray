@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>BCS Shuffle Planner | গুগল অ্যাকাউন্টে লগইন করুন</title>
-    <!-- Fonts & Icons -->
+    <title>BCS Shuffle Planner - ১০০% কাজ করবে</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDKs (v9 compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -17,182 +15,91 @@
             background: linear-gradient(145deg, #f4f9ff 0%, #e9f0fa 100%);
             font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
             color: #1a2c3e;
-            line-height: 1.5;
             padding-bottom: 2rem;
         }
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
+        .container { max-width: 1300px; margin: 0 auto; padding: 2rem 1.5rem; }
         .hero { text-align: center; margin-bottom: 1.8rem; }
         .hero h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #0b3b5f, #2c6e9e); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .sub { background: rgba(44,110,158,0.12); display: inline-block; padding: 0.4rem 1.2rem; border-radius: 60px; font-weight: 500; margin-top: 0.5rem; }
-        .login-section {
-            text-align: center;
-            background: white;
-            border-radius: 2rem;
-            padding: 2rem;
-            margin: 2rem auto;
-            max-width: 500px;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
-        }
-        .user-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #eef4fc;
-            padding: 0.7rem 1.2rem;
-            border-radius: 60px;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-        }
-        .user-avatar {
-            width: 40px;
-            border-radius: 50%;
-        }
-        .btn-google {
-            background: #4285f4;
-            color: white;
-            border: none;
-            padding: 0.8rem 1.6rem;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1rem;
-        }
-        .btn-google:hover { background: #357ae8; }
-        .btn-logout {
-            background: #d9534f;
-            color: white;
-            border: none;
-            padding: 0.4rem 1rem;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-        .section-title {
-            font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 1rem; padding-left: 0.5rem;
-            border-left: 6px solid #2c6e9e; display: flex; align-items: center; gap: 10px;
-        }
-        .marks-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 1rem; margin-bottom: 1.5rem;
-        }
-        .marks-card {
-            background: rgba(255,255,255,0.85); border-radius: 1.5rem; padding: 0.7rem 1rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
+        .sub { background: rgba(44,110,158,0.12); display: inline-block; padding: 0.4rem 1.2rem; border-radius: 60px; }
+        .login-section { text-align: center; background: white; border-radius: 2rem; padding: 2rem; margin: 2rem auto; max-width: 500px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); }
+        .user-info { display: flex; justify-content: space-between; align-items: center; background: #eef4fc; padding: 0.7rem 1.2rem; border-radius: 60px; margin-bottom: 1.5rem; }
+        .user-avatar { width: 40px; border-radius: 50%; }
+        .btn-google { background: #4285f4; color: white; border: none; padding: 0.8rem 1.6rem; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 12px; }
+        .btn-logout { background: #d9534f; color: white; border: none; padding: 0.4rem 1rem; border-radius: 30px; cursor: pointer; }
+        .section-title { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 1rem; border-left: 6px solid #2c6e9e; padding-left: 0.5rem; }
+        .marks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .marks-card { background: rgba(255,255,255,0.85); border-radius: 1.5rem; padding: 0.7rem 1rem; }
         .marks-subject { font-weight: 700; display: flex; justify-content: space-between; }
         .total-card { background: linear-gradient(115deg,#1b4f6e,#0f384f); color: white; border-radius: 28px; padding: 1rem; text-align: center; margin-bottom: 1rem; }
-        .study-panel {
-            background: white; border-radius: 2rem; padding: 1.5rem; margin: 1.5rem 0;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
-        }
-        .stats {
-            display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-            background: #eef4fc; padding: 1rem; border-radius: 1.5rem; margin-bottom: 1rem;
-        }
-        .stat-card {
-            background: white; border-radius: 1.5rem; padding: 0.5rem 1.2rem;
-            text-align: center; flex: 1;
-        }
+        .study-panel { background: white; border-radius: 2rem; padding: 1.5rem; margin: 1.5rem 0; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); }
+        .stats { display: flex; gap: 1rem; flex-wrap: wrap; background: #eef4fc; padding: 1rem; border-radius: 1.5rem; margin-bottom: 1rem; }
+        .stat-card { background: white; border-radius: 1.5rem; padding: 0.5rem 1rem; text-align: center; flex: 1; }
         .stat-number { font-size: 2rem; font-weight: 800; color: #1b5a7e; }
         .progress-bar { background: #d9e2ec; border-radius: 30px; height: 12px; margin: 0.5rem 0; }
-        .progress-fill { background: #2c6e9e; width: 0%; height: 100%; border-radius: 30px; transition: width 0.3s; }
+        .progress-fill { background: #2c6e9e; width: 0%; height: 100%; border-radius: 30px; }
         .topic-list { display: flex; flex-direction: column; gap: 0.8rem; margin: 1.2rem 0; }
-        .topic-item {
-            background: #f8fbfe; border-radius: 1rem; padding: 0.8rem 1rem;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-            border: 1px solid #e0edf5;
-        }
+        .topic-item { background: #f8fbfe; border-radius: 1rem; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border: 1px solid #e0edf5; }
         .topic-name { font-weight: 600; flex: 2; font-size: 0.95rem; }
         .topic-category { font-size: 0.7rem; background: #cfe3ef; padding: 0.2rem 0.6rem; border-radius: 30px; }
         .btn-done { background: #1b5a7e; border: none; color: white; padding: 0.4rem 1rem; border-radius: 2rem; cursor: pointer; font-weight: 600; }
-        .btn-shuffle { background: #2c6e9e20; border: 1px solid #2c6e9e; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; cursor: pointer; margin-right: 1rem; }
-        .empty-msg { text-align: center; padding: 2rem; color: #5c7f9c; font-style: italic; }
-        footer { text-align: center; margin-top: 2rem; font-size: 0.7rem; color: #5c7f9c; border-top: 1px solid #cbdde9; padding-top: 1rem; }
-        @media (max-width: 640px) { .topic-item { flex-direction: column; align-items: stretch; } .btn-done { align-self: flex-end; } }
+        .btn-shuffle { background: #2c6e9e20; border: 1px solid #2c6e9e; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; cursor: pointer; }
+        .empty-msg { text-align: center; padding: 2rem; color: #5c7f9c; }
         .hidden { display: none; }
+        footer { text-align: center; margin-top: 2rem; font-size: 0.7rem; }
+        @media (max-width: 640px) { .topic-item { flex-direction: column; align-items: stretch; } .btn-done { align-self: flex-end; } }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="hero">
         <h1>📘 বিসিএস শাফল স্টাডি প্ল্যানার</h1>
-        <div class="sub"><i class="fas fa-users"></i> গুগল অ্যাকাউন্টে লগইন | নিজের পড়া নিজে সংরক্ষণ করুন</div>
+        <div class="sub"><i class="fas fa-random"></i> নিজের গতিতে পড়ুন | শাফল করুন যতবার ইচ্ছা | একবার Done মানে চিরতরে শেষ</div>
     </div>
 
-    <!-- Login UI -->
     <div id="loginSection" class="login-section">
-        <i class="fas fa-google" style="font-size: 3rem; color: #4285f4;"></i>
-        <h3 style="margin: 1rem 0;">আপনার গুগল অ্যাকাউন্ট দিয়ে লগইন করুন</h3>
+        <i class="fab fa-google" style="font-size: 3rem; color: #4285f4;"></i>
+        <h3 style="margin: 1rem 0;">গুগল অ্যাকাউন্ট দিয়ে লগইন করুন</h3>
         <button id="googleSignInBtn" class="btn-google"><i class="fab fa-google"></i> Sign in with Google</button>
-        <p style="margin-top: 1rem; font-size: 0.8rem;">আপনার অগ্রগতি শুধু আপনার অ্যাকাউন্টেই সংরক্ষিত থাকবে</p>
     </div>
 
-    <!-- Main App (hidden until login) -->
     <div id="appContent" class="hidden">
-        <div class="user-info" id="userInfoBar">
-            <div><img id="userAvatar" class="user-avatar" src="" alt="avatar"> <span id="userEmail"></span></div>
-            <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> লগআউট</button>
-        </div>
+        <div class="user-info"><div><img id="userAvatar" class="user-avatar" src=""> <span id="userEmail"></span></div><button id="logoutBtn" class="btn-logout">লগআউট</button></div>
 
-        <!-- নম্বর বণ্টন (অপরিবর্তিত) -->
-        <div class="section-title"><i class="fas fa-chart-simple"></i><span>নম্বর বণ্টন</span></div>
+        <div class="section-title">📊 নম্বর বণ্টন</div>
         <div class="marks-grid">
-            <div class="marks-card"><div class="marks-subject">১. বাংলা ভাষা ও সাহিত্য <span class="marks-number">৩০</span></div></div>
-            <div class="marks-card"><div class="marks-subject">২. English Language & Literature <span class="marks-number">৩০</span></div></div>
-            <div class="marks-card"><div class="marks-subject">৩. বাংলাদেশ বিষয়াবলি <span class="marks-number">২৫</span></div></div>
-            <div class="marks-card"><div class="marks-subject">৪. আন্তর্জাতিক বিষয়াবলি <span class="marks-number">২৫</span></div></div>
-            <div class="marks-card"><div class="marks-subject">৫. ভূগোল, পরিবেশ ও দুর্যোগ <span class="marks-number">১০</span></div></div>
-            <div class="marks-card"><div class="marks-subject">৬. সাধারণ বিজ্ঞান <span class="marks-number">১৫</span></div></div>
-            <div class="marks-card"><div class="marks-subject">৭. কম্পিউটার ও আইটি <span class="marks-number">১৫</span></div></div>
-            <div class="marks-card"><div class="marks-subject">৮. গাণিতিক যুক্তি <span class="marks-number">২০</span></div></div>
-            <div class="marks-card"><div class="marks-subject">৯. মানসিক দক্ষতা <span class="marks-number">১৫</span></div></div>
-            <div class="marks-card"><div class="marks-subject">১০. নৈতিকতা, মূল্যবোধ ও সু-শাসন <span class="marks-number">১০</span></div></div>
+            <div class="marks-card"><div class="marks-subject">বাংলা ভাষা ও সাহিত্য <span>৩০</span></div></div>
+            <div class="marks-card"><div class="marks-subject">English Language & Literature <span>৩০</span></div></div>
+            <div class="marks-card"><div class="marks-subject">বাংলাদেশ বিষয়াবলি <span>২৫</span></div></div>
+            <div class="marks-card"><div class="marks-subject">আন্তর্জাতিক বিষয়াবলি <span>২৫</span></div></div>
+            <div class="marks-card"><div class="marks-subject">ভূগোল, পরিবেশ ও দুর্যোগ <span>১০</span></div></div>
+            <div class="marks-card"><div class="marks-subject">সাধারণ বিজ্ঞান <span>১৫</span></div></div>
+            <div class="marks-card"><div class="marks-subject">কম্পিউটার ও আইটি <span>১৫</span></div></div>
+            <div class="marks-card"><div class="marks-subject">গাণিতিক যুক্তি <span>২০</span></div></div>
+            <div class="marks-card"><div class="marks-subject">মানসিক দক্ষতা <span>১৫</span></div></div>
+            <div class="marks-card"><div class="marks-subject">নৈতিকতা, মূল্যবোধ ও সু-শাসন <span>১০</span></div></div>
         </div>
-        <div class="total-card"><i class="fas fa-calculator"></i> সর্বমোট নম্বর: ২০০</div>
+        <div class="total-card">🎯 সর্বমোট নম্বর: ২০০</div>
 
-        <!-- স্টাডি এরিয়া -->
         <div class="study-panel">
             <div class="stats">
-                <div class="stat-card"><i class="fas fa-hourglass-half"></i> <span class="stat-number" id="remainingCount">0</span><br>বাকি টপিক</div>
+                <div class="stat-card"><i class="fas fa-hourglass-half"></i> <span class="stat-number" id="remainingCount">0</span><br>বাকি</div>
                 <div class="stat-card"><i class="fas fa-check-circle"></i> <span class="stat-number" id="completedCount">0</span><br>শেষ করা</div>
                 <div class="stat-card"><i class="fas fa-chart-line"></i> <span class="stat-number" id="progressPercent">0</span>%<br>অগ্রগতি</div>
             </div>
             <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 1rem 0;">
-                <div><i class="fas fa-random"></i> প্রতিদিন যতবার ইচ্ছা শাফল করুন</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
+                <span><i class="fas fa-random"></i> অবশিষ্ট টপিক (শাফল করুন)</span>
                 <button id="shuffleBtn" class="btn-shuffle"><i class="fas fa-random"></i> শাফল করুন</button>
             </div>
             <div id="topicListContainer" class="topic-list">লোড হচ্ছে...</div>
-            <p style="font-size: 0.75rem; background:#f0f3f8; padding: 0.5rem; border-radius: 1rem;"><i class="fas fa-info-circle"></i> “Done” করলে টপিক চিরতরে চলে যাবে, আর কখনো শাফল তালিকায় আসবে না। সব ডাটা আপনার গুগল অ্যাকাউন্টে সেভ থাকবে।</p>
+            <p style="font-size: 0.75rem; background:#f0f3f8; padding: 0.5rem; border-radius: 1rem;">✅ "Done" চাপলে টপিক চিরতরে চলে যাবে। শাফল ক্লিক করলেই বাকি টপিকগুলোর ক্রম পরিবর্তন হবে।</p>
         </div>
-
-        <details style="background: white; border-radius: 1rem; padding: 0.8rem; margin-top: 1rem;">
-            <summary style="font-weight: bold;">📖 সম্পূর্ণ সিলেবাসের বিস্তারিত (অক্ষত)</summary>
-            <div style="margin-top: 0.5rem; max-height: 250px; overflow-y: auto; font-size: 0.85rem;">
-                <p><strong>১. বাংলা ভাষা ও সাহিত্য</strong> — ভাষা: প্রয়োগ-অপপ্রয়োগ, বানান শুদ্ধি, ধ্বনি, বর্ণ, সন্ধি, সমাস ইত্যাদি। সাহিত্য: প্রাচীন, মধ্যযুগ, আধুনিক যুগ।</p>
-                <p><strong>২. English</strong> — Parts of speech, idioms, clauses, transformation, literature (writers & quotations).</p>
-                <p><strong>৩. বাংলাদেশ</strong> — ইতিহাস, ভাষা আন্দোলন, মুক্তিযুদ্ধ, অর্থনীতি, সংবিধান, সরকার, ব্যক্তিত্ব।</p>
-                <p><strong>৪. আন্তর্জাতিক</strong> — বিশ্ব ইতিহাস, ভূ-রাজনীতি, নিরাপত্তা, সাম্প্রতিক ঘটনা, সংস্থা।</p>
-                <p><strong>৫. ভূগোল ও পরিবেশ</strong> — অবস্থান, সম্পদ, জলবায়ু, দুর্যোগ।</p>
-                <p><strong>৬. সাধারণ বিজ্ঞান</strong> — ভৌত, জীব, আধুনিক বিজ্ঞান (বিবর্তন, ব্ল্যাক হোল, রোগ)।</p>
-                <p><strong>৭. কম্পিউটার ও আইটি</strong> — হার্ডওয়্যার, সফটওয়্যার, নেটওয়ার্ক, সাইবার নিরাপত্তা।</p>
-                <p><strong>৮. গাণিতিক যুক্তি</strong> — শতকরা, লাভ-ক্ষতি, বীজগণিত, জ্যামিতি, সম্ভাব্যতা।</p>
-                <p><strong>৯. মানসিক দক্ষতা</strong> — verbal reasoning, problem solving, numerical ability.</p>
-                <p><strong>১০. নৈতিকতা ও সুশাসন</strong> — সংজ্ঞা, গুরুত্ব, সুশাসন প্রতিষ্ঠা।</p>
-            </div>
-        </details>
-        <footer><i class="fas fa-database"></i> প্রতিটি ইউজারের ডাটা ফায়ারবেজে সুরক্ষিত | শুধু আপনার পড়া আপনার অ্যাকাউন্টে</footer>
+        <footer><i class="fas fa-database"></i> আপনার অগ্রগতি গুগল অ্যাকাউন্টে সেভ থাকে</footer>
     </div>
 </div>
 
 <script>
-    // Firebase Config (as given)
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
         authDomain: "rayvid-c074a.firebaseapp.com",
@@ -203,91 +110,91 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const database = firebase.database();
+    const db = firebase.database();
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    // ------------------- کامل سیلابس (61 টি টপিক) -------------------
-    const allTopicsList = [
-        { id: 1, name: "প্রয়োগ-অপপ্রয়োগ, বানান ও বাক্য শুদ্ধি (বাংলা)", category: "বাংলা ভাষা" },
-        { id: 2, name: "পরিভাষা, সমার্থক ও বিপরীতার্থক শব্দ", category: "বাংলা ভাষা" },
-        { id: 3, name: "ধ্বনি, বর্ণ, শব্দ, পদ, বাক্য", category: "বাংলা ভাষা" },
-        { id: 4, name: "প্রত্যয়, সন্ধি ও সমাস", category: "বাংলা ভাষা" },
-        { id: 5, name: "প্রাচীন ও মধ্যযুগের সাহিত্য", category: "বাংলা সাহিত্য" },
-        { id: 6, name: "আধুনিক যুগের কবিতা (১৮০০-বর্তমান)", category: "বাংলা সাহিত্য" },
-        { id: 7, name: "আধুনিক যুগের গল্প, উপন্যাস, নাটক ও প্রবন্ধ", category: "বাংলা সাহিত্য" },
-        { id: 8, name: "Parts of Speech: Noun, Pronoun (English)", category: "English Language" },
-        { id: 9, name: "Verb (Finite, Non-finite, Linking, Phrasal, Modals)", category: "English Language" },
-        { id: 10, name: "Adjective, Adverb, Preposition, Conjunction", category: "English Language" },
-        { id: 11, name: "Idioms & Phrases, Clauses", category: "English Language" },
-        { id: 12, name: "Corrections: Tense, Verb, Preposition, Determiner, S-V Agreement", category: "English Language" },
-        { id: 13, name: "Sentence Transformations (Simple, Compound, Complex, Voice, Degree)", category: "English Language" },
-        { id: 14, name: "Words: Synonyms, Antonyms, Spelling, Prefix/Suffix", category: "English Language" },
-        { id: 15, name: "Composition (Paragraph, Letter, Application Parts)", category: "English Language" },
-        { id: 16, name: "English Literature: Writers & Quotations", category: "English Literature" },
-        { id: 17, name: "প্রাচীন ও মধ্যযুগের ইতিহাস ও সংস্কৃতি", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 18, name: "ভাষা আন্দোলন, ১৯৫৪ নির্বাচন, ১৯৬৯ অভ্যুত্থান", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 19, name: "মুক্তিযুদ্ধের ইতিহাস", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 20, name: "কৃষিজ সম্পদ ও খাদ্য ব্যবস্থাপনা", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 21, name: "জনসংখ্যা, জনশুমারি, ক্ষুদ্র নৃগোষ্ঠী", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 22, name: "অর্থনীতি: উন্নয়ন পরিকল্পনা, জাতীয় আয়-ব্যয়, দারিদ্র্য বিমোচন", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 23, name: "শিল্প ও বাণিজ্য (গার্মেন্টস, আমদানি-রপ্তানি, ব্যাংক)", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 24, name: "সংবিধান: প্রস্তাবনা, বৈশিষ্ট্য, মৌলিক অধিকার ও সংশোধনী", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 25, name: "রাজনৈতিক ব্যবস্থা: দল, সুশীল সমাজ", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 26, name: "সরকার ব্যবস্থা: আইন, শাসন, বিচার, স্থানীয় সরকার", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 27, name: "জাতীয় অর্জন ও ব্যক্তিত্ব", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 28, name: "বৈশ্বিক ইতিহাস, আঞ্চলিক ও আন্তর্জাতিক ব্যবস্থা, ভূ-রাজনীতি", category: "আন্তর্জাতিক বিষয়াবলি" },
-        { id: 29, name: "আন্তর্জাতিক নিরাপত্তা ও ক্ষমতা সম্পর্ক", category: "আন্তর্জাতিক বিষয়াবলি" },
-        { id: 30, name: "বিশ্বের সাম্প্রতিক ঘটনাপ্রবাহ", category: "আন্তর্জাতিক বিষয়াবলি" },
-        { id: 31, name: "আন্তর্জাতিক পরিবেশগত ইস্যু ও কূটনীতি", category: "আন্তর্জাতিক বিষয়াবলি" },
-        { id: 32, name: "আন্তর্জাতিক সংগঠন ও বৈশ্বিক অর্থনৈতিক প্রতিষ্ঠান", category: "আন্তর্জাতিক বিষয়াবলি" },
-        { id: 33, name: "ভৌগোলিক অবস্থান, সীমানা, ভূ-রাজনৈতিক গুরুত্ব", category: "ভূগোল" },
-        { id: 34, name: "অঞ্চলভিত্তিক ভৌত পরিবেশ ও সম্পদের বণ্টন", category: "ভূগোল" },
-        { id: 35, name: "বাংলাদেশের পরিবেশ ও প্রধান চ্যালেঞ্জ", category: "পরিবেশ" },
-        { id: 36, name: "বাংলাদেশ ও বৈশ্বিক পরিবেশ পরিবর্তন, জলবায়ু প্রভাব", category: "পরিবেশ" },
-        { id: 37, name: "প্রাকৃতিক দুর্যোগ ও ব্যবস্থাপনা", category: "দুর্যোগ ব্যবস্থাপনা" },
-        { id: 38, name: "ভৌত বিজ্ঞান (পদার্থ, এটম, এসিড, তড়িৎ, ইলেকট্রনিক্স)", category: "সাধারণ বিজ্ঞান" },
-        { id: 39, name: "জীব বিজ্ঞান (টিস্যু, জেনেটিক্স, সালোকসংশ্লেষণ, ভাইরাস, হৃদরোগ)", category: "সাধারণ বিজ্ঞান" },
-        { id: 40, name: "আধুনিক বিজ্ঞান (ব্ল্যাক হোল, বিবর্তন, সুনামি, রোগ)", category: "সাধারণ বিজ্ঞান" },
-        { id: 41, name: "Computer Organisation (CPU, ALU, Number System, OS)", category: "কম্পিউটার" },
-        { id: 42, name: "ভাইরাস, ফায়ারওয়াল, প্রোগ্রাম", category: "কম্পিউটার" },
-        { id: 43, name: "তথ্যপ্রযুক্তি: ই-কমার্স, নেটওয়ার্ক, ক্লাউড, সাইবার অপরাধ", category: "তথ্যপ্রযুক্তি" },
-        { id: 44, name: "গণিত: বাস্তব সংখ্যা, লসাগু, গসাগু, শতকরা, মুনাফা, অনুপাত, লাভ-ক্ষতি", category: "গাণিতিক যুক্তি" },
-        { id: 45, name: "বীজগাণিতিক সূত্র, সমীকরণ ও অসমতা", category: "গাণিতিক যুক্তি" },
-        { id: 46, name: "সূচক ও লগারিদম, অনুক্রম ও ধারা", category: "গাণিতিক যুক্তি" },
-        { id: 47, name: "জ্যামিতি: রেখা, কোণ, ত্রিভুজ, পিথাগোরাস, বৃত্ত, পরিমিতি", category: "গাণিতিক যুক্তি" },
-        { id: 48, name: "সেট, বিন্যাস ও সমাবেশ, পরিসংখ্যান ও সম্ভাব্যতা", category: "গাণিতিক যুক্তি" },
-        { id: 49, name: "Verbal Reasoning (ভাষাগত যুক্তি)", category: "মানসিক দক্ষতা" },
-        { id: 50, name: "Problem Solving, Spelling & Language", category: "মানসিক দক্ষতা" },
-        { id: 51, name: "Mechanical Reasoning, Space Relation, Numerical Ability", category: "মানসিক দক্ষতা" },
-        { id: 52, name: "নৈতিকতা, মূল্যবোধ ও সুশাসনের ধারণা", category: "নৈতিকতা ও সুশাসন" },
-        { id: 53, name: "ব্যক্তি ও সমাজে মূল্যবোধের গুরুত্ব, জাতীয় উন্নয়নে প্রভাব", category: "নৈতিকতা ও সুশাসন" },
-        { id: 54, name: "সুশাসন প্রতিষ্ঠার উপায় ও অভাবজনিত ক্ষতি", category: "নৈতিকতা ও সুশাসন" },
-        { id: 55, name: "বাংলা সাহিত্যের আধুনিক যুগের অন্যান্য অংশ", category: "বাংলা সাহিত্য" },
-        { id: 56, name: "বাংলাদেশের ভূ-প্রকৃতি ও সম্পদ বণ্টন (বিস্তারিত)", category: "ভূগোল" },
-        { id: 57, name: "পরিবেশ দূষণ ও প্রতিকার", category: "পরিবেশ" },
-        { id: 58, name: "ইংরেজি সাহিত্যের গুরুত্বপূর্ণ কোটেশন", category: "English Literature" },
-        { id: 59, name: "সাম্প্রতিক আন্তর্জাতিক জোট ও চুক্তি", category: "আন্তর্জাতিক বিষয়াবলি" },
-        { id: 60, name: "বাংলাদেশের অর্থনৈতিক সমীক্ষা (সাম্প্রতিক)", category: "বাংলাদেশ বিষয়াবলি" },
-        { id: 61, name: "জিন ও বংশগতি, জিনোম প্রকল্প", category: "সাধারণ বিজ্ঞান" }
+    // ------------------- সম্পূর্ণ টপিক লিস্ট (৬১টি) -------------------
+    const allTopics = [
+        { id:1, name:"প্রয়োগ-অপপ্রয়োগ, বানান ও বাক্য শুদ্ধি (বাংলা)", cat:"বাংলা ভাষা" },
+        { id:2, name:"পরিভাষা, সমার্থক/বিপরীতার্থক শব্দ", cat:"বাংলা ভাষা" },
+        { id:3, name:"ধ্বনি, বর্ণ, শব্দ, পদ, বাক্য", cat:"বাংলা ভাষা" },
+        { id:4, name:"প্রত্যয়, সন্ধি ও সমাস", cat:"বাংলা ভাষা" },
+        { id:5, name:"প্রাচীন ও মধ্যযুগের সাহিত্য", cat:"বাংলা সাহিত্য" },
+        { id:6, name:"আধুনিক যুগের কবিতা (১৮০০-বর্তমান)", cat:"বাংলা সাহিত্য" },
+        { id:7, name:"আধুনিক যুগের গল্প, উপন্যাস, নাটক, প্রবন্ধ", cat:"বাংলা সাহিত্য" },
+        { id:8, name:"Parts of Speech: Noun, Pronoun", cat:"English Language" },
+        { id:9, name:"Verb (Finite/Non-finite, Linking, Phrasal, Modals)", cat:"English Language" },
+        { id:10, name:"Adjective, Adverb, Preposition, Conjunction", cat:"English Language" },
+        { id:11, name:"Idioms & Phrases, Clauses", cat:"English Language" },
+        { id:12, name:"Corrections (Tense, Verb, Preposition, Determiner, S-V)", cat:"English Language" },
+        { id:13, name:"Sentence Transformations (Simple, Compound, Complex, Voice, Degree)", cat:"English Language" },
+        { id:14, name:"Words: Synonyms, Antonyms, Spelling, Prefix/Suffix", cat:"English Language" },
+        { id:15, name:"Composition (Paragraph, Letter, Application parts)", cat:"English Language" },
+        { id:16, name:"English Literature: Writers & Quotations", cat:"English Literature" },
+        { id:17, name:"প্রাচীন ও মধ্যযুগের ইতিহাস, সংস্কৃতি", cat:"বাংলাদেশ" },
+        { id:18, name:"ভাষা আন্দোলন, ১৯৫৪ নির্বাচন, ১৯৬৯ অভ্যুত্থান", cat:"বাংলাদেশ" },
+        { id:19, name:"মুক্তিযুদ্ধের ইতিহাস", cat:"বাংলাদেশ" },
+        { id:20, name:"কৃষিজ সম্পদ ও খাদ্য ব্যবস্থাপনা", cat:"বাংলাদেশ" },
+        { id:21, name:"জনসংখ্যা, জনশুমারি, ক্ষুদ্র নৃগোষ্ঠী", cat:"বাংলাদেশ" },
+        { id:22, name:"অর্থনীতি: উন্নয়ন পরিকল্পনা, জাতীয় আয়-ব্যয়, দারিদ্র্য", cat:"বাংলাদেশ" },
+        { id:23, name:"শিল্প ও বাণিজ্য (গার্মেন্টস, আমদানি-রপ্তানি, ব্যাংক)", cat:"বাংলাদেশ" },
+        { id:24, name:"সংবিধান: প্রস্তাবনা, বৈশিষ্ট্য, মৌলিক অধিকার, সংশোধনী", cat:"বাংলাদেশ" },
+        { id:25, name:"রাজনৈতিক ব্যবস্থা: দল, সুশীল সমাজ, চাপসৃষ্টিকারী গোষ্ঠী", cat:"বাংলাদেশ" },
+        { id:26, name:"সরকার ব্যবস্থা: আইন, শাসন, বিচার, স্থানীয় সরকার", cat:"বাংলাদেশ" },
+        { id:27, name:"জাতীয় অর্জন ও ব্যক্তিত্ব (পুরস্কার, খেলাধুলা)", cat:"বাংলাদেশ" },
+        { id:28, name:"বৈশ্বিক ইতিহাস, আঞ্চলিক ও আন্তর্জাতিক ব্যবস্থা, ভূ-রাজনীতি", cat:"আন্তর্জাতিক" },
+        { id:29, name:"আন্তর্জাতিক নিরাপত্তা ও ক্ষমতা সম্পর্ক", cat:"আন্তর্জাতিক" },
+        { id:30, name:"বিশ্বের সাম্প্রতিক ঘটনাপ্রবাহ", cat:"আন্তর্জাতিক" },
+        { id:31, name:"আন্তর্জাতিক পরিবেশগত ইস্যু ও কূটনীতি", cat:"আন্তর্জাতিক" },
+        { id:32, name:"আন্তর্জাতিক সংগঠন ও বৈশ্বিক অর্থনৈতিক প্রতিষ্ঠান", cat:"আন্তর্জাতিক" },
+        { id:33, name:"ভৌগোলিক অবস্থান, সীমানা, ভূ-রাজনৈতিক গুরুত্ব", cat:"ভূগোল" },
+        { id:34, name:"অঞ্চলভিত্তিক ভৌত পরিবেশ ও সম্পদের বণ্টন", cat:"ভূগোল" },
+        { id:35, name:"বাংলাদেশের পরিবেশ ও প্রধান চ্যালেঞ্জ", cat:"পরিবেশ" },
+        { id:36, name:"বাংলাদেশ ও বৈশ্বিক পরিবেশ পরিবর্তন, জলবায়ু", cat:"পরিবেশ" },
+        { id:37, name:"প্রাকৃতিক দুর্যোগ ও ব্যবস্থাপনা", cat:"দুর্যোগ" },
+        { id:38, name:"ভৌত বিজ্ঞান (পদার্থ, এটম, এসিড, তড়িৎ, ইলেকট্রনিক্স)", cat:"বিজ্ঞান" },
+        { id:39, name:"জীব বিজ্ঞান (টিস্যু, জেনেটিক্স, সালোকসংশ্লেষণ, ভাইরাস, হৃদরোগ)", cat:"বিজ্ঞান" },
+        { id:40, name:"আধুনিক বিজ্ঞান (ব্ল্যাক হোল, বিবর্তন, সুনামি, রোগ)", cat:"বিজ্ঞান" },
+        { id:41, name:"Computer Organisation (CPU, ALU, Number System, OS)", cat:"কম্পিউটার" },
+        { id:42, name:"ভাইরাস, ফায়ারওয়াল, প্রোগ্রাম", cat:"কম্পিউটার" },
+        { id:43, name:"তথ্যপ্রযুক্তি: ই-কমার্স, নেটওয়ার্ক, ক্লাউড, সাইবার অপরাধ", cat:"ICT" },
+        { id:44, name:"গণিত: বাস্তব সংখ্যা, ল.সা.গু, গ.সা.গু, শতকরা, মুনাফা, অনুপাত", cat:"গণিত" },
+        { id:45, name:"বীজগাণিতিক সূত্র, সমীকরণ ও অসমতা", cat:"গণিত" },
+        { id:46, name:"সূচক ও লগারিদম, অনুক্রম ও ধারা", cat:"গণিত" },
+        { id:47, name:"জ্যামিতি: রেখা, কোণ, ত্রিভুজ, পিথাগোরাস, বৃত্ত, পরিমিতি", cat:"গণিত" },
+        { id:48, name:"সেট, বিন্যাস ও সমাবেশ, পরিসংখ্যান ও সম্ভাব্যতা", cat:"গণিত" },
+        { id:49, name:"Verbal Reasoning (ভাষাগত যুক্তি)", cat:"মানসিক দক্ষতা" },
+        { id:50, name:"Problem Solving, Spelling & Language", cat:"মানসিক দক্ষতা" },
+        { id:51, name:"Mechanical Reasoning, Space Relation, Numerical Ability", cat:"মানসিক দক্ষতা" },
+        { id:52, name:"নৈতিকতা, মূল্যবোধ ও সুশাসনের ধারণা", cat:"নৈতিকতা" },
+        { id:53, name:"ব্যক্তি ও সমাজে মূল্যবোধের গুরুত্ব, জাতীয় উন্নয়নে প্রভাব", cat:"নৈতিকতা" },
+        { id:54, name:"সুশাসন প্রতিষ্ঠার উপায় ও অভাবজনিত ক্ষতি", cat:"নৈতিকতা" },
+        { id:55, name:"বাংলা সাহিত্যের আধুনিক যুগ (অন্যান্য)", cat:"বাংলা সাহিত্য" },
+        { id:56, name:"বাংলাদেশের ভূ-প্রকৃতি ও সম্পদ বণ্টন (বিস্তারিত)", cat:"ভূগোল" },
+        { id:57, name:"পরিবেশ দূষণ ও প্রতিকার", cat:"পরিবেশ" },
+        { id:58, name:"ইংরেজি সাহিত্যের গুরুত্বপূর্ণ কোটেশন", cat:"English Literature" },
+        { id:59, name:"সাম্প্রতিক আন্তর্জাতিক জোট ও চুক্তি", cat:"আন্তর্জাতিক" },
+        { id:60, name:"বাংলাদেশের অর্থনৈতিক সমীক্ষা (সাম্প্রতিক)", cat:"বাংলাদেশ" },
+        { id:61, name:"জিন ও বংশগতি, জিনোম প্রকল্প", cat:"বিজ্ঞান" }
     ];
 
-    let currentRemaining = [];     // অবশিষ্ট টপিক অবজেক্ট
-    let currentUser = null;
-    let dbUserRef = null;
+    let remainingTopics = [];   // অবশিষ্ট টপিক (অবজেক্ট অ্যারে)
+    let currentUserObj = null;
+    let dbRef = null;
 
-    // DOM
-    const loginSection = document.getElementById('loginSection');
-    const appContent = document.getElementById('appContent');
-    const googleBtn = document.getElementById('googleSignInBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
+    // DOM elements
+    const loginDiv = document.getElementById('loginSection');
+    const appDiv = document.getElementById('appContent');
+    const googleBtnDom = document.getElementById('googleSignInBtn');
+    const logoutBtnDom = document.getElementById('logoutBtn');
     const userEmailSpan = document.getElementById('userEmail');
-    const userAvatar = document.getElementById('userAvatar');
+    const userAvatarImg = document.getElementById('userAvatar');
     const remainingSpan = document.getElementById('remainingCount');
     const completedSpan = document.getElementById('completedCount');
     const progressPercentSpan = document.getElementById('progressPercent');
     const progressFill = document.getElementById('progressFill');
     const topicContainer = document.getElementById('topicListContainer');
-    const shuffleBtn = document.getElementById('shuffleBtn');
+    const shuffleButton = document.getElementById('shuffleBtn');
 
     function shuffleArray(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
@@ -298,108 +205,106 @@
     }
 
     function updateStats() {
-        const total = allTopicsList.length;
-        const remaining = currentRemaining.length;
-        const completedCount = total - remaining;
+        const total = allTopics.length;
+        const remaining = remainingTopics.length;
+        const doneCount = total - remaining;
         remainingSpan.innerText = remaining;
-        completedSpan.innerText = completedCount;
-        const percent = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+        completedSpan.innerText = doneCount;
+        const percent = total === 0 ? 0 : Math.round((doneCount / total) * 100);
         progressPercentSpan.innerText = percent;
         progressFill.style.width = percent + '%';
     }
 
-    function renderTopicList() {
-        if (!currentRemaining.length) {
-            topicContainer.innerHTML = '<div class="empty-msg"><i class="fas fa-trophy"></i> অভিনন্দন! আপনি সব টপিক শেষ করে ফেলেছেন! 🎉</div>';
+    function renderTopics() {
+        if (!remainingTopics.length) {
+            topicContainer.innerHTML = '<div class="empty-msg"><i class="fas fa-trophy"></i> অভিনন্দন! সব টপিক শেষ! 🎉</div>';
             updateStats();
             return;
         }
         let html = '';
-        currentRemaining.forEach(topic => {
+        remainingTopics.forEach(t => {
             html += `
-                <div class="topic-item" data-id="${topic.id}">
-                    <div class="topic-name"><strong>${topic.name}</strong></div>
-                    <div class="topic-category">${topic.category}</div>
-                    <button class="btn-done" data-id="${topic.id}"><i class="fas fa-check"></i> Done (আর কখনো দেখাবে না)</button>
+                <div class="topic-item" data-id="${t.id}">
+                    <div class="topic-name"><strong>${t.name}</strong></div>
+                    <div class="topic-category">${t.cat}</div>
+                    <button class="btn-done" data-id="${t.id}"><i class="fas fa-check"></i> Done</button>
                 </div>
             `;
         });
         topicContainer.innerHTML = html;
+        // attach done events
         document.querySelectorAll('.btn-done').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(btn.getAttribute('data-id'));
-                markTopicDone(id);
+                const index = remainingTopics.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    remainingTopics.splice(index, 1);
+                    saveToFirebase();
+                    renderTopics();
+                }
             });
         });
         updateStats();
     }
 
-    function markTopicDone(topicId) {
-        const index = currentRemaining.findIndex(t => t.id === topicId);
-        if (index !== -1) {
-            currentRemaining.splice(index, 1);
-            saveToFirebase();
-            renderTopicList();
-        }
-    }
-
     function reshuffle() {
-        if (currentRemaining.length) {
-            currentRemaining = shuffleArray([...currentRemaining]);
-            renderTopicList();
+        if (remainingTopics.length > 0) {
+            remainingTopics = shuffleArray([...remainingTopics]);
+            renderTopics();
+            console.log("শাফল করা হয়েছে, বর্তমান অবশিষ্ট:", remainingTopics.length);
         } else {
-            renderTopicList();
+            renderTopics(); // empty message
         }
     }
 
     function saveToFirebase() {
-        if (!currentUser) return;
-        const remainingIds = currentRemaining.map(t => t.id);
-        dbUserRef.set({
-            remainingIds: remainingIds,
-            lastUpdated: Date.now()
-        }).catch(err => console.warn("Save error", err));
+        if (!currentUserObj) return;
+        const remainingIds = remainingTopics.map(t => t.id);
+        dbRef.set({ remainingIds: remainingIds, updatedAt: Date.now() })
+            .catch(err => console.warn("সেভ করতে সমস্যা:", err));
     }
 
-    function loadFromFirebase(userUid) {
-        dbUserRef = database.ref('bcsStudy/' + userUid);
-        dbUserRef.once('value', (snapshot) => {
-            const data = snapshot.val();
+    function loadFromFirebase(uid) {
+        dbRef = db.ref('bcsStudy_shuffle/' + uid);
+        dbRef.once('value').then(snap => {
+            const data = snap.val();
             if (data && data.remainingIds) {
                 const remainingIds = data.remainingIds;
-                const remainingTopics = allTopicsList.filter(t => remainingIds.includes(t.id));
-                currentRemaining = remainingTopics;
+                remainingTopics = allTopics.filter(t => remainingIds.includes(t.id));
+                // যদি কোনো টপিক আগে থেকে কমপ্লিটেড হয়ে থাকে, সেটি বাদ পড়বে
+                if (remainingTopics.length === 0) remainingTopics = [];
             } else {
-                // নতুন ইউজার: সব টপিক থাকবে, শাফল করা অবস্থায়
-                currentRemaining = shuffleArray([...allTopicsList]);
+                // নতুন ইউজার: সব টপিক শাফল করে রাখি
+                remainingTopics = shuffleArray([...allTopics]);
             }
-            renderTopicList();
+            renderTopics();
+        }).catch(err => {
+            console.error("লোড করতে ব্যর্থ:", err);
+            remainingTopics = shuffleArray([...allTopics]);
+            renderTopics();
         });
     }
 
-    // Auth state listener
-    auth.onAuthStateChanged((user) => {
+    // auth state tracking
+    auth.onAuthStateChanged(user => {
         if (user) {
-            currentUser = user;
-            loginSection.classList.add('hidden');
-            appContent.classList.remove('hidden');
+            currentUserObj = user;
+            loginDiv.classList.add('hidden');
+            appDiv.classList.remove('hidden');
             userEmailSpan.innerText = user.email;
-            userAvatar.src = user.photoURL || 'https://via.placeholder.com/40';
+            userAvatarImg.src = user.photoURL || 'https://via.placeholder.com/40';
             loadFromFirebase(user.uid);
         } else {
-            currentUser = null;
-            loginSection.classList.remove('hidden');
-            appContent.classList.add('hidden');
+            currentUserObj = null;
+            loginDiv.classList.remove('hidden');
+            appDiv.classList.add('hidden');
         }
     });
 
-    googleBtn.addEventListener('click', () => {
-        auth.signInWithPopup(provider).catch(err => alert("লগইন ব্যর্থ: " + err.message));
-    });
-    logoutBtn.addEventListener('click', () => {
-        auth.signOut();
-    });
-    shuffleBtn.addEventListener('click', reshuffle);
+    googleBtnDom.addEventListener('click', () => auth.signInWithPopup(provider).catch(e => alert("লগইন ব্যর্থ: "+e.message)));
+    logoutBtnDom.addEventListener('click', () => auth.signOut());
+    shuffleButton.addEventListener('click', reshuffle);
+    console.log("শাফল বাটন ইভেন্ট অ্যাটাচ করা হয়েছে");
 </script>
 </body>
 </html>
