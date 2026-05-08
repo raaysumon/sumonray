@@ -167,7 +167,24 @@
     banglaGrammar.forEach(lec => topicsDataRaw.push({ cat: "বাংলা ভাষা (ব্যাকরণ)", name: lec }));
     
     // 3. ইংরেজি গ্রামার ০১-১৪
-    for(let i=1;i<=14;i++) topicsDataRaw.push({ cat: "ইংরেজি গ্রামার", name: `লেকচার-${String(i).padStart(2,'0')}: ইংরেজি গ্রামার (Noun, Verb, Tense, Voice, Narration, Transformation সহ প্র্যাকটিক্যাল) - বিস্তারিত সিলেবাস অনুযায়ী` });
+    const englishGrammar = [
+        "লেকচার-০১: Noun, Article Homework: Vocabulary- A-F; Written: Practicing Interchange of Parts of Speech (Part-01).",
+        "লেকচার-০২: Number, Gender, Group Verbs. Homework: Vocabulary G-M; Written: Sentence Correction, Making Sentences. (Part-01)",
+        "লেকচার-০৩: Pronoun, Determiner. Homework: Vocabulary N-S; Written: Transformation and Correction.",
+        "লেকচার-০৪: Adjective, Degree. Homework: Vocabulary T-Z; Written: Practicing Interchange of Parts of Speech. (Part-02)",
+        "লেকচার-০৫: Verb & Its Classification, Gerund, Participle. Homework: App. Preposition A-F; Written: Sentence Correction, Making Sentences. (Part-02)",
+        "লেকচার-০৬: Right form of Verbs, Subject-Verb Agreement, Tense. Homework: App. Preposition G-M; Written: Sentence Correction, Making Sentences. (Part-03)",
+        "লেকচার-০৭: Adverb, Modifier. Homework: App. Preposition N-S; Written: Error Correction, Transformation.",
+        "লেকচার-০৮: Conjunction & Linkers. Homework: App. Preposition T-Z; Written: relevance in Translation.",
+        "লেকচার-০৯: Preposition. Written: Combining Sentences.", 
+        "লেকচার-১০: Phrases, Clauses, Analogy. Homework: Idioms List A-F; Written: Combining Sentences and eliminating errors.",
+        "লেকচার-১১: Voice & Narration. Homework: Idioms List G-M; Written: Relevance in translation, report writing and summary writing.",
+        "লেকচার-১২: Transformation, Spelling List. Homework: Idioms List N-S; Written: Making Sentences.",
+        "লেকচার-১৩: Same word but different parts of speech, Suffix & Prefix, Foreign words. Homework: Idioms List T-Z; Written: Interchange of Parts of Speech. (Part-03)",
+        "লেকচার-১৪: Sentence correction, one word substitution, names of parts of paragraphs/ letter/ application.; Written: Eliminating errors, Meanings."
+    ];
+    englishGrammar.forEach(lec => topicsDataRaw.push({ cat: "ইংরেজি গ্রামার", name: lec }));
+    
     // 4. ইংরেজি সাহিত্য ০১-০৬
     for(let i=1;i<=6;i++) topicsDataRaw.push({ cat: "ইংরেজি সাহিত্য", name: `লেকচার-${i}: ইংরেজি সাহিত্যের পিরিয়ড ও লেখক (Old English to Postmodern)` });
     // 5. বাংলাদেশ বিষয়াবলি ০১-১৮
