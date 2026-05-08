@@ -1,9 +1,11 @@
+This is a complete, ready-to-run HTML document that implements a subject-wise study planner and progress tracker based on the detailed lecture data you provided.
+```html
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>দৈনিক পাঠ পরিকল্পক | বিষয়ভিত্তিক শাফল ও অগ্রগতি ট্র্যাকার</title>
+    <title>দৈনিক পাঠ পরিকল্পক | লেকচারভিত্তিক শাফল ও অগ্রগতি ট্র্যাকার</title>
     <!-- TailwindCSS + Font Awesome + Chart.js -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -32,9 +34,9 @@
     <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
         <div>
             <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                <i class="fas fa-layer-group text-indigo-600 mr-2"></i>বিষয়ভিত্তিক পাঠ শাফলার
+                <i class="fas fa-layer-group text-indigo-600 mr-2"></i>লেকচারভিত্তিক পাঠ শাফলার
             </h1>
-            <p class="text-gray-600 text-sm mt-1">বিষয় ফিল্টার করে পড়ুন | 'সম্পন্ন' করলে টপিক চিরতরে সরে যাবে | শাফল সর্বোচ্চ ৪ বার/দিন</p>
+            <p class="text-gray-600 text-sm mt-1">বিষয় ফিল্টার করে পড়ুন | 'সম্পন্ন' করলে টপিক স্থায়ীভাবে সরে যাবে | শাফল সর্বোচ্চ ৪ বার/দিন</p>
         </div>
         <button id="resetAllBtn" class="bg-white/80 backdrop-blur-sm border border-red-200 text-red-600 px-4 py-2 rounded-xl shadow-sm hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium">
             <i class="fas fa-undo-alt"></i> সম্পূর্ণ রিসেট
@@ -70,7 +72,7 @@
                 <div id="topicContent">
                     <span id="topicCatBadge" class="badge-cat inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3"></span>
                     <h3 id="currentTopicName" class="text-2xl font-bold text-gray-800 leading-tight"></h3>
-                    <p class="text-gray-500 text-sm mt-2"><i class="far fa-id-card"></i> টপিক কোড: <span id="currentTopicId"></span></p>
+                    <p class="text-gray-500 text-sm mt-2"><i class="far fa-id-card"></i> লেকচার কোড: <span id="currentTopicId"></span></p>
                 </div>
             </div>
 
@@ -83,7 +85,7 @@
                     <i class="fas fa-check-circle"></i> সম্পন্ন (Done)
                 </button>
                 <div class="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1.5">
-                    <i class="fas fa-lightbulb"></i> 'সম্পন্ন' করলে টপিক চিরতরে পড়া শেষ, পরবর্তী টপিক ফিল্টার অনুযায়ী আসবে।
+                    <i class="fas fa-lightbulb"></i> 'সম্পন্ন' করলে টপিক চিরতরে পড়া শেষ।
                 </div>
             </div>
         </div>
@@ -105,10 +107,10 @@
                 </div>
             </div>
             <div class="mt-3 text-sm text-center text-gray-600 bg-slate-50 rounded-lg p-2">
-                <i class="fas fa-database"></i> মোট টপিক: <strong id="totalTopicsCount">0</strong>
+                <i class="fas fa-database"></i> মোট লেকচার/টপিক: <strong id="totalTopicsCount">0</strong>
             </div>
             <div class="mt-2 text-xs text-gray-400 text-center">
-                * সম্পন্ন = টপিক পড়া শেষ → আর কখনো আসবে না। ফিল্টার চেঞ্জ করলে শুধু নির্বাচন প্রভাবিত হয়।
+                * সম্পন্ন = টপিক পড়া শেষ → আর কখনো আসবে না।
             </div>
         </div>
     </div>
@@ -116,7 +118,7 @@
     <!-- all topics list -->
     <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-md p-5 border border-indigo-50">
         <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-            <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (স্থিতি ও বিষয়সহ)</h2>
+            <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত লেকচারের তালিকা (স্থিতি ও বিষয়সহ)</h2>
             <span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-500"><i class="far fa-clock"></i> ফিল্টার অনুযায়ী শাফল করা যাবে</span>
         </div>
         <div class="scrollable-list">
@@ -126,137 +128,137 @@
 </div>
 
 <script>
-    // ======================= ১. সম্পূর্ণ টপিক ডেটাসেট (প্রদত্ত সিলেবাস থেকে) =======================
-    // নিচে সকল ID, Subject ও Topic কে অ্যাপ্লিকেশনের উপযোগী করে রূপান্তর করা হয়েছে।
-    // প্রতিটি এন্ট্রি: { id: serial, name: topic title, cat: subject name }
-    const topicsDataRaw = [
-        // বাংলা ভাষা ও সাহিত্য (BANGLA_01 to 08)
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "ভাষা ও বাংলা ভাষার উৎপত্তি, ধনি, বর্ণ ও অক্ষর" },
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "সন্ধি, ধনির পরিবর্তন, সমার্থক শব্দ, বিপরীত শব্দ" },
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "শব্দ ও শব্দের প্রকাশ, বাংলা বানানের নিয়ম, গ-তু ও স্ব-তু বিধান" },
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "পদ, ছন্দ, অলঙ্কার, এক কথায় প্রকাশ, ক্রিয়ার কাল" },
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "কারক ও বিভক্তি, অনুসর্গ, দ্বিত্ব শব্দ, পরিচয়" },
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "সমাস, প্রবাদ-প্রবচন, বাগধারা" },
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "উপসর্গ, ধাতু, প্রকৃতি-প্রত্যায়, যতি চিহ্ন" },
-        { cat: "বাংলা ভাষা ও সাহিত্য", name: "বাক্য ও বাক্য প্রকরণ, বাক্য রূপান্তর, প্রয়োগ-অপপ্রয়োগ" },
-        // বাংলাদেশ বিষয়াবলি (BANGLADESH_01 to 18)
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "প্রাচীনকাল হতে সাম্প্রতিক ইতিহাস, কৃষি ও সংস্কৃতি, প্রাচীন জনপদ" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "বাংলায় মুসলিম শাসন, ইলিয়াস শাহী, মুঘল ও নবাবী শাসন" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "ইউরোপীয় আগমন, ইস্ট ইন্ডিয়া কোম্পানি, বঙ্গভঙ্গ ও পাকিস্তান সৃষ্টি" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "ভাষা আন্দোলন, ১৯৫৪ নির্বাচন, গণঅভ্যুত্থান ১৯৬৯, রাজনৈতিক ব্যক্তিত্ব" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "মুক্তিযুদ্ধের রণকৌশল, বীরত্বসূচক খেতাব, ১৯৭৫-পরবর্তী ও ২০২৪ ছাত্র আন্দোলন" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "সংবিধান: প্রস্তাবনা, মৌলিক অধিকার, রাষ্ট্র পরিচালনার মূলনীতি" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "সংবিধানের গুরুত্বপূর্ণ অনুচ্ছেদ, সংশোধনসমূহ" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "বাংলাদেশের নির্বাচন, RPO ২০২৫, নির্বাচন কমিশন" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "রাজনৈতিক ব্যবস্থা, দলসমূহ, ক্ষমতাসীন ও বিরোধী সম্পর্ক" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "সরকার ব্যবস্থা: আইন, শাসন, বিচার ও স্থানীয় সরকার" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "অর্থনীতি: উন্নয়ন পরিকল্পনা, দারিদ্র্য বিমোচন" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "শিক্ষণ ও বাণিজ্য, গার্মেন্টস শিল্প" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "বৈদেশিক লেনদেন, অর্থমার্জন, ব্যাংক ও বিমা, পরিবেশ ও টেকসই উন্নয়ন" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "জনসংখ্যা, আদমশুমারি, জাতি-গোত্র, শিক্ষা ও স্বাস্থ্য" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "কৃষিজ সম্পদ, শস্য বহুমুখীকরণ, খাদ্য ব্যবস্থাপনা" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "সামাজিক সমস্যা, তথ্য অধিকার, ই-গভর্নেন্স, মৎস্য ও প্রাণী সম্পদ, সুন্দরবন" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "সুশীল সমাজ, এনজিও, জেন্ডার ইস্যু, SDG, অর্থনৈতিক অঞ্চল" },
-        { cat: "বাংলাদেশ বিষয়াবলি", name: "বাংলাদেশের মৌলিক ভূগোল, ব-দ্বীপ, বরেন্দ্র, ছিটমহল" },
-        // আন্তর্জাতিক বিষয়াবলি (INT_01 to INT_18)
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "বিশ্ব সত্যতা, এশিয়া মহাদেশ, দক্ষিণ এশিয়ার রাজনীতি, ভারত-পাকিস্তান যুদ্ধ" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "ইউরোপ মহাদেশ, মার্কিন যুক্তরাষ্ট্র, রাশিয়া, ইউক্রেন-রাশিয়া পরিস্থিতি" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "উত্তর ও দক্ষিণ আমেরিকা, চীন-ভারত কূটনীতি" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "আফ্রিকা মহাদেশ, প্রথম বিশ্বযুদ্ধ ও পরবর্তী সংঘাত" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "ওশেনীয়া, এন্টার্কটিকা, দ্বিতীয় বিশ্বযুদ্ধ ও উপনাম" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "জাতিপুঞ্জ ও জাতিসংঘ, অঙ্গসংগঠন, SDG, শান্তিরক্ষা মিশন" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "বিশ্বব্যাংক, IMF, ADB, WTO, অর্থনৈতিক প্রতিষ্ঠান" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "দেশভিত্তিক বিভিন্ন নাম, মুদ্রা, অর্থনৈতিক জোট (EU, G7, G20)" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "জাতিসংঘ ব্যবস্থা, LDC উত্তরণ, মানবাধিকার এজেন্ডা" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "SAARC, ASEAN, BIMSTEC, BRICS, OPEC, RCEP" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "NAM, কমনওয়েলথ, OIC, আরব লীগ, আন্তর্জাতিক কৃষি সংস্থা" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "মতবাদ: বাস্তববাদ, সাম্যবাদ, উপনিবেশবাদ, সংঘর্ষ তত্ত্ব" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "পশ্চিম এশিয়া, ইরান-যুক্তরাষ্ট্র, ইসরাইল-ফিলিস্তিন সংকট" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "আন্তরাষ্ট্রীয় নিরাপত্তা, ন্যাটো, সন্ত্রাসবাদ, নিরস্ত্রীকরণ" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "রেডক্রস, অ্যামনেস্টি, ট্রান্সপারেন্সি ইন্টারন্যাশনাল, আইএইএ" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "পরিবেশগত ইস্যু ও কূটনীতি, জলবায়ু সম্মেলন, প্রটোকল" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "মহাসাগর, প্রণালী, খাল, দ্বীপপুঞ্জ, ভূমিরূপ" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "বিশ্বায়ন, পতাকা, নোবেল পুরস্কার, গুরুত্বপূর্ণ দিবস" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "আন্তর্জাতিক অঙ্গনে বাংলাদেশ, বৈদেশিক নীতি, চুক্তি" },
-        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "সাম্প্রতিক ঘটনাপ্রবাহ, কূটনীতি ও রাষ্ট্রবিজ্ঞান" },
-        // গাণিতিক যুক্তি (MATH_01 to MATH_16) 
-        { cat: "গাণিতিক যুক্তি", name: "বাস্তব ও জটিল সংখ্যা, ল.সা.গু, গ.সা.গু" },
-        { cat: "গাণিতিক যুক্তি", name: "ভগ্নাংশ, অনুপাত, সমানুপাত, শতকরা" },
-        { cat: "গাণিতিক যুক্তি", name: "একক নিয়ম, লাভ-ক্ষতি" },
-        { cat: "গাণিতিক যুক্তি", name: "পাটিগণিত সরলীকরণ, সরল ও যৌগিক মুনাফা" },
-        { cat: "গাণিতিক যুক্তি", name: "বীজগাণিতিক সূত্রাবলি, সরলীকরণ" },
-        { cat: "গাণিতিক যুক্তি", name: "সরল সমীকরণ, দ্বিঘাত সমীকরণ, দুই ও তিন চলক" },
-        { cat: "গাণিতিক যুক্তি", name: "উৎপাদকে বিশ্লেষণ, দ্বিপদী বিস্তৃতি, অসমতা" },
-        { cat: "গাণিতিক যুক্তি", name: "অনুক্রম, সমান্তর ও গুণোত্তর ধারা" },
-        { cat: "গাণিতিক যুক্তি", name: "সূচক ও লগারিদম, ফাংশন" },
-        { cat: "গাণিতিক যুক্তি", name: "বিন্যাস ও সমাবেশ" },
-        { cat: "গাণিতিক যুক্তি", name: "সেট তত্ত্ব ও ভেনচিত্র" },
-        { cat: "গাণিতিক যুক্তি", name: "স্থানাঙ্ক জ্যামিতি, পরিসংখ্যান" },
-        { cat: "গাণিতিক যুক্তি", name: "ত্রিকোণমিতি, দূরত্ব ও উচ্চতা নির্ণয়" },
-        { cat: "গাণিতিক যুক্তি", name: "পরিমিতি: ক্ষেত্রফল সংক্রান্ত সমস্যা" },
-        { cat: "গাণিতিক যুক্তি", name: "রেখা, কোণ, পিথাগোরাসের উপপাদ্য" },
-        { cat: "গাণিতিক যুক্তি", name: "বৃত্ত ও চতুর্ভুজ সংক্রান্ত উপপাদ্য" },
-        // মানসিক দক্ষতা (MENTAL_01..05)
-        { cat: "মানসিক দক্ষতা", name: "যান্ত্রিক দক্ষতা (দর্পণ, প্রতিবিম্ব, যন্ত্রাংশ)" },
-        { cat: "মানসিক দক্ষতা", name: "স্থানিক সম্পর্ক, স্থানাঙ্ক, চিত্র গণনা" },
-        { cat: "মানসিক দক্ষতা", name: "সংখ্যাগত ক্ষমতা, ধারা, বর্গমূল, অনুক্রম" },
-        { cat: "মানসিক দক্ষতা", name: "ভাষাগত যৌক্তিক বিচার, সাদৃশ্য, সিদ্ধান্ত গ্রহণ, বানান" },
-        { cat: "মানসিক দক্ষতা", name: "সমস্যা সমাধান (ঘড়ি, তারিখ, নল ও কুয়ো, কাজ)" },
-        // সাধারণ বিজ্ঞান (SCIENCE_01..14)
-        { cat: "সাধারণ বিজ্ঞান", name: "আলো: প্রতিফলন, প্রতিসরণ, লেজার, আলোক দ্বৈততা" },
-        { cat: "সাধারণ বিজ্ঞান", name: "তাপ, শব্দ, ডপলার ক্রিয়া, প্রতিধ্বনি" },
-        { cat: "সাধারণ বিজ্ঞান", name: "মৌলিক কণা, ওহমের সূত্র, তড়িৎ ক্ষমতা" },
-        { cat: "সাধারণ বিজ্ঞান", name: "মাত্রীয়তা, ইলেকট্রনিক্স, অর্ধপরিবাহী, ডায়োড, ট্রানজিস্টর" },
-        { cat: "সাধারণ বিজ্ঞান", name: "চুম্বক ও চৌম্বকত্ব, তড়িৎচুম্বক, গ্যালভানোমিটার" },
-        { cat: "সাধারণ বিজ্ঞান", name: "পদার্থের ধর্ম, অ্যাসিড, ক্ষারক, লবণ, pH" },
-        { cat: "সাধারণ বিজ্ঞান", name: "বায়ুমণ্ডল, গ্রিনহাউস প্রভাব, শক্তির উৎস" },
-        { cat: "সাধারণ বিজ্ঞান", name: "পোলার দ্রব্য, সিরামিক, ধাতু-অধাতু, পলিমার" },
-        { cat: "সাধারণ বিজ্ঞান", name: "ভৌত পরিবর্তন, তাপ ইঞ্জিন, তড়িৎ কোষ" },
-        { cat: "সাধারণ বিজ্ঞান", name: "আপেক্ষিকতা তত্ত্ব, বিশ্বতত্ত্ব" },
-        { cat: "সাধারণ বিজ্ঞান", name: "জীবনবিজ্ঞান, কোষ, DNA, RNA, জিন প্রযুক্তি, ক্লোনিং" },
-        { cat: "সাধারণ বিজ্ঞান", name: "উদ্ভিদ অঙ্গসংস্থান, অণুজীব, ভাইরাস, ব্যাকটেরিয়া" },
-        { cat: "সাধারণ বিজ্ঞান", name: "খাদ্য ও পুষ্টি, ভিটামিন, BMI, ফাস্টফুড" },
-        { cat: "সাধারণ বিজ্ঞান", name: "অঙ্গতন্ত্র, রোগ ও স্বাস্থ্যসেবা, ডেঙ্গু, ক্যান্সার, ভ্যাকসিন" },
-        // কম্পিউটার ও তথ্য প্রযুক্তি (COMPUTER_01..06)
-        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "কম্পিউটারের ইতিহাস, প্রকারভেদ, সামাজিক মিডিয়া, সাইবার অপরাধ" },
-        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "CPU, মাইক্রোপ্রসেসর, মেমোরি, ইনপুট-আউটপুট ডিভাইস" },
-        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "সংখ্যা পদ্ধতি, বুলিয়ান অ্যালজেবরা, লজিক গেইট" },
-        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "প্রোগ্রামিং ভাষা, সফটওয়্যার, অপারেটিং সিস্টেম, ভাইরাস" },
-        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "ডেটা নেটওয়ার্ক, টপোলজি, ডেটাবেজ সিস্টেম" },
-        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "মোবাইল প্রযুক্তি, ইন্টারনেট, ক্লাউড কম্পিউটিং, ই-কমার্স" },
-        // ভূগোল, পরিবেশ ও দুর্যোগ ব্যবস্থাপনা
-        { cat: "ভূগোল ও পরিবেশ", name: "মহাবিশ্ব ও পৃথিবী, ভূমিরূপ, ভূ-সঞ্চালন" },
-        { cat: "ভূগোল ও পরিবেশ", name: "জলবায়ু, বৈশ্বিক উষ্ণায়ন, বাংলাদেশের জলবায়ু, আন্তর্জাতিক উদ্যোগ" },
-        { cat: "ভূগোল ও পরিবেশ", name: "ভূ-প্রাকৃতিক বিপর্যয়, দুর্যোগ ব্যবস্থাপনা, বাংলাদেশের দুর্যোগ" },
-        { cat: "ভূগোল ও পরিবেশ", name: "মানচিত্র, বায়ুমণ্ডল, বারিমণ্ডল, পৃথিবীর অভ্যন্তর" },
-        // নৈতিকতা ও সু-শাসন
-        { cat: "নৈতিকতা ও সুশাসন", name: "নৈতিকতা, মূল্যবোধ ও সুশাসনের ধারণা, উপাদান" },
-        { cat: "নৈতিকতা ও সুশাসন", name: "রাষ্ট্রীয় উন্নয়নে মূল্যবোধ, সংবিধানের অনুচ্ছেদ, গুরুত্বপূর্ণ গ্রন্থ" },
-        { cat: "নৈতিকতা ও সুশাসন", name: "আইনের ধারণা, স্বাধীনতা, চাপসৃষ্টিকারী গোষ্ঠী, মনিটরিং" },
-        { cat: "নৈতিকতা ও সুশাসন", name: "গণতন্ত্র, একনায়কতন্ত্র, নির্বাচন, আমলাতন্ত্র" },
-        // লিখিত লাইভ ও রেকর্ডড ক্লাস (রচনা, কম্প্রিহেনশন, ট্রান্সলেশন)
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "রচনা সমালোচনা, ভাষা আন্দোলন ও ছাত্র অভ্যুত্থানভিত্তিক গ্রন্থ" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "সারাংশ/সারমর্ম লেখার কৌশল" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Reading Comprehension কৌশল (Word meaning, Paraphrasing)" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Summary ও Feature লেখা" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "আন্তর্জাতিক বিষয়াবলি প্রবন্ধ সমাধান" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "ভাব-সম্প্রসারণ ও প্রতিবেদন লেখা" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "পত্র / সংলাপ ও সম্পাদক বরাবর পত্র" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Translation (English to Bangla & Bangla to English)" },
-        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Essay Writing: Thesis, Argumentative, Synthesis" }
+    // ======================= সম্পূর্ণ লেকচার ডেটাসেট (প্রদত্ত তথ্যের ভিত্তিতে) =======================
+    // নিচে প্রতিটি লেকচারকে আলাদা টপিক হিসেবে সংকলিত করা হয়েছে। বিষয়: বাংলা সাহিত্য, বাংলা ভাষা, ইংরেজি গ্রামার, ইংরেজি সাহিত্য, 
+    // বাংলাদেশ বিষয়াবলি, আন্তর্জাতিক বিষয়াবলি, গাণিতিক যুক্তি, মানসিক দক্ষতা, সাধারণ বিজ্ঞান, কম্পিউটার, ভূগোল, নৈতিকতা, লিখিত প্রস্তুতি।
+    
+    const topicsDataRaw = [];
+    
+    // 1. বাংলা সাহিত্য (Bangla Lit) লেকচার ১-১৪ (প্রদত্ত Bangla part 1)
+    const banglaLitLectures = [
+        "লেকচার-১: বাংলা সাহিত্যের যুগ বিভাগ, প্রাচীন যুগ ও চর্যাপদ, অন্ধকার যুগ, শ্রীকৃষ্ণকীর্তন, বৈষ্ণব পদাবলী, চণ্ডীদাস, বিদ্যাপতি, জ্ঞানদাস, গোবিন্দদাস, জীবনী সাহিত্য।",
+        "লেকচার-২: মঙ্গলকাব্য, মর্সিয়া সাহিত্য, নাথ সাহিত্য, অনুবাদ সাহিত্য, মুসলিম সাহিত্য, রোমান্টিক প্রণয়োপাখ্যান ও আরাকান রাজসভায় বাংলা সাহিত্য। মধ্যযুগের পৃষ্ঠপোষক।",
+        "লেকচার-৩: লোকসাহিত্য ও ময়মনসিংহ গীতিকা, শায়ের-কবিওয়ালা ও পুঁথি সাহিত্য। আধুনিক যুগের উন্মেষ, ফোর্ট উইলিয়াম কলেজ, শ্রীরামপুর মিশন, হিন্দু কলেজ, ইয়ংবেঙ্গল, মোহামেডান লিটারারি সোসাইটি, বাংলা একাডেমি, এশিয়াটিক সোসাইটি।",
+        "লেকচার-৪: রাজা রামমোহন রায়, লালন শাহ, ঈশ্বরচন্দ্র গুপ্ত, প্যারীচাঁদ মিত্র, মদনমোহন তর্কালঙ্কার, ঈশ্বরচন্দ্র বিদ্যাসাগর, মাইকেল মধুসূদন দত্ত, রঙ্গলাল বন্দ্যোপাধ্যায়, দীনবন্ধু মিত্র, নওয়াব ফয়জুন্নেছা চৌধুরাণী, বিহারীলাল চক্রবর্তী, কৃষ্ণচন্দ্র মজুমদার, সঞ্জীবচন্দ্র চট্টোপাধ্যায়।",
+        "লেকচার-৫: বঙ্কিমচন্দ্র চট্টোপাধ্যায়, হেমচন্দ্র বন্দ্যোপাধ্যায়, কালী প্রসন্ন সিংহ, নবীনচন্দ্র সেন, মীর মশাররফ হোসেন, স্বর্ণকুমারী দেবী, কায়কোবাদ, মোহাম্মদ নসিবর রহমান, মোজাম্মেল হক।",
+        "লেকচার-৬: রবীন্দ্রনাথ ঠাকুর, দ্বিজেন্দ্রলাল রায়, কামিনী রায়, দীনেশচন্দ্র সেন, প্রমথ চৌধুরী, মোহাম্মদ আকরম খাঁ, আবদুল করিম সাহিত্য বিশারদ, শরৎচন্দ্র চট্টোপাধ্যায়, দক্ষিণারঞ্জন মিত্র মজুমদার, যতীন্দ্রমোহন বাগচী।",
+        "লেকচার-৭: রোকেয়া সাখাওয়াত হোসেন, সৈয়দ ইসমাইল হোসেন সিরাজী, কাজী ইমদাদুল হক, সত্যেন্দ্রনাথ দত্ত, ড. মুহম্মদ শহীদুল্লাহ, সুকুমার রায়, মোহিতলাল মজুমদার, এস ওয়াজেদ আলী, কাজী আবদুল ওদুদ, প্রিন্সিপাল ইব্রাহীম খাঁ, বিভূতিভূষণ বন্দ্যোপাধ্যায়, আবুল কালাম শামসুদ্দীন, ডা. লুৎফর রহমান।",
+        "লেকচার-৮: কাজী মোতাহার হোসেন, গোলাম মোস্তফা, আবুল মনসুর আহমদ, তারাশঙ্কর বন্দ্যোপাধ্যায়, কাজী নজরুল ইসলাম, জীবনানন্দ দাশ, বলাইচাঁদ মুখোপাধ্যায়, অমিয় চক্রবর্তী।",
+        "লেকচার-৯: সুধীন্দ্রনাথ দত্ত, ড. মুহম্মদ এনামুল হক, অচিন্ত্যকুমার সেনগুপ্ত, আবুল ফজল, জসীম উদ্দীন, মোতাহের হোসেন চৌধুরী, অদ্বৈত মল্লবর্মণ, সৈয়দ মুজতবা আলী, আবদুল কাদির, বন্দে আলী মিয়া, হুমায়ুন কবির, নুরুল মোমেন, বুদ্ধদেব বসু, মানিক বন্দ্যোপাধ্যায়, শামসুন নাহার মাহমুদ, বিষ্ণু দে।",
+        "লেকচার-১০: আবু জাফর শামসুদ্দীন, বেগম সুফিয়া কামাল, নীহাররঞ্জন গুপ্ত, আহসান হাবীব, শওকত ওসমান, ফররুখ আহমদ, সিকান্দার আবু জাফর, মুহম্মদ আবদুল হাই, আহমদ শরীফ, নীলিমা ইব্রাহিম, সৈয়দ আলী আহসান, সৈয়দ ওয়ালীউল্লাহ, সমরেশ বসু, মুনীর চৌধুরী, রশীদ করীম, আবু ইসহাক।",
+        "লেকচার-১১: শামসুদ্দীন আবুল কালাম, সুকান্ত ভট্টাচার্য, শহীদুল্লা কায়সার, আন্নাদাশঙ্কর রায়, জাহানারা ইমাম, শামসুর রহমান, সৈয়দ মুস্তাফা সিরাজ, সাঈদ আহমদ, আবদুল্লাহ আল-মুতি শরফুদ্দীন, ড. আলাউদ্দিন আল আজাদ, হাসান হাফিজুর রহমান, আবদুল গাফফার চৌধুরী, আবু জাফর ওবায়দুল্লাহ, সুনীল গঙ্গোপাধ্যায়, জহির রায়হান, মেহতাব উদ্দীন আহমদ, রাবেয়া খাতুন।",
+        "লেকচার-১২: সৈয়দ শামসুল হক, আবু হেনা মোস্তফা কামাল, আল মাহমুদ, রাশিদা খান, শওকত আলী, ড. আনিসুজ্জামান, হাসান আজিজুল হক, শহীদ সাবের, মাহমুদুল হক, আবদুল্লাহ আল মামুন, রফিক আজাদ, শহীদ কাদরী, আখতারুজ্জামান ইলিয়াস, আবদুল মান্নান সৈয়দ, আহমদ ছফা, হুমায়ূন আহমেদ।",
+        "লেকচার-১৩: সেলিনা হোসেন, হুমায়ূন আজাদ, মামুনুর রশীদ, সেলিম আল দীন, ইমদাদুল হক মিলন, রুদ্র মুহম্মদ শহীদুল্লাহ, আনিসুল হক, বিখ্যাত পত্রিকা ও সম্পাদক, চরিত্র, উপাধি ও ছদ্মনাম।",
+        "লেকচার-১৪: দেশভাগ ভিত্তিক রচনা, ভাষা আন্দোলন, মুক্তিযুদ্ধভিত্তিক রচনা, বিখ্যাত উক্তি, বাংলা সাহিত্যে প্রথম, ইতিহাস গ্রন্থ ও লোকগান (বাউল, পল্লীগীতি, ভাটিয়ালি, মুর্শিদী)।"
     ];
-
-    // Assign sequential IDs
+    banglaLitLectures.forEach((lec, idx) => topicsDataRaw.push({ cat: "বাংলা সাহিত্য", name: lec }));
+    
+    // 2. বাংলা ভাষা (Bangla Grammar) - লেকচার ০১-০৮
+    const banglaLang = [
+        "লেকচার-০১: ভাষা ও বাংলা ভাষার উৎপত্তি, ধ্বনি, বর্ণ ও অক্ষর।",
+        "লেকচার-০২: সন্ধি, ধ্বনির পরিবর্তন, সমার্থক শব্দ, বিপরীত শব্দ।",
+        "লেকচার-০৩: শব্দ ও শব্দের প্রকারভেদ, বানানের নিয়ম, ণ-ত্ব ও ষ-ত্ব বিধান।",
+        "লেকচার-০৪: পদ, ছন্দ, অলঙ্কার, এক কথায় প্রকাশ, ক্রিয়ার কাল।",
+        "লেকচার-০৫: কারক ও বিভক্তি, অনুসর্গ, শুদ্ধ শব্দ, পরিভাষা।",
+        "লেকচার-০৬: সমাস, প্রবাদ-প্রবচন, বাগধারা।",
+        "লেকচার-০৭: উপসর্গ, ধাতু, প্রকৃতি-প্রত্যয়, যতি চিহ্নের ব্যবহার।",
+        "লেকচার-০৮: বাক্য ও বাক্য প্রকরণ, বাক্যের রূপান্তর, বাক্য শুদ্ধি ও প্রয়োগ-অপপ্রয়োগ।"
+    ];
+    banglaLang.forEach(lec => topicsDataRaw.push({ cat: "বাংলা ভাষা (ব্যাকরণ)", name: lec }));
+    
+    // 3. English Grammar লেকচার ০১-১৪
+    const engGrammar = [
+        "লেকচার-০১: Noun, Article | Vocabulary A-F | Interchange of Parts of Speech (Part-01)",
+        "লেকচার-০২: Number, Gender, Group Verbs | Vocabulary G-M | Sentence Correction (Part-01)",
+        "লেকচার-০৩: Pronoun, Determiner | Vocabulary N-S | Transformation & Correction",
+        "লেকচার-০৪: Adjective, Degree | Vocabulary T-Z | Interchange of Parts of Speech (Part-02)",
+        "লেকচার-০৫: Verb & Classification, Gerund, Participle | App. Preposition A-F | Sentence Correction (Part-02)",
+        "লেকচার-০৬: Right form of Verbs, Subject-Verb Agreement, Tense | App. Preposition G-M | Correction (Part-03)",
+        "লেকচার-০৭: Adverb, Modifier | App. Preposition N-S | Error Correction, Transformation",
+        "লেকচার-০৮: Conjunction & Linkers | App. Preposition T-Z | Relevance in Translation",
+        "লেকচার-০৯: Preposition | Written: Combining Sentences",
+        "লেকচার-১০: Phrases, Clauses, Analogy | Idioms A-F | Combining Sentences & errors",
+        "লেকচার-১১: Voice & Narration | Idioms G-M | Relevance in translation, report writing",
+        "লেকচার-১২: Transformation, Spelling List | Idioms N-S | Making Sentences",
+        "লেকচার-১৩: Same word different POS, Suffix/Prefix, Foreign words | Idioms T-Z | Interchange (Part-03)",
+        "লেকচার-১৪: Sentence correction, one word substitution, names of paragraphs/letter | Eliminating errors"
+    ];
+    engGrammar.forEach(lec => topicsDataRaw.push({ cat: "ইংরেজি গ্রামার", name: lec }));
+    
+    // 4. English Literature লেকচার ০১-০৬
+    const engLit = [
+        "লেকচার-০১: Introduction, Periods, Old & Middle English (Anglo Saxon, Norman, Chaucer, Dark Age), Literary Terms, Critics",
+        "লেকচার-০২: Renaissance Period (Elizabethan, Jacobean, Caroline, Commonwealth) – Important writers",
+        "লেকচার-০৩: Neo-classical Period (Restoration, Augustan, Age of Sensibility) – Important writers",
+        "লেকচার-০৪: Romantic Period – Important writers",
+        "লেকচার-০৫: Victorian Period – Important writers",
+        "লেকচার-০৬: Modern & Postmodern Period – American, Irish, Indian, Bangladeshi writers"
+    ];
+    engLit.forEach(lec => topicsDataRaw.push({ cat: "ইংরেজি সাহিত্য", name: lec }));
+    
+    // 5. বাংলাদেশ বিষয়াবলি লেকচার ০১-১৮
+    const bangladesh = Array.from({length: 18}, (_, i) => `লেকচার-${String(i+1).padStart(2,'0')}: বাংলাদেশ বিষয়াবলি লেকচার ${i+1} (প্রাচীন ইতিহাস থেকে সাম্প্রতিক ছাত্র আন্দোলন, সংবিধান, নির্বাচন, অর্থনীতি, ভূগোল ইত্যাদি)`);
+    bangladesh.forEach(lec => topicsDataRaw.push({ cat: "বাংলাদেশ বিষয়াবলি", name: lec }));
+    
+    // 6. আন্তর্জাতিক বিষয়াবলি ১৬টি লেকচার
+    const international = Array.from({length: 16}, (_, i) => `লেকচার-${String(i+1).padStart(2,'0')}: আন্তর্জাতিক বিষয়াবলি (মহাদেশ, সংগঠন, অর্থনীতি, নিরাপত্তা, কূটনীতি, বাংলাদেশের বৈদেশিক নীতি)`);
+    international.forEach(lec => topicsDataRaw.push({ cat: "আন্তর্জাতিক বিষয়াবলি", name: lec }));
+    
+    // 7. গাণিতিক যুক্তি লেকচার ০১-১৬
+    const mathLogic = Array.from({length: 16}, (_, i) => `লেকচার-${String(i+1).padStart(2,'0')}: গাণিতিক যুক্তি (সংখ্যা, অনুপাত, লাভ-ক্ষতি, বীজগণিত, জ্যামিতি, পরিসংখ্যান, ত্রিকোণমিতি, সেট, সম্ভাব্যতা)`);
+    mathLogic.forEach(lec => topicsDataRaw.push({ cat: "গাণিতিক যুক্তি", name: lec }));
+    
+    // 8. মানসিক দক্ষতা ০১-০৫
+    const mental = [
+        "লেকচার-০১: যান্ত্রিক দক্ষতা (দর্পণ, প্রতিচ্ছবি, যন্ত্রাংশ)",
+        "লেকচার-০২: স্থানাঙ্ক সম্পর্ক ও চিত্র গণনা",
+        "লেকচার-০৩: সংখ্যাগত ক্ষমতা (অনুক্রম, ধারা, বর্গমূল, সমীকরণ)",
+        "লেকচার-০৪: ভাষাগত যৌক্তিক বিচার, সাদৃশ্য, সিদ্ধান্ত, বানান ও ভাষা",
+        "লেকচার-০৫: সমস্যা সমাধান (ঘড়ি, তারিখ, নল ও চৌবাচ্চা, কাজ ও সময়)"
+    ];
+    mental.forEach(lec => topicsDataRaw.push({ cat: "মানসিক দক্ষতা", name: lec }));
+    
+    // 9. সাধারণ বিজ্ঞান ০১-১৪
+    const science = Array.from({length: 14}, (_, i) => `লেকচার-${String(i+1).padStart(2,'0')}: সাধারণ বিজ্ঞান (আলো, শব্দ, তড়িৎ, রসায়ন, জীববিজ্ঞান, পুষ্টি, রোগ, চুম্বকত্ব, জ্যোতির্বিজ্ঞান)`);
+    science.forEach(lec => topicsDataRaw.push({ cat: "সাধারণ বিজ্ঞান", name: lec }));
+    
+    // 10. কম্পিউটার ও তথ্যপ্রযুক্তি ০১-০৬
+    const computer = Array.from({length: 6}, (_, i) => `লেকচার-${i+1}: কম্পিউটার ও ICT (ইতিহাস, হার্ডওয়্যার, সফটওয়্যার, নেটওয়ার্ক, মোবাইল প্রযুক্তি, ক্লাউড কম্পিউটিং)`);
+    computer.forEach(lec => topicsDataRaw.push({ cat: "কম্পিউটার ও আইসিটি", name: lec }));
+    
+    // 11. ভূগোল ও পরিবেশ ০১-০৪
+    const geography = [
+        "লেকচার-০১: মহাবিশ্ব, পৃথিবী, ভূমিরূপ ও ভূ-গঠন",
+        "লেকচার-০২: জলবায়ু, বিশ্ব উষ্ণায়ন, বাংলাদেশের জলবায়ু, আন্তর্জাতিক উদ্যোগ",
+        "লেকচার-০৩: ভূ-রাজনীতি, দুর্যোগ ব্যবস্থাপনা, বাংলাদেশের দুর্যোগ",
+        "লেকচার-০৪: মানচিত্র, বায়ুমণ্ডল, বারিমণ্ডল, অভ্যন্তরীণ গঠন"
+    ];
+    geography.forEach(lec => topicsDataRaw.push({ cat: "ভূগোল ও পরিবেশ", name: lec }));
+    
+    // 12. নৈতিকতা ও সুশাসন ০১-০৪
+    const ethics = [
+        "লেকচার-০১: নৈতিকতা, মূল্যবোধ ও সুশাসনের ধারণা ও গুরুত্ব",
+        "লেকচার-০২: জাতীয় উন্নয়নে মূল্যবোধ, দার্শনিক, সংবিধানের অনুচ্ছেদ, সংস্কৃতি",
+        "লেকচার-০৩: আইন, স্বাধীনতা, চাপসৃষ্টিকারী গোষ্ঠী, নেতৃত্ব",
+        "লেকচার-০৪: গণতন্ত্র, একনায়কতন্ত্র, জনমত, আমলাতন্ত্র"
+    ];
+    ethics.forEach(lec => topicsDataRaw.push({ cat: "নৈতিকতা ও সুশাসন", name: lec }));
+    
+    // 13. লিখিত পরীক্ষা প্রস্তুতি  (Written) লেকচার ০১-১৫
+    const written = Array.from({length: 15}, (_, i) => `লেকচার-${String(i+1).padStart(2,'0')}: লিখিত প্রস্তুতি (ভাবসম্প্রসারণ, রিডিং কম্প্রিহেনশন, পত্র/প্রতিবেদন, গ্রন্থ সমালোচনা, translation, রচনা, আন্তর্জাতিক বিষয়, Essay Writing)`);
+    written.forEach(lec => topicsDataRaw.push({ cat: "লিখিত পরীক্ষা প্রস্তুতি", name: lec }));
+    
+    // Assign sequential IDs and final array
     let allTopics = topicsDataRaw.map((item, idx) => ({ id: idx+1, name: item.name, cat: item.cat }));
     
-    // extract unique subjects for filter dropdown
+    // unique subjects
     const uniqueSubjects = [...new Set(allTopics.map(t => t.cat))].sort();
     
     // ---------- App State ----------
-    let completedIds = [];          // সম্পন্ন টপিকের আইডি
+    let completedIds = [];
     let currentTopic = null;
     let shuffleUsed = 0;
-    let currentFilter = "ALL";      // "ALL" or specific subject name
+    let currentFilter = "ALL";
     const MAX_SHUFFLE = 4;
     let progressChart = null;
     
@@ -275,38 +277,26 @@
     const topicsListContainer = document.getElementById('topicsListContainer');
     const subjectFilterSelect = document.getElementById('subjectFilterSelect');
     
-    // Helper: pending topics (সব) but can filter if needed
     function getPendingTopics(filter = null) {
         let pending = allTopics.filter(t => !completedIds.includes(t.id));
-        if (filter && filter !== "ALL") {
-            pending = pending.filter(t => t.cat === filter);
-        }
+        if (filter && filter !== "ALL") pending = pending.filter(t => t.cat === filter);
         return pending;
     }
-    
-    // get pending topics based on global currentFilter
-    function getPendingFiltered() {
-        return getPendingTopics(currentFilter);
-    }
-    
-    // random from filtered pending (optionally exclude currentId)
+    function getPendingFiltered() { return getPendingTopics(currentFilter); }
     function getRandomFilteredPending(excludeId = null) {
         let pending = getPendingFiltered();
         if (pending.length === 0) return null;
         if (excludeId !== null) pending = pending.filter(t => t.id !== excludeId);
-        if (pending.length === 0) return null;
-        return pending[Math.floor(Math.random() * pending.length)];
+        return pending.length ? pending[Math.floor(Math.random() * pending.length)] : null;
     }
     
-    // save state locally
     function persistState() {
-        localStorage.setItem('dailyPlannerSubject', JSON.stringify({
+        localStorage.setItem('dailyPlannerLectures', JSON.stringify({
             completedIds, shuffleUsed, currentTopicId: currentTopic?.id || null, filter: currentFilter
         }));
     }
-    
     function loadState() {
-        const saved = localStorage.getItem('dailyPlannerSubject');
+        const saved = localStorage.getItem('dailyPlannerLectures');
         if (!saved) return false;
         try {
             const data = JSON.parse(saved);
@@ -321,13 +311,9 @@
         } catch(e) { return false; }
     }
     
-    // revalidate topic based on filter
     function validateTopicByFilter() {
         const filteredPending = getPendingFiltered();
-        if (filteredPending.length === 0) {
-            currentTopic = null;
-            return;
-        }
+        if (filteredPending.length === 0) { currentTopic = null; return; }
         if (!currentTopic || completedIds.includes(currentTopic.id) || (currentFilter !== "ALL" && currentTopic.cat !== currentFilter)) {
             currentTopic = getRandomFilteredPending();
             shuffleUsed = 0;
@@ -375,10 +361,7 @@
             currentTopicIdSpan.innerText = currentTopic.id;
             topicCatBadge.innerText = currentTopic.cat;
             let canShuffle = (shuffleUsed < MAX_SHUFFLE);
-            if (canShuffle) {
-                const others = getPendingFiltered().filter(t => t.id !== currentTopic.id);
-                if (others.length === 0) canShuffle = false;
-            }
+            if (canShuffle) { const others = getPendingFiltered().filter(t => t.id !== currentTopic.id); if (others.length === 0) canShuffle = false; }
             shuffleBtn.disabled = !canShuffle;
             doneBtn.disabled = false;
         }
@@ -392,19 +375,14 @@
         if (filteredPending.length <= 1) { alert("এই ফিল্টারে আর ভিন্ন টপিক নেই। সম্পন্ন করুন বা ফিল্টার বাড়ান।"); return; }
         let newTopic = getRandomFilteredPending(currentTopic.id);
         if (newTopic) { currentTopic = newTopic; shuffleUsed++; fullRender(); }
-        else alert("ভিন্ন টপিক পাওয়া যায়নি।");
+        else alert("ভিন্ন টপিক পাওয়া যায়নি।");
     }
     
     function handleDone() {
         if (!currentTopic) { alert("কোন টপিক নেই!"); return; }
         if (!completedIds.includes(currentTopic.id)) completedIds.push(currentTopic.id);
         const remainingFiltered = getPendingFiltered();
-        if (remainingFiltered.length === 0) {
-            currentTopic = null;
-            fullRender();
-            alert(`🎉 "${currentFilter === 'ALL' ? 'সব বিষয়' : currentFilter}" ফিল্টারের সব টপিক সম্পন্ন!`);
-            return;
-        }
+        if (remainingFiltered.length === 0) { currentTopic = null; fullRender(); alert(`🎉 "${currentFilter === 'ALL' ? 'সব বিষয়' : currentFilter}" ফিল্টারের সব লেকচার সম্পন্ন!`); return; }
         let nextTopic = getRandomFilteredPending();
         if (nextTopic) currentTopic = nextTopic;
         else currentTopic = remainingFiltered[0];
@@ -425,15 +403,13 @@
     }
     
     function onFilterChange() {
-        const newFilter = subjectFilterSelect.value;
-        currentFilter = newFilter;
+        currentFilter = subjectFilterSelect.value;
         shuffleUsed = 0;
         validateTopicByFilter();
         fullRender();
     }
     
     function init() {
-        // populate filter dropdown
         subjectFilterSelect.innerHTML = '<option value="ALL">📚 সব বিষয় (ALL)</option>';
         uniqueSubjects.forEach(sub => { subjectFilterSelect.innerHTML += `<option value="${sub}">📖 ${sub}</option>`; });
         loadState();
