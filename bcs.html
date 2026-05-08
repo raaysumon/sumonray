@@ -3,536 +3,457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>দৈনিক পাঠ পরিকল্পক | টপিক শাফল ও বিশ্লেষণ</title>
-    <!-- TailwindCSS + Font Awesome + Chart.js CDN -->
+    <title>দৈনিক পাঠ পরিকল্পক | বিষয়ভিত্তিক শাফল ও অগ্রগতি ট্র্যাকার</title>
+    <!-- TailwindCSS + Font Awesome + Chart.js -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        /* custom smooth transition & scroll */
         body {
             background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
             font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
         }
-        .card-hover {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
-        }
-        .topic-list-item {
-            transition: background 0.15s;
-        }
-        .scrollable-list {
-            max-height: 380px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-        }
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 10px;
-        }
-        button:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-        .badge-cat {
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 0.7rem;
-            font-weight: 500;
-        }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1); }
+        .scrollable-list { max-height: 420px; overflow-y: auto; scrollbar-width: thin; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        button:disabled { opacity: 0.55; cursor: not-allowed; }
+        .badge-cat { background: #e0f2fe; color: #0369a1; font-size: 0.7rem; font-weight: 500; }
+        .subject-badge { background: #f1f5f9; border-radius: 20px; padding: 0.2rem 0.7rem; font-size: 0.75rem; color: #1e293b; }
+        .filter-active { border-color: #f97316; background: #fff7ed; }
     </style>
 </head>
 <body class="antialiased p-4 md:p-6">
 
-    <div class="max-w-7xl mx-auto">
-        <!-- header -->
-        <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                    <i class="fas fa-random text-indigo-600 mr-2"></i>দৈনিক পাঠ শাফলার
-                </h1>
-                <p class="text-gray-600 text-sm mt-1">প্রতিদিন নতুন টপিক | সর্বোচ্চ ৪ বার শাফল | 'সম্পন্ন' করলে টপিক চিরতরে সরে যাবে</p>
-            </div>
-            <button id="resetAllBtn" class="bg-white/80 backdrop-blur-sm border border-red-200 text-red-600 px-4 py-2 rounded-xl shadow-sm hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium">
-                <i class="fas fa-undo-alt"></i> সম্পূর্ণ রিসেট
-            </button>
+<div class="max-w-7xl mx-auto">
+    <!-- header -->
+    <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent">
+                <i class="fas fa-layer-group text-indigo-600 mr-2"></i>বিষয়ভিত্তিক পাঠ শাফলার
+            </h1>
+            <p class="text-gray-600 text-sm mt-1">বিষয় ফিল্টার করে পড়ুন | 'সম্পন্ন' করলে টপিক চিরতরে সরে যাবে | শাফল সর্বোচ্চ ৪ বার/দিন</p>
         </div>
+        <button id="resetAllBtn" class="bg-white/80 backdrop-blur-sm border border-red-200 text-red-600 px-4 py-2 rounded-xl shadow-sm hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium">
+            <i class="fas fa-undo-alt"></i> সম্পূর্ণ রিসেট
+        </button>
+    </div>
 
-        <!-- main grid: daily card + graph + info -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- LEFT: daily lesson panel -->
-            <div class="lg:col-span-2 bg-white rounded-2xl shadow-md p-5 md:p-6 border border-indigo-100 card-hover">
-                <div class="flex justify-between items-start flex-wrap gap-2 mb-3">
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-calendar-day text-indigo-500"></i> আজকের নির্ধারিত পাঠ</h2>
-                    <div class="bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 text-sm font-medium">
-                        <i class="fas fa-exchange-alt mr-1"></i> বাকি শাফল: <span id="remainingShuffleSpan">4</span>
-                    </div>
-                </div>
-
-                <!-- Current topic card -->
-                <div id="currentTopicContainer" class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 mb-6 border border-indigo-200 transition-all">
-                    <div id="noTopicMsg" class="hidden text-center py-6 text-gray-500">
-                        <i class="fas fa-trophy text-4xl text-amber-400 mb-2"></i>
-                        <p class="font-medium">🎉 চমৎকার! সমস্ত টপিক সম্পন্ন হয়েছে। <br> নতুন যাত্রার জন্য রিসেট করুন।</p>
-                    </div>
-                    <div id="topicContent">
-                        <span id="topicCatBadge" class="badge-cat inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3"></span>
-                        <h3 id="currentTopicName" class="text-2xl font-bold text-gray-800 leading-tight"></h3>
-                        <p class="text-gray-500 text-sm mt-2"><i class="far fa-id-card"></i> টপিক আইডি: <span id="currentTopicId"></span></p>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex flex-wrap gap-4 items-center">
-                    <button id="shuffleBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300">
-                        <i class="fas fa-random"></i> শাফল করুন (♻️)
-                    </button>
-                    <button id="doneBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-8 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300">
-                        <i class="fas fa-check-circle"></i> সম্পন্ন (Done)
-                    </button>
-                    <div class="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1.5">
-                        <i class="fas fa-info-circle"></i> 'সম্পন্ন' করলে টপিক আর কখনো আসবে না, পরের দিনের টপিক সেট হবে।
-                    </div>
-                </div>
-
-                <!-- quick hint -->
-                <div class="mt-4 text-xs text-gray-500 border-t pt-3 flex justify-between">
-                    <span><i class="fas fa-lightbulb text-yellow-500"></i> সর্বোচ্চ ৪ বার শাফল করে আজকের পাঠ নির্বাচন করুন।</span>
-                    <span><i class="fas fa-chart-line"></i> বিশ্লেষণ গ্রাফে অগ্রগতি দেখা যাবে।</span>
+    <!-- main grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- LEFT: daily lesson + filter -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-md p-5 md:p-6 border border-indigo-100 card-hover">
+            <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-calendar-day text-indigo-500"></i> আজকের নির্ধারিত পাঠ</h2>
+                <div class="bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 text-sm font-medium">
+                    <i class="fas fa-exchange-alt mr-1"></i> বাকি শাফল: <span id="remainingShuffleSpan">4</span>
                 </div>
             </div>
 
-            <!-- RIGHT: analysis graph & stats -->
-            <div class="bg-white rounded-2xl shadow-md p-5 border border-slate-100">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 mb-3"><i class="fas fa-chart-pie text-purple-500"></i> অগ্রগতি বিশ্লেষণ</h2>
-                <div class="w-full h-48 md:h-52 relative mx-auto">
-                    <canvas id="progressChart" width="200" height="200" class="w-full h-full"></canvas>
+            <!-- Subject Filter Row -->
+            <div class="mb-5 p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center gap-3">
+                <label class="font-semibold text-gray-700 text-sm"><i class="fas fa-filter text-amber-500"></i> বিষয় ফিল্টার :</label>
+                <select id="subjectFilterSelect" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400 outline-none flex-1 min-w-[180px]">
+                    <option value="ALL">📚 সব বিষয় (ALL)</option>
+                </select>
+                <span class="text-xs text-gray-400"><i class="fas fa-info-circle"></i> শাফল বা সম্পন্ন করলে ফিল্টার অনুযায়ী টপিক নির্বাচিত হবে</span>
+            </div>
+
+            <!-- Current topic card -->
+            <div id="currentTopicContainer" class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 mb-6 border border-indigo-200 transition-all">
+                <div id="noTopicMsg" class="hidden text-center py-6 text-gray-500">
+                    <i class="fas fa-trophy text-4xl text-amber-400 mb-2"></i>
+                    <p class="font-medium">🎉 চমৎকার! এই ফিল্টারের সব টপিক সম্পন্ন হয়েছে। <br> ফিল্টার পরিবর্তন করুন বা রিসেট করুন।</p>
                 </div>
-                <div class="flex justify-around mt-4 text-center">
-                    <div class="bg-green-50 p-2 rounded-xl flex-1 mx-1">
-                        <p class="text-xs text-green-700 font-medium">সম্পন্ন (পড়া)</p>
-                        <p class="text-2xl font-bold text-green-700" id="studiedCount">0</p>
-                    </div>
-                    <div class="bg-red-50 p-2 rounded-xl flex-1 mx-1">
-                        <p class="text-xs text-red-600 font-medium">বাকি (বাদ)</p>
-                        <p class="text-2xl font-bold text-red-600" id="pendingCount">0</p>
-                    </div>
+                <div id="topicContent">
+                    <span id="topicCatBadge" class="badge-cat inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3"></span>
+                    <h3 id="currentTopicName" class="text-2xl font-bold text-gray-800 leading-tight"></h3>
+                    <p class="text-gray-500 text-sm mt-2"><i class="far fa-id-card"></i> টপিক কোড: <span id="currentTopicId"></span></p>
                 </div>
-                <div class="mt-3 text-sm text-center text-gray-600 bg-slate-50 rounded-lg p-2">
-                    <i class="fas fa-database"></i> মোট টপিক: <strong id="totalTopicsCount">0</strong>
-                </div>
-                <div class="mt-3 text-xs text-gray-400 text-center">
-                    * 'সম্পন্ন' = টপিক পড়া শেষ → ভবিষ্যতে আর আসবে না।
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-4 items-center">
+                <button id="shuffleBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300">
+                    <i class="fas fa-random"></i> শাফল করুন (বিষয়ভিত্তিক)
+                </button>
+                <button id="doneBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-8 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300">
+                    <i class="fas fa-check-circle"></i> সম্পন্ন (Done)
+                </button>
+                <div class="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1.5">
+                    <i class="fas fa-lightbulb"></i> 'সম্পন্ন' করলে টপিক চিরতরে পড়া শেষ, পরবর্তী টপিক ফিল্টার অনুযায়ী আসবে।
                 </div>
             </div>
         </div>
 
-        <!-- all topics list with status & categories -->
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-md p-5 border border-indigo-50">
-            <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-                <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (স্থিতি সহ)</h2>
-                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-500"><i class="far fa-clock"></i> সব ক্যাটাগরি</span>
+        <!-- RIGHT: analysis graph & stats -->
+        <div class="bg-white rounded-2xl shadow-md p-5 border border-slate-100">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 mb-3"><i class="fas fa-chart-pie text-purple-500"></i> অগ্রগতি বিশ্লেষণ</h2>
+            <div class="w-full h-48 md:h-52 relative mx-auto">
+                <canvas id="progressChart" width="200" height="200" class="w-full h-full"></canvas>
             </div>
-            <div class="scrollable-list">
-                <div id="topicsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-1">
-                    <!-- dynamic topics injected -->
+            <div class="flex justify-around mt-4 text-center">
+                <div class="bg-green-50 p-2 rounded-xl flex-1 mx-1">
+                    <p class="text-xs text-green-700 font-medium">সম্পন্ন (পড়া)</p>
+                    <p class="text-2xl font-bold text-green-700" id="studiedCount">0</p>
                 </div>
+                <div class="bg-red-50 p-2 rounded-xl flex-1 mx-1">
+                    <p class="text-xs text-red-600 font-medium">বাকি (বাদ)</p>
+                    <p class="text-2xl font-bold text-red-600" id="pendingCount">0</p>
+                </div>
+            </div>
+            <div class="mt-3 text-sm text-center text-gray-600 bg-slate-50 rounded-lg p-2">
+                <i class="fas fa-database"></i> মোট টপিক: <strong id="totalTopicsCount">0</strong>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 text-center">
+                * সম্পন্ন = টপিক পড়া শেষ → আর কখনো আসবে না। ফিল্টার চেঞ্জ করলে শুধু নির্বাচন প্রভাবিত হয়।
             </div>
         </div>
     </div>
 
-    <script>
-        // ---------- original topic dataset (61 topics exactly) ----------
-        const allTopics = [
-            { id:1, name:"প্রয়োগ-অপপ্রয়োগ, বানান ও বাক্য শুদ্ধি (বাংলা)", cat:"বাংলা ভাষা" },
-            { id:2, name:"পরিভাষা, সমার্থক ও বিপরীতার্থক শব্দ", cat:"বাংলা ভাষা" },
-            { id:3, name:"ধ্বনি, বর্ণ, শব্দ, পদ, বাক্য", cat:"বাংলা ভাষা" },
-            { id:4, name:"প্রত্যয়, সন্ধি ও সমাস", cat:"বাংলা ভাষা" },
-            { id:5, name:"প্রাচীন ও মধ্যযুগের সাহিত্য", cat:"বাংলা সাহিত্য" },
-            { id:6, name:"আধুনিক যুগের কবিতা (১৮০০-বর্তমান)", cat:"বাংলা সাহিত্য" },
-            { id:7, name:"আধুনিক যুগের গল্প, উপন্যাস, নাটক, প্রবন্ধ", cat:"বাংলা সাহিত্য" },
-            { id:8, name:"Parts of Speech: Noun, Pronoun (English)", cat:"English" },
-            { id:9, name:"Verb (Finite, Non-finite, Linking, Phrasal, Modals)", cat:"English" },
-            { id:10, name:"Adjective, Adverb, Preposition, Conjunction", cat:"English" },
-            { id:11, name:"Idioms & Phrases, Clauses", cat:"English" },
-            { id:12, name:"Corrections (Tense, Verb, Preposition, S-V Agreement)", cat:"English" },
-            { id:13, name:"Sentence Transformations", cat:"English" },
-            { id:14, name:"Words: Synonyms, Antonyms, Spelling", cat:"English" },
-            { id:15, name:"Composition", cat:"English" },
-            { id:16, name:"English Literature: Writers & Quotations", cat:"English Lit." },
-            { id:17, name:"প্রাচীন ও মধ্যযুগের ইতিহাস ও সংস্কৃতি", cat:"বাংলাদেশ" },
-            { id:18, name:"ভাষা আন্দোলন থেকে অভ্যুত্থান", cat:"বাংলাদেশ" },
-            { id:19, name:"মুক্তিযুদ্ধের ইতিহাস", cat:"বাংলাদেশ" },
-            { id:20, name:"কৃষিজ সম্পদ ও খাদ্য ব্যবস্থাপনা", cat:"বাংলাদেশ" },
-            { id:21, name:"জনসংখ্যা ও ক্ষুদ্র নৃগোষ্ঠী", cat:"বাংলাদেশ" },
-            { id:22, name:"অর্থনীতি ও উন্নয়ন", cat:"বাংলাদেশ" },
-            { id:23, name:"শিল্প ও বাণিজ্য", cat:"বাংলাদেশ" },
-            { id:24, name:"সংবিধান ও মৌলিক অধিকার", cat:"বাংলাদেশ" },
-            { id:25, name:"রাজনৈতিক ব্যবস্থা", cat:"বাংলাদেশ" },
-            { id:26, name:"সরকার ব্যবস্থা", cat:"বাংলাদেশ" },
-            { id:27, name:"জাতীয় অর্জন ও ব্যক্তিত্ব", cat:"বাংলাদেশ" },
-            { id:28, name:"বৈশ্বিক ইতিহাস ও ভূ-রাজনীতি", cat:"আন্তর্জাতিক" },
-            { id:29, name:"আন্তর্জাতিক নিরাপত্তা ও ক্ষমতা", cat:"আন্তর্জাতিক" },
-            { id:30, name:"বিশ্বের সাম্প্রতিক ঘটনাপ্রবাহ", cat:"আন্তর্জাতিক" },
-            { id:31, name:"পরিবেশগত ইস্যু ও কূটনীতি", cat:"আন্তর্জাতিক" },
-            { id:32, name:"আন্তর্জাতিক সংগঠন", cat:"আন্তর্জাতিক" },
-            { id:33, name:"ভৌগোলিক অবস্থান ও সীমানা", cat:"ভূগোল" },
-            { id:34, name:"ভৌত পরিবেশ ও সম্পদের বণ্টন", cat:"ভূগোল" },
-            { id:35, name:"বাংলাদেশের পরিবেশ ও চ্যালেঞ্জ", cat:"পরিবেশ" },
-            { id:36, name:"জলবায়ু পরিবর্তন ও প্রভাব", cat:"পরিবেশ" },
-            { id:37, name:"প্রাকৃতিক দুর্যোগ ও ব্যবস্থাপনা", cat:"দুর্যোগ" },
-            { id:38, name:"ভৌত বিজ্ঞান (পদার্থ, পরমাণু, এসিড)", cat:"বিজ্ঞান" },
-            { id:39, name:"জীব বিজ্ঞান (টিস্যু, জেনেটিক্স)", cat:"বিজ্ঞান" },
-            { id:40, name:"আধুনিক বিজ্ঞান", cat:"বিজ্ঞান" },
-            { id:41, name:"Computer Organisation & OS", cat:"কম্পিউটার" },
-            { id:42, name:"ভাইরাস, ফায়ারওয়াল, প্রোগ্রাম", cat:"কম্পিউটার" },
-            { id:43, name:"তথ্যপ্রযুক্তি (ই-কমার্স, ক্লাউড)", cat:"ICT" },
-            { id:44, name:"গণিত: সংখ্যা, শতকরা, লাভ-ক্ষতি", cat:"গণিত" },
-            { id:45, name:"বীজগাণিতিক সূত্র ও সমীকরণ", cat:"গণিত" },
-            { id:46, name:"সূচক ও লগারিদম", cat:"গণিত" },
-            { id:47, name:"জ্যামিতি ও পরিমিতি", cat:"গণিত" },
-            { id:48, name:"সেট, বিন্যাস ও সম্ভাবনা", cat:"গণিত" },
-            { id:49, name:"Verbal Reasoning", cat:"মানসিক দক্ষতা" },
-            { id:50, name:"Problem Solving", cat:"মানসিক দক্ষতা" },
-            { id:51, name:"Numerical Ability", cat:"মানসিক দক্ষতা" },
-            { id:52, name:"নৈতিকতা ও সুশাসনের ধারণা", cat:"নৈতিকতা" },
-            { id:53, name:"মূল্যবোধের গুরুত্ব", cat:"নৈতিকতা" },
-            { id:54, name:"সুশাসন প্রতিষ্ঠার উপায়", cat:"নৈতিকতা" },
-            { id:55, name:"আধুনিক যুগের সাহিত্য - ২", cat:"বাংলা সাহিত্য" },
-            { id:56, name:"ভূ-প্রকৃতি ও সম্পদ বণ্টন", cat:"ভূগোল" },
-            { id:57, name:"পরিবেশ দূষণ ও প্রতিকার", cat:"পরিবেশ" },
-            { id:58, name:"ইংরেজি সাহিত্য কোটেশন", cat:"English Lit." },
-            { id:59, name:"আন্তর্জাতিক জোট ও চুক্তি", cat:"আন্তর্জাতিক" },
-            { id:60, name:"অর্থনৈতিক সমীক্ষা", cat:"বাংলাদেশ" },
-            { id:61, name:"জিন ও বংশগতি", cat:"বিজ্ঞান" }
-        ];
+    <!-- all topics list -->
+    <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-md p-5 border border-indigo-50">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+            <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (স্থিতি ও বিষয়সহ)</h2>
+            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-500"><i class="far fa-clock"></i> ফিল্টার অনুযায়ী শাফল করা যাবে</span>
+        </div>
+        <div class="scrollable-list">
+            <div id="topicsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-1"></div>
+        </div>
+    </div>
+</div>
 
-        // ---------- app state ----------
-        let completedIds = [];       // array of completed topic ids
-        let currentTopic = null;     // current daily topic object
-        let shuffleUsed = 0;          // number of shuffles done for current daily selection
-        const MAX_SHUFFLE = 4;
+<script>
+    // ======================= ১. সম্পূর্ণ টপিক ডেটাসেট (প্রদত্ত সিলেবাস থেকে) =======================
+    // নিচে সকল ID, Subject ও Topic কে অ্যাপ্লিকেশনের উপযোগী করে রূপান্তর করা হয়েছে।
+    // প্রতিটি এন্ট্রি: { id: serial, name: topic title, cat: subject name }
+    const topicsDataRaw = [
+        // বাংলা ভাষা ও সাহিত্য (BANGLA_01 to 08)
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "ভাষা ও বাংলা ভাষার উৎপত্তি, ধনি, বর্ণ ও অক্ষর" },
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "সন্ধি, ধনির পরিবর্তন, সমার্থক শব্দ, বিপরীত শব্দ" },
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "শব্দ ও শব্দের প্রকাশ, বাংলা বানানের নিয়ম, গ-তু ও স্ব-তু বিধান" },
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "পদ, ছন্দ, অলঙ্কার, এক কথায় প্রকাশ, ক্রিয়ার কাল" },
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "কারক ও বিভক্তি, অনুসর্গ, দ্বিত্ব শব্দ, পরিচয়" },
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "সমাস, প্রবাদ-প্রবচন, বাগধারা" },
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "উপসর্গ, ধাতু, প্রকৃতি-প্রত্যায়, যতি চিহ্ন" },
+        { cat: "বাংলা ভাষা ও সাহিত্য", name: "বাক্য ও বাক্য প্রকরণ, বাক্য রূপান্তর, প্রয়োগ-অপপ্রয়োগ" },
+        // বাংলাদেশ বিষয়াবলি (BANGLADESH_01 to 18)
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "প্রাচীনকাল হতে সাম্প্রতিক ইতিহাস, কৃষি ও সংস্কৃতি, প্রাচীন জনপদ" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "বাংলায় মুসলিম শাসন, ইলিয়াস শাহী, মুঘল ও নবাবী শাসন" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "ইউরোপীয় আগমন, ইস্ট ইন্ডিয়া কোম্পানি, বঙ্গভঙ্গ ও পাকিস্তান সৃষ্টি" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "ভাষা আন্দোলন, ১৯৫৪ নির্বাচন, গণঅভ্যুত্থান ১৯৬৯, রাজনৈতিক ব্যক্তিত্ব" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "মুক্তিযুদ্ধের রণকৌশল, বীরত্বসূচক খেতাব, ১৯৭৫-পরবর্তী ও ২০২৪ ছাত্র আন্দোলন" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "সংবিধান: প্রস্তাবনা, মৌলিক অধিকার, রাষ্ট্র পরিচালনার মূলনীতি" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "সংবিধানের গুরুত্বপূর্ণ অনুচ্ছেদ, সংশোধনসমূহ" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "বাংলাদেশের নির্বাচন, RPO ২০২৫, নির্বাচন কমিশন" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "রাজনৈতিক ব্যবস্থা, দলসমূহ, ক্ষমতাসীন ও বিরোধী সম্পর্ক" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "সরকার ব্যবস্থা: আইন, শাসন, বিচার ও স্থানীয় সরকার" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "অর্থনীতি: উন্নয়ন পরিকল্পনা, দারিদ্র্য বিমোচন" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "শিক্ষণ ও বাণিজ্য, গার্মেন্টস শিল্প" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "বৈদেশিক লেনদেন, অর্থমার্জন, ব্যাংক ও বিমা, পরিবেশ ও টেকসই উন্নয়ন" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "জনসংখ্যা, আদমশুমারি, জাতি-গোত্র, শিক্ষা ও স্বাস্থ্য" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "কৃষিজ সম্পদ, শস্য বহুমুখীকরণ, খাদ্য ব্যবস্থাপনা" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "সামাজিক সমস্যা, তথ্য অধিকার, ই-গভর্নেন্স, মৎস্য ও প্রাণী সম্পদ, সুন্দরবন" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "সুশীল সমাজ, এনজিও, জেন্ডার ইস্যু, SDG, অর্থনৈতিক অঞ্চল" },
+        { cat: "বাংলাদেশ বিষয়াবলি", name: "বাংলাদেশের মৌলিক ভূগোল, ব-দ্বীপ, বরেন্দ্র, ছিটমহল" },
+        // আন্তর্জাতিক বিষয়াবলি (INT_01 to INT_18)
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "বিশ্ব সত্যতা, এশিয়া মহাদেশ, দক্ষিণ এশিয়ার রাজনীতি, ভারত-পাকিস্তান যুদ্ধ" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "ইউরোপ মহাদেশ, মার্কিন যুক্তরাষ্ট্র, রাশিয়া, ইউক্রেন-রাশিয়া পরিস্থিতি" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "উত্তর ও দক্ষিণ আমেরিকা, চীন-ভারত কূটনীতি" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "আফ্রিকা মহাদেশ, প্রথম বিশ্বযুদ্ধ ও পরবর্তী সংঘাত" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "ওশেনীয়া, এন্টার্কটিকা, দ্বিতীয় বিশ্বযুদ্ধ ও উপনাম" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "জাতিপুঞ্জ ও জাতিসংঘ, অঙ্গসংগঠন, SDG, শান্তিরক্ষা মিশন" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "বিশ্বব্যাংক, IMF, ADB, WTO, অর্থনৈতিক প্রতিষ্ঠান" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "দেশভিত্তিক বিভিন্ন নাম, মুদ্রা, অর্থনৈতিক জোট (EU, G7, G20)" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "জাতিসংঘ ব্যবস্থা, LDC উত্তরণ, মানবাধিকার এজেন্ডা" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "SAARC, ASEAN, BIMSTEC, BRICS, OPEC, RCEP" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "NAM, কমনওয়েলথ, OIC, আরব লীগ, আন্তর্জাতিক কৃষি সংস্থা" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "মতবাদ: বাস্তববাদ, সাম্যবাদ, উপনিবেশবাদ, সংঘর্ষ তত্ত্ব" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "পশ্চিম এশিয়া, ইরান-যুক্তরাষ্ট্র, ইসরাইল-ফিলিস্তিন সংকট" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "আন্তরাষ্ট্রীয় নিরাপত্তা, ন্যাটো, সন্ত্রাসবাদ, নিরস্ত্রীকরণ" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "রেডক্রস, অ্যামনেস্টি, ট্রান্সপারেন্সি ইন্টারন্যাশনাল, আইএইএ" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "পরিবেশগত ইস্যু ও কূটনীতি, জলবায়ু সম্মেলন, প্রটোকল" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "মহাসাগর, প্রণালী, খাল, দ্বীপপুঞ্জ, ভূমিরূপ" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "বিশ্বায়ন, পতাকা, নোবেল পুরস্কার, গুরুত্বপূর্ণ দিবস" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "আন্তর্জাতিক অঙ্গনে বাংলাদেশ, বৈদেশিক নীতি, চুক্তি" },
+        { cat: "আন্তর্জাতিক বিষয়াবলি", name: "সাম্প্রতিক ঘটনাপ্রবাহ, কূটনীতি ও রাষ্ট্রবিজ্ঞান" },
+        // গাণিতিক যুক্তি (MATH_01 to MATH_16) 
+        { cat: "গাণিতিক যুক্তি", name: "বাস্তব ও জটিল সংখ্যা, ল.সা.গু, গ.সা.গু" },
+        { cat: "গাণিতিক যুক্তি", name: "ভগ্নাংশ, অনুপাত, সমানুপাত, শতকরা" },
+        { cat: "গাণিতিক যুক্তি", name: "একক নিয়ম, লাভ-ক্ষতি" },
+        { cat: "গাণিতিক যুক্তি", name: "পাটিগণিত সরলীকরণ, সরল ও যৌগিক মুনাফা" },
+        { cat: "গাণিতিক যুক্তি", name: "বীজগাণিতিক সূত্রাবলি, সরলীকরণ" },
+        { cat: "গাণিতিক যুক্তি", name: "সরল সমীকরণ, দ্বিঘাত সমীকরণ, দুই ও তিন চলক" },
+        { cat: "গাণিতিক যুক্তি", name: "উৎপাদকে বিশ্লেষণ, দ্বিপদী বিস্তৃতি, অসমতা" },
+        { cat: "গাণিতিক যুক্তি", name: "অনুক্রম, সমান্তর ও গুণোত্তর ধারা" },
+        { cat: "গাণিতিক যুক্তি", name: "সূচক ও লগারিদম, ফাংশন" },
+        { cat: "গাণিতিক যুক্তি", name: "বিন্যাস ও সমাবেশ" },
+        { cat: "গাণিতিক যুক্তি", name: "সেট তত্ত্ব ও ভেনচিত্র" },
+        { cat: "গাণিতিক যুক্তি", name: "স্থানাঙ্ক জ্যামিতি, পরিসংখ্যান" },
+        { cat: "গাণিতিক যুক্তি", name: "ত্রিকোণমিতি, দূরত্ব ও উচ্চতা নির্ণয়" },
+        { cat: "গাণিতিক যুক্তি", name: "পরিমিতি: ক্ষেত্রফল সংক্রান্ত সমস্যা" },
+        { cat: "গাণিতিক যুক্তি", name: "রেখা, কোণ, পিথাগোরাসের উপপাদ্য" },
+        { cat: "গাণিতিক যুক্তি", name: "বৃত্ত ও চতুর্ভুজ সংক্রান্ত উপপাদ্য" },
+        // মানসিক দক্ষতা (MENTAL_01..05)
+        { cat: "মানসিক দক্ষতা", name: "যান্ত্রিক দক্ষতা (দর্পণ, প্রতিবিম্ব, যন্ত্রাংশ)" },
+        { cat: "মানসিক দক্ষতা", name: "স্থানিক সম্পর্ক, স্থানাঙ্ক, চিত্র গণনা" },
+        { cat: "মানসিক দক্ষতা", name: "সংখ্যাগত ক্ষমতা, ধারা, বর্গমূল, অনুক্রম" },
+        { cat: "মানসিক দক্ষতা", name: "ভাষাগত যৌক্তিক বিচার, সাদৃশ্য, সিদ্ধান্ত গ্রহণ, বানান" },
+        { cat: "মানসিক দক্ষতা", name: "সমস্যা সমাধান (ঘড়ি, তারিখ, নল ও কুয়ো, কাজ)" },
+        // সাধারণ বিজ্ঞান (SCIENCE_01..14)
+        { cat: "সাধারণ বিজ্ঞান", name: "আলো: প্রতিফলন, প্রতিসরণ, লেজার, আলোক দ্বৈততা" },
+        { cat: "সাধারণ বিজ্ঞান", name: "তাপ, শব্দ, ডপলার ক্রিয়া, প্রতিধ্বনি" },
+        { cat: "সাধারণ বিজ্ঞান", name: "মৌলিক কণা, ওহমের সূত্র, তড়িৎ ক্ষমতা" },
+        { cat: "সাধারণ বিজ্ঞান", name: "মাত্রীয়তা, ইলেকট্রনিক্স, অর্ধপরিবাহী, ডায়োড, ট্রানজিস্টর" },
+        { cat: "সাধারণ বিজ্ঞান", name: "চুম্বক ও চৌম্বকত্ব, তড়িৎচুম্বক, গ্যালভানোমিটার" },
+        { cat: "সাধারণ বিজ্ঞান", name: "পদার্থের ধর্ম, অ্যাসিড, ক্ষারক, লবণ, pH" },
+        { cat: "সাধারণ বিজ্ঞান", name: "বায়ুমণ্ডল, গ্রিনহাউস প্রভাব, শক্তির উৎস" },
+        { cat: "সাধারণ বিজ্ঞান", name: "পোলার দ্রব্য, সিরামিক, ধাতু-অধাতু, পলিমার" },
+        { cat: "সাধারণ বিজ্ঞান", name: "ভৌত পরিবর্তন, তাপ ইঞ্জিন, তড়িৎ কোষ" },
+        { cat: "সাধারণ বিজ্ঞান", name: "আপেক্ষিকতা তত্ত্ব, বিশ্বতত্ত্ব" },
+        { cat: "সাধারণ বিজ্ঞান", name: "জীবনবিজ্ঞান, কোষ, DNA, RNA, জিন প্রযুক্তি, ক্লোনিং" },
+        { cat: "সাধারণ বিজ্ঞান", name: "উদ্ভিদ অঙ্গসংস্থান, অণুজীব, ভাইরাস, ব্যাকটেরিয়া" },
+        { cat: "সাধারণ বিজ্ঞান", name: "খাদ্য ও পুষ্টি, ভিটামিন, BMI, ফাস্টফুড" },
+        { cat: "সাধারণ বিজ্ঞান", name: "অঙ্গতন্ত্র, রোগ ও স্বাস্থ্যসেবা, ডেঙ্গু, ক্যান্সার, ভ্যাকসিন" },
+        // কম্পিউটার ও তথ্য প্রযুক্তি (COMPUTER_01..06)
+        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "কম্পিউটারের ইতিহাস, প্রকারভেদ, সামাজিক মিডিয়া, সাইবার অপরাধ" },
+        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "CPU, মাইক্রোপ্রসেসর, মেমোরি, ইনপুট-আউটপুট ডিভাইস" },
+        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "সংখ্যা পদ্ধতি, বুলিয়ান অ্যালজেবরা, লজিক গেইট" },
+        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "প্রোগ্রামিং ভাষা, সফটওয়্যার, অপারেটিং সিস্টেম, ভাইরাস" },
+        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "ডেটা নেটওয়ার্ক, টপোলজি, ডেটাবেজ সিস্টেম" },
+        { cat: "কম্পিউটার ও তথ্য প্রযুক্তি", name: "মোবাইল প্রযুক্তি, ইন্টারনেট, ক্লাউড কম্পিউটিং, ই-কমার্স" },
+        // ভূগোল, পরিবেশ ও দুর্যোগ ব্যবস্থাপনা
+        { cat: "ভূগোল ও পরিবেশ", name: "মহাবিশ্ব ও পৃথিবী, ভূমিরূপ, ভূ-সঞ্চালন" },
+        { cat: "ভূগোল ও পরিবেশ", name: "জলবায়ু, বৈশ্বিক উষ্ণায়ন, বাংলাদেশের জলবায়ু, আন্তর্জাতিক উদ্যোগ" },
+        { cat: "ভূগোল ও পরিবেশ", name: "ভূ-প্রাকৃতিক বিপর্যয়, দুর্যোগ ব্যবস্থাপনা, বাংলাদেশের দুর্যোগ" },
+        { cat: "ভূগোল ও পরিবেশ", name: "মানচিত্র, বায়ুমণ্ডল, বারিমণ্ডল, পৃথিবীর অভ্যন্তর" },
+        // নৈতিকতা ও সু-শাসন
+        { cat: "নৈতিকতা ও সুশাসন", name: "নৈতিকতা, মূল্যবোধ ও সুশাসনের ধারণা, উপাদান" },
+        { cat: "নৈতিকতা ও সুশাসন", name: "রাষ্ট্রীয় উন্নয়নে মূল্যবোধ, সংবিধানের অনুচ্ছেদ, গুরুত্বপূর্ণ গ্রন্থ" },
+        { cat: "নৈতিকতা ও সুশাসন", name: "আইনের ধারণা, স্বাধীনতা, চাপসৃষ্টিকারী গোষ্ঠী, মনিটরিং" },
+        { cat: "নৈতিকতা ও সুশাসন", name: "গণতন্ত্র, একনায়কতন্ত্র, নির্বাচন, আমলাতন্ত্র" },
+        // লিখিত লাইভ ও রেকর্ডড ক্লাস (রচনা, কম্প্রিহেনশন, ট্রান্সলেশন)
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "রচনা সমালোচনা, ভাষা আন্দোলন ও ছাত্র অভ্যুত্থানভিত্তিক গ্রন্থ" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "সারাংশ/সারমর্ম লেখার কৌশল" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Reading Comprehension কৌশল (Word meaning, Paraphrasing)" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Summary ও Feature লেখা" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "আন্তর্জাতিক বিষয়াবলি প্রবন্ধ সমাধান" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "ভাব-সম্প্রসারণ ও প্রতিবেদন লেখা" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "পত্র / সংলাপ ও সম্পাদক বরাবর পত্র" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Translation (English to Bangla & Bangla to English)" },
+        { cat: "লিখিত পরীক্ষা প্রস্তুতি", name: "Essay Writing: Thesis, Argumentative, Synthesis" }
+    ];
 
-        // chart instance
-        let progressChart = null;
-
-        // DOM elements
-        const shuffleBtn = document.getElementById('shuffleBtn');
-        const doneBtn = document.getElementById('doneBtn');
-        const remainingShuffleSpan = document.getElementById('remainingShuffleSpan');
-        const currentTopicNameSpan = document.getElementById('currentTopicName');
-        const currentTopicIdSpan = document.getElementById('currentTopicId');
-        const topicCatBadge = document.getElementById('topicCatBadge');
-        const studiedCountSpan = document.getElementById('studiedCount');
-        const pendingCountSpan = document.getElementById('pendingCount');
-        const totalTopicsCountSpan = document.getElementById('totalTopicsCount');
-        const noTopicMsgDiv = document.getElementById('noTopicMsg');
-        const topicContentDiv = document.getElementById('topicContent');
-        const topicsListContainer = document.getElementById('topicsListContainer');
-
-        // Helper: get pending topics (not completed)
-        function getPendingTopics() {
-            return allTopics.filter(t => !completedIds.includes(t.id));
+    // Assign sequential IDs
+    let allTopics = topicsDataRaw.map((item, idx) => ({ id: idx+1, name: item.name, cat: item.cat }));
+    
+    // extract unique subjects for filter dropdown
+    const uniqueSubjects = [...new Set(allTopics.map(t => t.cat))].sort();
+    
+    // ---------- App State ----------
+    let completedIds = [];          // সম্পন্ন টপিকের আইডি
+    let currentTopic = null;
+    let shuffleUsed = 0;
+    let currentFilter = "ALL";      // "ALL" or specific subject name
+    const MAX_SHUFFLE = 4;
+    let progressChart = null;
+    
+    // DOM elements
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const doneBtn = document.getElementById('doneBtn');
+    const remainingShuffleSpan = document.getElementById('remainingShuffleSpan');
+    const currentTopicNameSpan = document.getElementById('currentTopicName');
+    const currentTopicIdSpan = document.getElementById('currentTopicId');
+    const topicCatBadge = document.getElementById('topicCatBadge');
+    const studiedCountSpan = document.getElementById('studiedCount');
+    const pendingCountSpan = document.getElementById('pendingCount');
+    const totalTopicsCountSpan = document.getElementById('totalTopicsCount');
+    const noTopicMsgDiv = document.getElementById('noTopicMsg');
+    const topicContentDiv = document.getElementById('topicContent');
+    const topicsListContainer = document.getElementById('topicsListContainer');
+    const subjectFilterSelect = document.getElementById('subjectFilterSelect');
+    
+    // Helper: pending topics (সব) but can filter if needed
+    function getPendingTopics(filter = null) {
+        let pending = allTopics.filter(t => !completedIds.includes(t.id));
+        if (filter && filter !== "ALL") {
+            pending = pending.filter(t => t.cat === filter);
         }
-
-        // Helper: get random topic from pending list (optional excludeId)
-        function getRandomPendingTopic(excludeId = null) {
-            let pending = getPendingTopics();
-            if (pending.length === 0) return null;
-            if (excludeId !== null) {
-                pending = pending.filter(t => t.id !== excludeId);
-                if (pending.length === 0) return null;
+        return pending;
+    }
+    
+    // get pending topics based on global currentFilter
+    function getPendingFiltered() {
+        return getPendingTopics(currentFilter);
+    }
+    
+    // random from filtered pending (optionally exclude currentId)
+    function getRandomFilteredPending(excludeId = null) {
+        let pending = getPendingFiltered();
+        if (pending.length === 0) return null;
+        if (excludeId !== null) pending = pending.filter(t => t.id !== excludeId);
+        if (pending.length === 0) return null;
+        return pending[Math.floor(Math.random() * pending.length)];
+    }
+    
+    // save state locally
+    function persistState() {
+        localStorage.setItem('dailyPlannerSubject', JSON.stringify({
+            completedIds, shuffleUsed, currentTopicId: currentTopic?.id || null, filter: currentFilter
+        }));
+    }
+    
+    function loadState() {
+        const saved = localStorage.getItem('dailyPlannerSubject');
+        if (!saved) return false;
+        try {
+            const data = JSON.parse(saved);
+            if (data.completedIds) completedIds = data.completedIds;
+            if (typeof data.shuffleUsed === 'number') shuffleUsed = Math.min(data.shuffleUsed, MAX_SHUFFLE);
+            if (data.filter && (data.filter === "ALL" || uniqueSubjects.includes(data.filter))) currentFilter = data.filter;
+            if (data.currentTopicId && !completedIds.includes(data.currentTopicId)) {
+                const found = allTopics.find(t => t.id === data.currentTopicId);
+                if (found) currentTopic = found;
             }
-            const randomIndex = Math.floor(Math.random() * pending.length);
-            return pending[randomIndex];
+            return true;
+        } catch(e) { return false; }
+    }
+    
+    // revalidate topic based on filter
+    function validateTopicByFilter() {
+        const filteredPending = getPendingFiltered();
+        if (filteredPending.length === 0) {
+            currentTopic = null;
+            return;
         }
-
-        // Save to localStorage
-        function persistState() {
-            const state = {
-                completedIds: completedIds,
-                shuffleUsed: shuffleUsed,
-                currentTopicId: currentTopic ? currentTopic.id : null
-            };
-            localStorage.setItem('dailyShufflePlanner', JSON.stringify(state));
+        if (!currentTopic || completedIds.includes(currentTopic.id) || (currentFilter !== "ALL" && currentTopic.cat !== currentFilter)) {
+            currentTopic = getRandomFilteredPending();
+            shuffleUsed = 0;
         }
-
-        // Load from localStorage (and validate consistency)
-        function loadState() {
-            const saved = localStorage.getItem('dailyShufflePlanner');
-            if (!saved) return false;
-            try {
-                const data = JSON.parse(saved);
-                if (data.completedIds && Array.isArray(data.completedIds)) completedIds = data.completedIds;
-                if (typeof data.shuffleUsed === 'number') shuffleUsed = Math.min(data.shuffleUsed, MAX_SHUFFLE);
-                const savedTopicId = data.currentTopicId;
-                if (savedTopicId !== null && !completedIds.includes(savedTopicId)) {
-                    const found = allTopics.find(t => t.id === savedTopicId);
-                    if (found) currentTopic = found;
-                    else currentTopic = null;
-                } else {
-                    currentTopic = null;
-                }
-                return true;
-            } catch(e) { return false; }
+    }
+    
+    function renderTopicsList() {
+        let html = '';
+        for (let topic of allTopics) {
+            const isCompleted = completedIds.includes(topic.id);
+            const statusClass = isCompleted ? 'bg-green-100 border-green-200' : 'bg-white border-gray-200';
+            const statusText = isCompleted ? '<span class="text-green-700 text-xs font-medium bg-green-200 px-2 py-0.5 rounded-full"><i class="fas fa-check-circle"></i> সম্পন্ন</span>' : '<span class="text-amber-600 text-xs font-medium bg-amber-100 px-2 py-0.5 rounded-full"><i class="fas fa-hourglass-half"></i> অপঠিত</span>';
+            html += `<div class="${statusClass} border rounded-xl p-3 flex flex-wrap justify-between items-center gap-2">
+                        <div class="flex-1"><div class="flex gap-2 flex-wrap"><span class="text-xs font-mono text-gray-400">#${topic.id}</span><span class="badge-cat">${escapeHtml(topic.cat)}</span></div>
+                        <p class="text-sm font-medium text-gray-800 mt-1">${escapeHtml(topic.name)}</p></div>
+                        <div>${statusText}</div>
+                    </div>`;
         }
-
-        // Initial or reset runtime: validate current topic and reinitialize if invalid
-        function validateAndSetTopic() {
-            const pending = getPendingTopics();
-            if (pending.length === 0) {
-                currentTopic = null;
-                return;
-            }
-            // if currentTopic is null or completed OR not in pending list -> pick random pending
-            if (!currentTopic || completedIds.includes(currentTopic.id) || !pending.some(t => t.id === currentTopic.id)) {
-                currentTopic = getRandomPendingTopic();
-                // reset shuffle counter only if we had to pick fresh due to inconsistency (but keep existing if valid?)
-                if (currentTopic) {
-                    // better to reset shuffleUsed at valid new assignment, but we also want to keep shuffle count consistent only when done calls reset.
-                    // However when loading ok, we should not reset shuffleUsed arbitrarily.
-                    // Only if we force new topic due to inconsistency, reset shuffle to 0.
-                    shuffleUsed = 0;
-                }
-            }
-            // in case after all pending done -> null
-            if (getPendingTopics().length === 0) currentTopic = null;
+        topicsListContainer.innerHTML = html;
+    }
+    
+    function fullRender() {
+        const total = allTopics.length;
+        const completedCount = completedIds.length;
+        const pendingTotal = total - completedCount;
+        studiedCountSpan.innerText = completedCount;
+        pendingCountSpan.innerText = pendingTotal;
+        totalTopicsCountSpan.innerText = total;
+        if (progressChart) {
+            progressChart.data.datasets[0].data = [completedCount, pendingTotal];
+            progressChart.update();
         }
-
-        // Full UI update: chart, buttons, remaining shuffle, topic display, list
-        function fullRender() {
-            // update counts
-            const total = allTopics.length;
-            const completedCount = completedIds.length;
-            const pendingCountVal = total - completedCount;
-            studiedCountSpan.innerText = completedCount;
-            pendingCountSpan.innerText = pendingCountVal;
-            totalTopicsCountSpan.innerText = total;
-
-            // update chart
-            if (progressChart) {
-                progressChart.data.datasets[0].data = [completedCount, pendingCountVal];
-                progressChart.update();
+        const remaining = MAX_SHUFFLE - shuffleUsed;
+        remainingShuffleSpan.innerText = remaining >=0 ? remaining : 0;
+        const filteredPending = getPendingFiltered();
+        if (filteredPending.length === 0 || !currentTopic) {
+            noTopicMsgDiv.classList.remove('hidden');
+            topicContentDiv.classList.add('hidden');
+            shuffleBtn.disabled = true;
+            doneBtn.disabled = true;
+        } else {
+            noTopicMsgDiv.classList.add('hidden');
+            topicContentDiv.classList.remove('hidden');
+            currentTopicNameSpan.innerText = currentTopic.name;
+            currentTopicIdSpan.innerText = currentTopic.id;
+            topicCatBadge.innerText = currentTopic.cat;
+            let canShuffle = (shuffleUsed < MAX_SHUFFLE);
+            if (canShuffle) {
+                const others = getPendingFiltered().filter(t => t.id !== currentTopic.id);
+                if (others.length === 0) canShuffle = false;
             }
-
-            // remaining shuffle display
-            const remaining = MAX_SHUFFLE - shuffleUsed;
-            remainingShuffleSpan.innerText = remaining >=0 ? remaining : 0;
-
-            // handle empty state / topic
-            const pendingTopics = getPendingTopics();
-            if (pendingTopics.length === 0 || !currentTopic) {
-                noTopicMsgDiv.classList.remove('hidden');
-                topicContentDiv.classList.add('hidden');
-                shuffleBtn.disabled = true;
-                doneBtn.disabled = true;
-            } else {
-                noTopicMsgDiv.classList.add('hidden');
-                topicContentDiv.classList.remove('hidden');
-                currentTopicNameSpan.innerText = currentTopic.name;
-                currentTopicIdSpan.innerText = currentTopic.id;
-                topicCatBadge.innerText = currentTopic.cat;
-                // shuffle button enable/disable based on remaining attempts & if at least one different pending possible
-                let canShuffle = (shuffleUsed < MAX_SHUFFLE);
-                if (canShuffle) {
-                    const differentPendingExists = getPendingTopics().filter(t => t.id !== currentTopic.id).length > 0;
-                    if (!differentPendingExists && getPendingTopics().length === 1) canShuffle = false;
-                }
-                shuffleBtn.disabled = !canShuffle;
-                doneBtn.disabled = false;
-            }
-
-            // render topics list with status
-            renderTopicsList();
-
-            // persist after every change
-            persistState();
+            shuffleBtn.disabled = !canShuffle;
+            doneBtn.disabled = false;
         }
-
-        // render all topics (completed badge shows 'পড়া শেষ', pending shows 'অপঠিত')
-        function renderTopicsList() {
-            if (!topicsListContainer) return;
-            // sort by id but show all
-            const sorted = [...allTopics].sort((a,b) => a.id - b.id);
-            let html = '';
-            for (let topic of sorted) {
-                const isCompleted = completedIds.includes(topic.id);
-                const statusClass = isCompleted ? 'bg-green-100 border-green-200' : 'bg-white border-gray-200';
-                const statusText = isCompleted ? 
-                    '<span class="text-green-700 text-xs font-medium bg-green-200 px-2 py-0.5 rounded-full"><i class="fas fa-check-circle"></i> সম্পন্ন</span>' : 
-                    '<span class="text-amber-600 text-xs font-medium bg-amber-100 px-2 py-0.5 rounded-full"><i class="fas fa-hourglass-half"></i> অপঠিত</span>';
-                html += `
-                    <div class="${statusClass} border rounded-xl p-3 flex flex-wrap justify-between items-center gap-2 topic-list-item">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-xs font-mono text-gray-400">#${topic.id}</span>
-                                <span class="badge-cat text-[11px] px-2 py-0.5">${escapeHtml(topic.cat)}</span>
-                            </div>
-                            <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">${escapeHtml(topic.name)}</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            ${statusText}
-                        </div>
-                    </div>
-                `;
-            }
-            topicsListContainer.innerHTML = html;
+        renderTopicsList();
+        persistState();
+    }
+    
+    function handleShuffle() {
+        if (shuffleUsed >= MAX_SHUFFLE) { alert(`সর্বোচ্চ ${MAX_SHUFFLE} বার শাফল করতে পারেন!`); return; }
+        const filteredPending = getPendingFiltered();
+        if (filteredPending.length <= 1) { alert("এই ফিল্টারে আর ভিন্ন টপিক নেই। সম্পন্ন করুন বা ফিল্টার বাড়ান।"); return; }
+        let newTopic = getRandomFilteredPending(currentTopic.id);
+        if (newTopic) { currentTopic = newTopic; shuffleUsed++; fullRender(); }
+        else alert("ভিন্ন টপিক পাওয়া যায়নি।");
+    }
+    
+    function handleDone() {
+        if (!currentTopic) { alert("কোন টপিক নেই!"); return; }
+        if (!completedIds.includes(currentTopic.id)) completedIds.push(currentTopic.id);
+        const remainingFiltered = getPendingFiltered();
+        if (remainingFiltered.length === 0) {
+            currentTopic = null;
+            fullRender();
+            alert(`🎉 "${currentFilter === 'ALL' ? 'সব বিষয়' : currentFilter}" ফিল্টারের সব টপিক সম্পন্ন!`);
+            return;
         }
-
-        // simple escape
-        function escapeHtml(str) {
-            if(!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if(m === '&') return '&amp;';
-                if(m === '<') return '&lt;';
-                if(m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        // Shuffle action: change current topic (if possible)
-        function handleShuffle() {
-            if (shuffleUsed >= MAX_SHUFFLE) {
-                alert(`আপনি আজকে সর্বোচ্চ ${MAX_SHUFFLE} বার শাফল করতে পারেন! পরবর্তী টপিকের জন্য 'সম্পন্ন' করুন।`);
-                return;
-            }
-            const pending = getPendingTopics();
-            if (pending.length === 0) {
-                alert('সমস্ত টপিক সম্পন্ন হয়ে গেছে! রিসেট করুন নতুন করে শুরু করতে।');
-                return;
-            }
-            // choose another random pending topic different from current (if possible)
-            let newTopic = null;
-            const differentTopics = pending.filter(t => t.id !== currentTopic.id);
-            if (differentTopics.length > 0) {
-                const rand = Math.floor(Math.random() * differentTopics.length);
-                newTopic = differentTopics[rand];
-            } else {
-                // only same topic remains -> no alternative
-                alert('আর কোনো ভিন্ন অপশন নেই, শুধু এই টপিকটি বাকি। আপনি এটি সম্পন্ন করতে পারেন।');
-                return;
-            }
-            if (newTopic) {
-                currentTopic = newTopic;
-                shuffleUsed++;
-                fullRender();
-            } else {
-                alert('কোনো বদলি টপিক পাওয়া যায়নি।');
-            }
-        }
-
-        // Done: mark current topic completed, pick new pending topic for next day, reset shuffle counter.
-        function handleDone() {
-            if (!currentTopic) {
-                if (getPendingTopics().length === 0) alert('সব টপিক শেষ! রিসেট বাটনে ক্লিক করুন৷');
-                else alert('কোনো টপিক নির্বাচিত নেই! পেজ রিলোড করুন');
-                return;
-            }
-            // avoid double adding
-            if (!completedIds.includes(currentTopic.id)) {
-                completedIds.push(currentTopic.id);
-            }
-            // after marking, get remaining pending topics
-            const remainingPending = getPendingTopics();
-            if (remainingPending.length === 0) {
-                // no topics left
-                currentTopic = null;
-                shuffleUsed = 0;
-                fullRender();
-                alert("🎉 অভিনন্দন! আপনি সব টপিক সম্পন্ন করেছেন! 👏 রিসেট করে আবার শুরু করতে পারেন।");
-                return;
-            }
-            // select new random pending topic as next day's topic (reset shuffle count)
-            let nextTopic = getRandomPendingTopic();
-            if (nextTopic) {
-                currentTopic = nextTopic;
-                shuffleUsed = 0;    // নতুন দিবসের জন্য শাফল কাউন্ট রিসেট
-            } else {
-                // fallback: any pending
-                const anyPending = getPendingTopics();
-                if (anyPending.length) currentTopic = anyPending[0];
-                else currentTopic = null;
-                shuffleUsed = 0;
-            }
+        let nextTopic = getRandomFilteredPending();
+        if (nextTopic) currentTopic = nextTopic;
+        else currentTopic = remainingFiltered[0];
+        shuffleUsed = 0;
+        fullRender();
+    }
+    
+    function resetEverything() {
+        if (confirm('সম্পূর্ণ অগ্রগতি মুছে যাবে এবং ফিল্টার "সব বিষয়" এ রিসেট হবে। নিশ্চিত?')) {
+            completedIds = [];
+            currentFilter = "ALL";
+            subjectFilterSelect.value = "ALL";
+            shuffleUsed = 0;
+            const allPending = allTopics;
+            currentTopic = allPending[Math.floor(Math.random() * allPending.length)];
             fullRender();
         }
-
-        // Reset everything: clear completed, pick random pending topic, reset shuffles
-        function resetEverything() {
-            if (confirm('⚠️ রিসেট করলে সব অগ্রগতি মুছে যাবে এবং সব টপিক আবার শেখার জন্য উপলব্ধ হবে। আপনি কি নিশ্চিত?')) {
-                completedIds = [];
-                const pendingAll = allTopics;
-                const randomStart = pendingAll[Math.floor(Math.random() * pendingAll.length)];
-                currentTopic = randomStart;
-                shuffleUsed = 0;
-                fullRender();
-            }
-        }
-
-        // Initialization and event binding
-        function initApp() {
-            // load from localStorage
-            const loaded = loadState();
-            if (!loaded) {
-                // first time: random topic, empty completed, shuffle 0
-                completedIds = [];
-                shuffleUsed = 0;
-                const randomInit = allTopics[Math.floor(Math.random() * allTopics.length)];
-                currentTopic = randomInit;
-            } else {
-                // after load, validate current topic integrity
-                validateAndSetTopic();
-                // also ensure shuffleUsed within bounds
-                if (shuffleUsed > MAX_SHUFFLE) shuffleUsed = MAX_SHUFFLE;
-                // if no current topic but pending left -> pick one
-                if (!currentTopic && getPendingTopics().length > 0) {
-                    currentTopic = getRandomPendingTopic();
-                    shuffleUsed = 0;
-                }
-            }
-            // chart init
-            const ctx = document.getElementById('progressChart').getContext('2d');
-            progressChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['সম্পন্ন (পড়া)', 'বাকি (বাদ)'],
-                    datasets: [{
-                        data: [completedIds.length, allTopics.length - completedIds.length],
-                        backgroundColor: ['#10b981', '#f97316'],
-                        borderWidth: 0,
-                        hoverOffset: 8,
-                        cutout: '60%'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { font: { size: 11 } } },
-                        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw} টি` } }
-                    }
-                }
-            });
-            fullRender();
-
-            // button events
-            shuffleBtn.addEventListener('click', handleShuffle);
-            doneBtn.addEventListener('click', handleDone);
-            document.getElementById('resetAllBtn').addEventListener('click', resetEverything);
-        }
-
-        // start
-        initApp();
-    </script>
+    }
+    
+    function onFilterChange() {
+        const newFilter = subjectFilterSelect.value;
+        currentFilter = newFilter;
+        shuffleUsed = 0;
+        validateTopicByFilter();
+        fullRender();
+    }
+    
+    function init() {
+        // populate filter dropdown
+        subjectFilterSelect.innerHTML = '<option value="ALL">📚 সব বিষয় (ALL)</option>';
+        uniqueSubjects.forEach(sub => { subjectFilterSelect.innerHTML += `<option value="${sub}">📖 ${sub}</option>`; });
+        loadState();
+        if (!currentTopic && getPendingFiltered().length > 0) currentTopic = getRandomFilteredPending();
+        if (currentFilter && subjectFilterSelect) subjectFilterSelect.value = currentFilter;
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        progressChart = new Chart(ctx, {
+            type: 'doughnut', data: { labels: ['সম্পন্ন (পড়া)', 'বাকি'], datasets: [{ data: [completedIds.length, allTopics.length - completedIds.length], backgroundColor: ['#10b981', '#f97316'], borderWidth: 0, cutout: '60%' }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+        });
+        fullRender();
+        shuffleBtn.addEventListener('click', handleShuffle);
+        doneBtn.addEventListener('click', handleDone);
+        document.getElementById('resetAllBtn').addEventListener('click', resetEverything);
+        subjectFilterSelect.addEventListener('change', onFilterChange);
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    
+    init();
+</script>
 </body>
 </html>
