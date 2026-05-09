@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>আড্ডা চ্যাট + ভিডিও কল (সঠিক ভিডিও দেখাবে)</title>
+    <title>আড্ডা চ্যাট + ভিডিও কল (বিশ্বব্যাপী)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script type="importmap">
         {
@@ -399,7 +399,7 @@
     let peerConnection = null;
     let localStream = null;
     let remoteAudio = null;
-    let pendingRemoteStream = null;    // store remote stream if video elements not ready
+    let pendingRemoteStream = null;
     let remoteVideo = null;
     let localVideo = null;
     let currentCallDocId = null;
@@ -571,7 +571,6 @@
             }
         };
         
-        // Handle incoming tracks (remote audio/video)
         pc.ontrack = (event) => {
             console.log("ontrack fired, kind:", event.track.kind);
             if (event.track.kind === "audio") {
@@ -583,7 +582,6 @@
                     remoteAudio.srcObject = event.streams[0];
                 }
             } else if (event.track.kind === "video") {
-                // Store remote stream for later attachment if video element not ready
                 pendingRemoteStream = event.streams[0];
                 if (remoteVideo && remoteVideo.srcObject !== pendingRemoteStream) {
                     remoteVideo.srcObject = pendingRemoteStream;
@@ -621,7 +619,6 @@
         });
     }
 
-    // Caller starts call
     async function startCall(targetUserId, targetNickname, videoEnabled) {
         if (isCallActive) { showToast("কল চলছে, আগে কল শেষ করুন।"); return; }
         try {
@@ -644,7 +641,6 @@
             });
             listenForCandidates(currentCallDocId);
             
-            // Listen for answer and final status
             const unsubAnswer = onSnapshot(doc(db, "calls", currentCallDocId), async (snap) => {
                 const data = snap.data();
                 if (!data) return;
@@ -665,7 +661,6 @@
         } catch(err) { console.error(err); showToast("কল শুরু ব্যর্থ"); endCall(); }
     }
 
-    // Callee answers call
     async function answerCall(callId, fromName, fromUid, videoRequired) {
         try {
             isVideoCall = videoRequired;
@@ -683,12 +678,8 @@
             await peerConnection.setLocalDescription(answer);
             await updateDoc(callDocRef, { answer: { sdp: answer.sdp, type: answer.type }, status: "active" });
             listenForCandidates(callId);
-            
-            // Show call panel immediately after setting up peerConnection
             showCallPanel(true, fromName, videoRequired);
             isCallActive = true;
-            
-            // Monitor call end
             const statusUnsub = onSnapshot(callDocRef, (snap) => {
                 if (snap.data()?.status === "ended") { statusUnsub(); endCall(); }
             });
@@ -738,18 +729,15 @@
         `;
         document.body.appendChild(callPanelDiv);
         
-        // Set up local video preview (already have localStream)
         if (isVideo && localStream) {
             localVideo = document.getElementById('localVideo');
             if (localVideo) localVideo.srcObject = localStream;
             remoteVideo = document.getElementById('remoteVideo');
-            // If we already received remote stream from ontrack, attach now
             if (remoteVideo && pendingRemoteStream) {
                 remoteVideo.srcObject = pendingRemoteStream;
             }
         }
         
-        // Mute button
         const muteBtn = document.getElementById("muteCallBtn");
         let muted = false;
         muteBtn?.addEventListener("click", () => {
@@ -760,7 +748,6 @@
             }
         });
         
-        // Video toggle button
         if (isVideo) {
             const videoToggle = document.getElementById("toggleVideoBtn");
             let videoOff = false;
@@ -773,13 +760,9 @@
             });
         }
         
-        // Hangup button
         document.getElementById("hangupCallBtn")?.addEventListener("click", () => { endCall(); });
         
-        // If peerConnection already has ontrack that hasn't attached remote video yet, we need to ensure
-        // that any future video track will be attached to remoteVideo element.
         if (peerConnection && isVideo && remoteVideo) {
-            // Override ontrack to ensure remote video is attached even if we set it after peerConnection creation
             const originalOntrack = peerConnection.ontrack;
             peerConnection.ontrack = (event) => {
                 if (event.track.kind === 'video' && remoteVideo) {
@@ -864,7 +847,6 @@
         modal.querySelector("#closeCallModal").onclick = () => modal.remove();
     }
 
-    // UI Helpers
     async function setNickname(newName) {
         if (!currentUser) return false;
         const trimmed = newName.trim();
@@ -895,7 +877,6 @@
     showAudioCallModalBtn.addEventListener("click", () => showCallModal(false));
     showVideoCallModalBtn.addEventListener("click", () => showCallModal(true));
 
-    // Auth init
     async function initAnonymous() {
         const cred = await signInAnonymously(auth);
         currentUser = cred.user;
