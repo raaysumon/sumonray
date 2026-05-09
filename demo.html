@@ -1,467 +1,614 @@
+This is a complete, production-ready real-time chat web application built with Firebase. It supports multiple users with sign-up, login, and messaging in Bangla, similar to WhatsApp.
+```html
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>দৈনিক পাঠ পরিকল্পক | টপিকভিত্তিক অগ্রগতি + তারিখ ট্র্যাকিং (ফায়ারবেস)</title>
-    <!-- TailwindCSS + Font Awesome + Chart.js -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>রায়ভিড চ্যাট - রিয়েল টাইম মেসেজিং</title>
+    <!-- Firebase SDK v10 (modular) -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+            }
+        }
+    </script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans Bengali', sans-serif;
+        }
+
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
-        }
-        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1); }
-        .scrollable-list { max-height: 420px; overflow-y: auto; scrollbar-width: thin; }
-        .progress-bar-custom { height: 8px; border-radius: 20px; background-color: #e2e8f0; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 20px; transition: width 0.3s ease; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-        button:disabled { opacity: 0.55; cursor: not-allowed; }
-        .badge-cat { background: #e0f2fe; color: #0369a1; font-size: 0.7rem; font-weight: 500; }
-        .subject-progress-card { transition: all 0.2s; background: white; border-left: 4px solid; }
-        .auth-card {
-            backdrop-filter: blur(12px);
-            background: rgba(255, 255, 255, 0.92);
-            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.2);
-        }
-        .toggle-link { cursor: pointer; color: #4f46e5; font-weight: 500; }
-        .toggle-link:hover { text-decoration: underline; }
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000;
-        }
-        .reset-modal {
-            background: white; max-width: 450px; width: 90%;
-            border-radius: 1.5rem; box-shadow: 0 25px 40px -12px black;
-            padding: 1.5rem;
-        }
-        .completion-date-badge {
-            font-size: 0.7rem;
-            background: #e6f7ec;
-            color: #2b6e3b;
-            border-radius: 40px;
-            padding: 0.2rem 0.6rem;
-            display: inline-flex;
+            background: #0b141a;
+            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 0.3rem;
+            min-height: 100vh;
+            margin: 0;
+            padding: 12px;
+        }
+
+        /* Main App Container */
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            height: 90vh;
+            background: #f0f2f5;
+            border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header Style */
+        .chat-header {
+            background: #075e54;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.3px;
+        }
+        .user-status {
+            font-size: 0.7rem;
+            opacity: 0.85;
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-image: radial-gradient(circle at 10% 30%, rgba(210, 225, 220, 0.4) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+        }
+
+        /* Message Bubble */
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.2s ease;
+        }
+        .message-own {
+            align-self: flex-end;
+        }
+        .message-other {
+            align-self: flex-start;
+        }
+        .bubble {
+            padding: 10px 14px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.1);
+        }
+        .bubble-own {
+            background: #dcf8c5;
+            color: #111;
+            border-bottom-right-radius: 4px;
+        }
+        .bubble-other {
+            background: white;
+            color: #111;
+            border-bottom-left-radius: 4px;
+        }
+        .sender-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            margin-left: 6px;
+            color: #075e54;
+        }
+        .message-time {
+            font-size: 0.65rem;
+            color: #6b6b6b;
+            margin-top: 4px;
+            margin-left: 8px;
+            margin-right: 8px;
+            text-align: right;
+        }
+        .message-other .message-time {
+            text-align: left;
+        }
+        /* Input Area */
+        .input-area {
+            background: #ffffff;
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-top: 1px solid #e2e2e2;
+        }
+        .message-input {
+            flex: 1;
+            border: none;
+            background: #f0f2f5;
+            padding: 12px 16px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .message-input:focus {
+            background: #e6e9ed;
+        }
+        .send-btn {
+            background: #075e54;
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.3rem;
+        }
+        .send-btn:hover {
+            background: #0b6b5f;
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            padding: 28px 24px;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        .auth-tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 28px;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 8px 0;
+            width: 50%;
+            cursor: pointer;
+            color: #7a7a7a;
+            transition: 0.2s;
+        }
+        .tab-active {
+            color: #075e54;
+            border-bottom: 3px solid #075e54;
+        }
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .auth-form input {
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+            background: #f9fafc;
+        }
+        .auth-form input:focus {
+            border-color: #075e54;
+        }
+        .auth-btn {
+            background: #075e54;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .error-msg {
+            background: #fce4e4;
+            color: #c62828;
+            padding: 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .hide {
+            display: none;
+        }
+        .empty-chat {
+            text-align: center;
+            color: #546e7a;
+            margin-top: 40px;
+            font-style: italic;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e9ecef;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bdbdbd;
+            border-radius: 10px;
         }
     </style>
 </head>
-<body class="antialiased p-4 md:p-6">
-
-<div class="max-w-7xl mx-auto">
-    <!-- Authentication Panel -->
-    <div id="authContainer" class="flex items-center justify-center min-h-[80vh]">
-        <div class="auth-card rounded-2xl p-8 max-w-md w-full border border-indigo-100 shadow-2xl">
-            <div class="text-center mb-6">
-                <i class="fas fa-chalkboard-user text-5xl text-indigo-600 mb-2"></i>
-                <h2 class="text-2xl font-bold text-gray-800">পাঠ পরিকল্পক</h2>
-                <p class="text-gray-500 text-sm">আপনার অগ্রগতি + সম্পন্ন করার তারিখ সংরক্ষিত হবে</p>
-            </div>
-            <div id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label>
-                    <input type="email" id="loginEmail" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="you@example.com">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label>
-                    <input type="password" id="loginPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="********">
-                </div>
-                <button id="signInBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2"><i class="fas fa-sign-in-alt"></i> লগইন</button>
-                <div class="text-center my-3 text-sm text-gray-500">অথবা</div>
-                <button id="googleSignInBtn" class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2"><i class="fab fa-google text-red-500"></i> Google দিয়ে লগইন</button>
-                <div class="text-center mt-4 text-sm">নতুন ব্যবহারকারী? <span id="showSignup" class="toggle-link">অ্যাকাউন্ট তৈরি করুন</span></div>
-            </div>
-            <div id="signupForm" style="display:none;">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label>
-                    <input type="email" id="signupEmail" class="w-full border border-gray-300 rounded-xl px-4 py-2" placeholder="you@example.com">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label>
-                    <input type="password" id="signupPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2" placeholder="৬+ অক্ষর">
-                </div>
-                <button id="signUpBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition"><i class="fas fa-user-plus"></i> সাইন আপ</button>
-                <div class="text-center mt-4 text-sm">ইতিমধ্যে অ্যাকাউন্ট আছে? <span id="showLogin" class="toggle-link">লগইন করুন</span></div>
-            </div>
-            <div id="authError" class="text-red-600 text-sm text-center mt-3 hidden"></div>
+<body>
+<div class="app-container" id="appRoot">
+    <!-- অথেন্টিকেশন বিভাগ -->
+    <div id="authSection" class="auth-container">
+        <div class="auth-tabs">
+            <button class="tab-btn" id="loginTabBtn">লগইন</button>
+            <button class="tab-btn" id="signupTabBtn">সাইন আপ</button>
+        </div>
+        <!-- লগইন ফর্ম -->
+        <div id="loginForm" class="auth-form">
+            <input type="email" id="loginEmail" placeholder="ইমেল ঠিকানা" autocomplete="email">
+            <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড" autocomplete="current-password">
+            <div id="loginError" class="error-msg hide"></div>
+            <button class="auth-btn" id="doLoginBtn">লগইন করুন</button>
+        </div>
+        <!-- সাইন আপ ফর্ম -->
+        <div id="signupForm" class="auth-form hide">
+            <input type="text" id="signupName" placeholder="আপনার নাম (যেমন: রহিম)" autocomplete="name">
+            <input type="email" id="signupEmail" placeholder="ইমেল ঠিকানা" autocomplete="email">
+            <input type="password" id="signupPassword" placeholder="পাসওয়ার্ড (৬ অক্ষর)" autocomplete="new-password">
+            <input type="password" id="signupConfirm" placeholder="পাসওয়ার্ড নিশ্চিত করুন">
+            <div id="signupError" class="error-msg hide"></div>
+            <button class="auth-btn" id="doSignupBtn">নতুন অ্যাকাউন্ট তৈরি করুন</button>
         </div>
     </div>
 
-    <!-- Main App (visible after login) -->
-    <div id="appContainer" style="display:none;">
-        <!-- Header -->
-        <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                    <i class="fas fa-calendar-check text-indigo-600 mr-2"></i>টপিক ট্র্যাকার + তারিখ রেকর্ড
-                </h1>
-                <p class="text-gray-600 text-sm mt-1">প্রতিটি টপিক 'সম্পন্ন' করলে তারিখ সংরক্ষিত হয় | ফায়ারবেসে সম্পন্ন তারিখসহ রাখা হয়</p>
+    <!-- চ্যাট প্রধান ইন্টারফেস (প্রথমে লুকানো) -->
+    <div id="chatSection" class="hide" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="chat-header">
+            <div class="user-info">
+                <span class="user-name" id="currentUserName">লোড হচ্ছে...</span>
+                <span class="user-status">✨ অনলাইন</span>
             </div>
-            <div class="flex gap-3 items-center">
-                <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm text-sm text-gray-700"><i class="fas fa-user-circle text-indigo-500"></i> <span id="userEmailSpan">user@example.com</span></div>
-                <button id="logoutBtn" class="bg-white/80 border border-red-200 text-red-600 px-4 py-2 rounded-xl shadow-sm hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium"><i class="fas fa-sign-out-alt"></i> লগআউট</button>
-                <button id="resetModalBtn" class="bg-white/80 border border-red-200 text-red-600 px-4 py-2 rounded-xl shadow-sm hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium"><i class="fas fa-undo-alt"></i> রিসেট (বিভাগ নির্বাচন)</button>
-            </div>
+            <button class="logout-btn" id="logoutBtn">প্রস্থান</button>
         </div>
-
-        <!-- Main grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="lg:col-span-2 bg-white rounded-2xl shadow-md p-5 md:p-6 border border-indigo-100 card-hover">
-                <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-calendar-day text-indigo-500"></i> আজকের নির্ধারিত পাঠ</h2>
-                    <div class="bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 text-sm font-medium"><i class="fas fa-exchange-alt mr-1"></i> বাকি শাফল: <span id="remainingShuffleSpan">20</span></div>
-                </div>
-                <div class="mb-5 p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center gap-3">
-                    <label class="font-semibold text-gray-700 text-sm"><i class="fas fa-filter text-amber-500"></i> বিষয় ফিল্টার :</label>
-                    <select id="subjectFilterSelect" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400 outline-none flex-1 min-w-[180px]"></select>
-                    <span class="text-xs text-gray-400"><i class="fas fa-info-circle"></i> ফিল্টার অনুযায়ী শাফল ও পাঠ নির্বাচন</span>
-                </div>
-                <div id="currentTopicContainer" class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 mb-6 border border-indigo-200 transition-all">
-                    <div id="noTopicMsg" class="hidden text-center py-6 text-gray-500"><i class="fas fa-trophy text-4xl text-amber-400 mb-2"></i><p class="font-medium">🎉 চমৎকার! এই ফিল্টারের সব টপিক সম্পন্ন হয়েছে। <br> ফিল্টার পরিবর্তন করুন বা রিসেট করুন।</p></div>
-                    <div id="topicContent"><span id="topicCatBadge" class="badge-cat inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3"></span><h3 id="currentTopicName" class="text-xl md:text-2xl font-bold text-gray-800 leading-tight"></h3><p class="text-gray-500 text-sm mt-2"><i class="far fa-id-card"></i> টপিক আইডি: <span id="currentTopicId"></span></p></div>
-                </div>
-                <div class="flex flex-wrap gap-4 items-center">
-                    <button id="shuffleBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300"><i class="fas fa-random"></i> শাফল করুন (সর্বোচ্চ ২০ বার)</button>
-                    <button id="doneBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-8 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300"><i class="fas fa-check-circle"></i> সম্পন্ন (Done)</button>
-                    <div class="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1.5"><i class="fas fa-calendar-alt"></i> সম্পন্ন করলে আজকের তারিখ সংরক্ষিত হবে</div>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-md p-5 border border-slate-100">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 mb-3"><i class="fas fa-chart-pie text-purple-500"></i> সামগ্রিক অগ্রগতি</h2>
-                <div class="w-full h-44 md:h-48 relative mx-auto"><canvas id="progressChart" width="200" height="200" class="w-full h-full"></canvas></div>
-                <div class="flex justify-around mt-4 text-center">
-                    <div class="bg-green-50 p-2 rounded-xl flex-1 mx-1"><p class="text-xs text-green-700 font-medium">সম্পন্ন (পড়া)</p><p class="text-2xl font-bold text-green-700" id="studiedCount">0</p></div>
-                    <div class="bg-red-50 p-2 rounded-xl flex-1 mx-1"><p class="text-xs text-red-600 font-medium">বাকি (বাদ)</p><p class="text-2xl font-bold text-red-600" id="pendingCount">0</p></div>
-                </div>
-                <div class="mt-2 text-sm text-center text-gray-600 bg-slate-50 rounded-lg p-2"><i class="fas fa-database"></i> মোট টপিক: <strong id="totalTopicsCount">0</strong></div>
-            </div>
+        <div class="messages-area" id="messagesContainer">
+            <div class="empty-chat">কোনো বার্তা নেই, প্রথম মেসেজ পাঠান!</div>
         </div>
-
-        <!-- Subject-wise progress -->
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-md p-5 border border-indigo-50 mb-8">
-            <div class="flex flex-wrap justify-between items-center gap-3 mb-4"><h2 class="text-xl font-bold text-gray-800"><i class="fas fa-chart-simple text-indigo-600 mr-2"></i> বিষয়ভিত্তিক অগ্রগতি (টপিক অনুযায়ী)</h2><span class="text-xs bg-indigo-100 px-3 py-1 rounded-full text-indigo-700"><i class="far fa-clock"></i> সম্পন্ন টপিকের হার দেখুন</span></div>
-            <div id="subjectProgressContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-2"></div>
-        </div>
-
-        <!-- All topics list with completion date -->
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-md p-5 border border-indigo-50">
-            <div class="flex flex-wrap justify-between items-center mb-3 gap-2"><h2 class="text-lg font-bold text-gray-800"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (স্থিতি + সম্পন্নের তারিখ)</h2><span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-500">প্রতিটি টপিক কবে পড়েছেন তা সংরক্ষিত হয়</span></div>
-            <div class="scrollable-list"><div id="topicsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-1"></div></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" class="message-input" placeholder="বার্তা লিখুন..." autocomplete="off">
+            <button class="send-btn" id="sendMessageBtn">📨</button>
         </div>
     </div>
 </div>
 
-<!-- Reset Modal -->
-<div id="resetModal" class="modal-overlay" style="display: none;">
-    <div class="reset-modal">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-trash-alt text-red-500 mr-2"></i>বিভাগ অনুযায়ী রিসেট</h3>
-            <button id="closeResetModalBtn" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-        </div>
-        <p class="text-sm text-gray-600 mb-4">যে বিভাগের অগ্রগতি রিসেট করতে চান নির্বাচন করুন। <br> <span class="font-semibold">পাসওয়ার্ড প্রয়োজন (ইমেইল লগইন থাকলে)</span></p>
-        <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-1">বিভাগ নির্বাচন করুন</label>
-            <select id="resetSectionSelect" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-red-400"></select>
-        </div>
-        <div id="passwordResetField" class="mb-4">
-            <label class="block text-gray-700 font-medium mb-1">পাসওয়ার্ড নিশ্চিতকরণ</label>
-            <input type="password" id="resetPasswordInput" class="w-full border border-gray-300 rounded-xl px-4 py-2" placeholder="আপনার অ্যাকাউন্টের পাসওয়ার্ড">
-            <p id="resetPasswordHint" class="text-xs text-gray-500 mt-1"></p>
-        </div>
-        <div class="flex gap-3 justify-end">
-            <button id="cancelResetBtn" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">বাতিল</button>
-            <button id="confirmResetBtn" class="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center gap-2"><i class="fas fa-check-circle"></i> রিসেট করুন</button>
-        </div>
-    </div>
-</div>
+<script type="module">
+    import { initializeApp } from "firebase/app";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "firebase/auth";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp } from "firebase/firestore";
 
-<script>
-    // ======================= সম্পূর্ণ মূল টপিক ডেটাসেট (কোনো পরিবর্তন নয়) =======================
-    const topicsDataRaw = [];
-    // সমস্ত টপিক ব্রাঞ্চ (প্রদত্ত কোডের সম্পূর্ণ ডেটা, অপরিবর্তিত)
-    const banglaLitFull = [ "লেকচার-১: বাংলা সাহিত্যের যুগ বিভাগ, প্রাচীন যুগ ও চর্যাপদ, অন্ধকার যুগ, শ্রীকৃষ্ণকীর্তন, বৈষ্ণব পদাবলী, চণ্ডীদাস, বিদ্যাপতি, জ্ঞানদাস, গোবিন্দদাস, জীবনী সাহিত্য।","লেকচার-২: মঙ্গলকাব্য, মর্সিয়া সাহিত্য, নাথ সাহিত্য, অনুবাদ সাহিত্য, মুসলিম সাহিত্য, রোমান্টিক প্রণয়োপাখ্যান ও আরাকান রাজসভায় বাংলা সাহিত্য। মধ্যযুগের পৃষ্ঠপোষক।","লেকচার-৩: লোকসাহিত্য ও ময়মনসিংহ গীতিকা, শায়ের-কবিওয়ালা ও পুঁথি সাহিত্য। আধুনিক যুগের উন্মেষ, ফোর্ট উইলিয়াম কলেজ, শ্রীরামপুর মিশন, হিন্দু কলেজ, ইয়ংবেঙ্গল, মোহামেডান লিটারারি সোসাইটি, বাংলা একাডেমি, এশিয়াটিক সোসাইটি।","লেকচার-৪: রাজা রামমোহন রায়, লালন শাহ, ঈশ্বরচন্দ্র গুপ্ত, প্যারীচাঁদ মিত্র, মদনমোহন তর্কালঙ্কার, ঈশ্বরচন্দ্র বিদ্যাসাগর, মাইকেল মধুসূদন দত্ত, রঙ্গলাল বন্দ্যোপাধ্যায়, দীনবন্ধু মিত্র, নওয়াব ফয়জুন্নেছা চৌধুরাণী, বিহারীলাল চক্রবর্তী, কৃষ্ণচন্দ্র মজুমদার, সঞ্জীবচন্দ্র চট্টোপাধ্যায়।","লেকচার-৫: বঙ্কিমচন্দ্র চট্টোপাধ্যায়, হেমচন্দ্র বন্দ্যোপাধ্যায়, কালী প্রসন্ন সিংহ, নবীনচন্দ্র সেন, মীর মশাররফ হোসেন, স্বর্ণকুমারী দেবী, কায়কোবাদ, মোহাম্মদ নসিবর রহমান, মোজাম্মেল হক।","লেকচার-৬: রবীন্দ্রনাথ ঠাকুর, দ্বিজেন্দ্রলাল রায়, কামিনী রায়, দীনেশচন্দ্র সেন, প্রমথ চৌধুরী, মোহাম্মদ আকরম খাঁ, আবদুল করিম সাহিত্য বিশারদ, শরৎচন্দ্র চট্টোপাধ্যায়, দক্ষিণারঞ্জন মিত্র মজুমদার, যতীন্দ্রমোহন বাগচী।","লেকচার-৭: রোকেয়া সাখাওয়াত হোসেন, সৈয়দ ইসমাইল হোসেন সিরাজী, কাজী ইমদাদুল হক, সত্যেন্দ্রনাথ দত্ত, ড. মুহম্মদ শহীদুল্লাহ, সুকুমার রায়, মোহিতলাল মজুমদার, এস ওয়াজেদ আলী, কাজী আবদুল ওদুদ, প্রিন্সিপাল ইব্রাহীম খাঁ, বিভূতিভূষণ বন্দ্যোপাধ্যায়, আবুল কালাম শামসুদ্দীন, ডা. লুৎফর রহমান।","লেকচার-৮: কাজী মোতাহার হোসেন, গোলাম মোস্তফা, আবুল মনসুর আহমদ, তারাশঙ্কর বন্দ্যোপাধ্যায়, কাজী নজরুল ইসলাম, জীবনানন্দ দাশ, বলাইচাঁদ মুখোপাধ্যায়, অমিয় চক্রবর্তী।","লেকচার-৯: সুধীন্দ্রনাথ দত্ত, ড. মুহম্মদ এনামুল হক, অচিন্ত্যকুমার সেনগুপ্ত, আবুল ফজল, জসীম উদ্দীন, মোতাহের হোসেন চৌধুরী, অদ্বৈত মল্লবর্মণ, সৈয়দ মুজতবা আলী, আবদুল কাদির, বন্দে আলী মিয়া, হুমায়ুন কবির, নুরুল মোমেন, বুদ্ধদেব বসু, মানিক বন্দ্যোপাধ্যায়, শামসুন নাহার মাহমুদ, বিষ্ণু দে।","লেকচার-১০: আবু জাফর শামসুদ্দীন, বেগম সুফিয়া কামাল, নীহাররঞ্জন গুপ্ত, আহসান হাবীব, শওকত ওসমান, ফররুখ আহমদ, সিকান্দার আবু জাফর, মুহম্মদ আবদুল হাই, আহমদ শরীফ, নীলিমা ইব্রাহিম, সৈয়দ আলী আহসান, সৈয়দ ওয়ালীউল্লাহ, সমরেশ বসু, মুনীর চৌধুরী, রশীদ করীম, আবু ইসহাক।","লেকচার-১১: শামসুদ্দীন আবুল কালাম, সুকান্ত ভট্টাচার্য, শহীদুল্লা কায়সার, আন্নাদাশঙ্কর রায়, জাহানারা ইমাম, শামসুর রহমান, সৈয়দ মুস্তাফা সিরাজ, সাঈদ আহমদ, আবদুল্লাহ আল-মুতি শরফুদ্দীন, ড. আলাউদ্দিন আল আজাদ, হাসান হাফিজুর রহমান, আবদুল গাফফার চৌধুরী, আবু জাফর ওবায়দুল্লাহ, সুনীল গঙ্গোপাধ্যায়, জহির রায়হান, মেহতাব উদ্দীন আহমদ, রাবেয়া খাতুন।","লেকচার-১২: সৈয়দ শামসুল হক, আবু হেনা মোস্তফা কামাল, আল মাহমুদ, রাশিদা খান, শওকত আলী, ড. আনিসুজ্জামান, হাসান আজিজুল হক, শহীদ সাবের, মাহমুদুল হক, আবদুল্লাহ আল মামুন, রফিক আজাদ, শহীদ কাদরী, আখতারুজ্জামান ইলিয়াস, আবদুল মান্নান সৈয়দ, আহমদ ছফা, হুমায়ূন আহমেদ।","লেকচার-১৩: সেলিনা হোসেন, হুমায়ূন আজাদ, মামুনুর রশীদ, সেলিম আল দীন, ইমদাদুল হক মিলন, রুদ্র মুহম্মদ শহীদুল্লাহ, আনিসুল হক, সাহিত্যের পত্রিকা, চরিত্র, উপাধি ও ছদ্মনাম।","লেকচার-১৪: দেশভাগ, ভাষা আন্দোলন, মুক্তিযুদ্ধভিত্তিক রচনা, বিখ্যাত উক্তি, বাংলা সাহিত্যে প্রথম, ইতিহাসগ্রন্থ ও লোকগান (বাউল, পল্লীগীতি, ভাটিয়ালি)।" ];
-    banglaLitFull.forEach(lec => topicsDataRaw.push({ cat: "বাংলা সাহিত্য", name: lec }));
-    const banglaGrammarFull = [ "লেকচার-০১: ভাষা ও বাংলা ভাষার উৎপত্তি, ধ্বনি, বর্ণ ও অক্ষর।","লেকচার-০২: সন্ধি, ধ্বনির পরিবর্তন, সমার্থক ও বিপরীত শব্দ।","লেকচার-০৩: শব্দ ও প্রকার, বানানের নিয়ম, ণ-ত্ব ও ষ-ত্ব বিধান।","লেকচার-০৪: পদ, ছন্দ, অলঙ্কার, এক কথায় প্রকাশ, ক্রিয়ার কাল।","লেকচার-০৫: কারক ও বিভক্তি, অনুসর্গ, শুদ্ধ শব্দ, পরিভাষা।","লেকচার-০৬: সমাস, প্রবাদ-প্রবচন, বাগধারা।","লেকচার-০৭: উপসর্গ, ধাতু, প্রকৃতি-প্রত্যয়, যতি চিহ্ন।","লেকচার-০৮: বাক্য ও প্রকরণ, বাক্যের রূপান্তর, শুদ্ধি ও প্রয়োগ।" ];
-    banglaGrammarFull.forEach(lec => topicsDataRaw.push({ cat: "বাংলা ভাষা (ব্যাকরণ)", name: lec }));
-    const englishGrammarFull = [ "লেকচার-০১: Noun, Article Homework: Vocabulary- A-F; Written: Practicing Interchange of Parts of Speech (Part-01).","লেকচার-০২: Number, Gender, Group Verbs. Homework: Vocabulary G-M; Written: Sentence Correction, Making Sentences. (Part-01)","লেকচার-০৩: Pronoun, Determiner. Homework: Vocabulary N-S; Written: Transformation and Correction.","লেকচার-০৪: Adjective, Degree. Homework: Vocabulary T-Z; Written: Practicing Interchange of Parts of Speech. (Part-02)","লেকচার-০৫: Verb & Its Classification, Gerund, Participle. Homework: App. Preposition A-F; Written: Sentence Correction, Making Sentences. (Part-02)","লেকচার-০৬: Right form of Verbs, Subject-Verb Agreement, Tense. Homework: App. Preposition G-M; Written: Sentence Correction, Making Sentences. (Part-03)","লেকচার-০৭: Adverb, Modifier. Homework: App. Preposition N-S; Written: Error Correction, Transformation.","লেকচার-০৮: Conjunction & Linkers. Homework: App. Preposition T-Z; Written: relevance in Translation.","লেকচার-০৯: Preposition. Written: Combining Sentences.","লেকচার-১০: Phrases, Clauses, Analogy. Homework: Idioms List A-F; Written: Combining Sentences and eliminating errors.","লেকচার-১১: Voice & Narration. Homework: Idioms List G-M; Written: Relevance in translation, report writing and summary writing.","লেকচার-১২: Transformation, Spelling List. Homework: Idioms List N-S; Written: Making Sentences.","লেকচার-১৩: Same word but different parts of speech, Suffix & Prefix, Foreign words. Homework: Idioms List T-Z; Written: Interchange of Parts of Speech. (Part-03)","লেকচার-১৪: Sentence correction, one word substitution, names of parts of paragraphs/ letter/ application.; Written: Eliminating errors, Meanings." ];
-    englishGrammarFull.forEach(lec => topicsDataRaw.push({ cat: "ইংরেজি গ্রামার", name: lec }));
-    const englishLiteratureFull = [ "লেকচার-০১: Introduction to English Literature, Syllabus Discussion, Question Analysis, Study Hacks, Names of Periods and Ages, Old & Middle English Period (Anglo Saxon Period, The Anglo-Norman Period, The Age of Chaucer, The Barren Age/Dark Age). Titles of Literature, Literary Terms, Figures of Speech, Notable Critics.","লেকচার-০২: Renaissance Period (Preparation for Renaissance, Introduction to Shakespeare, The Elizabethan Period, The Jacobean Period, Caroline Age, Commonwealth Period). (Important writers)","লেকচার-০৩: Neo-classical Period (The Restoration Period, The Augustan Period, The Age of Sensibility). (Important writers)","লেকচার-০৪: Romantic Period. (Important writers)","লেকচার-০৫: Victorian Period. (Important writers)","লেকচার-০৬: Modern & Postmodern Period. (Important writers) Names of American, Irish, Indian and Bangladeshi Writers." ];
-    englishLiteratureFull.forEach(lec => topicsDataRaw.push({ cat: "ইংরেজি সাহিত্য", name: lec }));
-    const bangladeshAffairsFull = []; for(let i=1;i<=18;i++) bangladeshAffairsFull.push(`লেকচার-${String(i).padStart(2,'0')}: বাংলাদেশ বিষয়াবলি সামগ্রী (${i})`);
-    bangladeshAffairsFull.forEach(lec => topicsDataRaw.push({ cat: "বাংলাদেশ বিষয়াবলি", name: lec }));
-    const internationalFull = []; for(let i=1;i<=16;i++) internationalFull.push(`লেকচার-${String(i).padStart(2,'0')}: আন্তর্জাতিক বিষয়াবলি আলোচনা (পার্ট-${i})`);
-    internationalFull.forEach(lec => topicsDataRaw.push({ cat: "আন্তর্জাতিক বিষয়াবলি", name: lec }));
-    const mathFull = []; for(let i=1;i<=16;i++) mathFull.push(`লেকচার-${String(i).padStart(2,'0')}: গাণিতিক যুক্তি অধ্যায়-${i}`);
-    mathFull.forEach(lec => topicsDataRaw.push({ cat: "গাণিতিক যুক্তি", name: lec }));
-    const mentalFull = []; for(let i=1;i<=5;i++) mentalFull.push(`লেকচার-0${i}: মানসিক দক্ষতা টপিক-${i}`);
-    mentalFull.forEach(lec => topicsDataRaw.push({ cat: "মানসিক দক্ষতা", name: lec }));
-    const scienceFull = []; for(let i=1;i<=14;i++) scienceFull.push(`লেকচার-${String(i).padStart(2,'0')}: সাধারণ বিজ্ঞান থিম-${i}`);
-    scienceFull.forEach(lec => topicsDataRaw.push({ cat: "সাধারণ বিজ্ঞান", name: lec }));
-    const itFull = []; for(let i=1;i<=6;i++) itFull.push(`লেকচার-0${i}: কম্পিউটার ও আইসিটি অংশ-${i}`);
-    itFull.forEach(lec => topicsDataRaw.push({ cat: "কম্পিউটার ও আইসিটি", name: lec }));
-    const geoFull = []; for(let i=1;i<=4;i++) geoFull.push(`লেকচার-0${i}: ভূগোল ও পরিবেশ অধ্যায়-${i}`);
-    geoFull.forEach(lec => topicsDataRaw.push({ cat: "ভূগোল ও পরিবেশ", name: lec }));
-    const ethicsFull = []; for(let i=1;i<=4;i++) ethicsFull.push(`লেকচার-0${i}: নৈতিকতা ও সুশাসন ইউনিট-${i}`);
-    ethicsFull.forEach(lec => topicsDataRaw.push({ cat: "নৈতিকতা ও সুশাসন", name: lec }));
-    const writtenFull = []; for(let i=1;i<=15;i++) writtenFull.push(`লেকচার-${String(i).padStart(2,'0')}: লিখিত প্রস্তুতি সেশন-${i}`);
-    writtenFull.forEach(lec => topicsDataRaw.push({ cat: "লিখিত প্রস্তুতি", name: lec }));
-    
-    const allTopics = topicsDataRaw.map((item, idx) => ({ id: idx+1, name: item.name, cat: item.cat }));
-    const uniqueSubjects = [...new Set(allTopics.map(t => t.cat))].sort();
+    // Firebase configuration (প্রদত্ত তথ্য)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
+        authDomain: "rayvid-c074a.firebaseapp.com",
+        projectId: "rayvid-c074a",
+        storageBucket: "rayvid-c074a.firebasestorage.app",
+        messagingSenderId: "970771885312",
+        appId: "1:970771885312:web:104ae741f28287a01ad7e5"
+    };
 
-    // Firebase
-    const firebaseConfig = { apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q", authDomain: "rayvid-c074a.firebaseapp.com", projectId: "rayvid-c074a", storageBucket: "rayvid-c074a.firebasestorage.app", messagingSenderId: "970771885312", appId: "1:970771885312:web:104ae741f28287a01ad7e5" };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
     
-    let currentUserObj = null;
-    let completedTopics = []; // { id, completedAt: Date or Firestore Timestamp }
-    let currentTopic = null, shuffleUsed = 0, currentFilter = "ALL";
-    let progressChart = null;
-    const MAX_SHUFFLE = 20;
+    // DOM elements
+    const authSection = document.getElementById('authSection');
+    const chatSection = document.getElementById('chatSection');
+    const loginFormDiv = document.getElementById('loginForm');
+    const signupFormDiv = document.getElementById('signupForm');
+    const loginTab = document.getElementById('loginTabBtn');
+    const signupTab = document.getElementById('signupTabBtn');
+    const loginBtn = document.getElementById('doLoginBtn');
+    const signupBtn = document.getElementById('doSignupBtn');
+    const loginError = document.getElementById('loginError');
+    const signupError = document.getElementById('signupError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendMessageBtn');
+    const currentUserNameSpan = document.getElementById('currentUserName');
     
-    function getCompletedSet() { return new Set(completedTopics.map(c => c.id)); }
-    function getCompletionDate(topicId) { const entry = completedTopics.find(c => c.id === topicId); return entry ? entry.completedAt : null; }
-    function formatDate(dateVal) { if(!dateVal) return null; let d = dateVal.toDate ? dateVal.toDate() : new Date(dateVal); return d.toLocaleDateString('bn-BD', { year:'numeric', month:'long', day:'numeric' }); }
+    // State variables
+    let currentUser = null;
+    let unsubscribeMessages = null;  // realtime listener unsubscribe function
     
-    function getPendingTopics(filter = null) {
-        const completedSet = getCompletedSet();
-        let pending = allTopics.filter(t => !completedSet.has(t.id));
-        if (filter && filter !== "ALL") pending = pending.filter(t => t.cat === filter);
-        return pending;
-    }
-    function getPendingFiltered() { return getPendingTopics(currentFilter); }
-    function getRandomFilteredPending(excludeId = null) {
-        let pending = getPendingFiltered();
-        if (!pending.length) return null;
-        if (excludeId !== null) pending = pending.filter(t => t.id !== excludeId);
-        return pending.length ? pending[Math.floor(Math.random() * pending.length)] : null;
-    }
-    function validateTopicByFilter() {
-        const filteredPending = getPendingFiltered();
-        if (!filteredPending.length) { currentTopic = null; return; }
-        if (!currentTopic || getCompletedSet().has(currentTopic.id) || (currentFilter !== "ALL" && currentTopic.cat !== currentFilter)) {
-            currentTopic = getRandomFilteredPending();
-            shuffleUsed = 0;
+    // Bangla Error messages (user friendly)
+    const getBanglaErrorMessage = (errorCode) => {
+        switch(errorCode) {
+            case 'auth/invalid-email': return 'ইমেল ঠিকানা সঠিক নয়।';
+            case 'auth/user-not-found': return 'এই ইমেল ব্যবহারকারী খুঁজে পাওয়া যায়নি।';
+            case 'auth/wrong-password': return 'পাসওয়ার্ড ভুল। আবার চেষ্টা করুন।';
+            case 'auth/email-already-in-use': return 'এই ইমেল ইতিমধ্যে নিবন্ধিত হয়েছে।';
+            case 'auth/weak-password': return 'পাসওয়ার্ড দুর্বল, কমপক্ষে ৬ অক্ষর দিন।';
+            case 'auth/invalid-credential': return 'লগইন তথ্য সঠিক নয়।';
+            default: return 'একটি ত্রুটি ঘটেছে। আবার চেষ্টা করুন।';
         }
-    }
-    async function saveToFirestore() {
-        if (!currentUserObj) return;
-        const data = { shuffleUsed, currentFilter, currentTopicId: currentTopic?.id || null, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), completedTopics: completedTopics.map(ct => ({ id: ct.id, completedAt: ct.completedAt })) };
-        await db.collection("users").doc(currentUserObj.uid).set(data, { merge: true });
-    }
-    async function loadFromFirestore(user) {
-        const doc = await db.collection("users").doc(user.uid).get();
-        let data = doc.exists ? doc.data() : {};
-        // নতুন completedTopics ফরম্যাট অথবা পুরানো completedIds মাইগ্রেশন
-        if (data.completedTopics && Array.isArray(data.completedTopics)) {
-            completedTopics = data.completedTopics.map(ct => ({ id: ct.id, completedAt: ct.completedAt }));
-        } else if (data.completedIds && Array.isArray(data.completedIds)) {
-            // মাইগ্রেশন: পুরানো ডেটা -> আজকের তারিখ ধরে রূপান্তর
-            const now = new Date();
-            completedTopics = data.completedIds.map(id => ({ id, completedAt: now }));
-            await saveToFirestore();
-        } else { completedTopics = []; }
-        shuffleUsed = data.shuffleUsed || 0;
-        currentFilter = data.currentFilter || "ALL";
-        const topicId = data.currentTopicId;
-        const completedSet = getCompletedSet();
-        if (topicId && !completedSet.has(topicId)) currentTopic = allTopics.find(t => t.id === topicId) || null;
-        else currentTopic = null;
-        if (subjectFilterSelectElem) subjectFilterSelectElem.value = currentFilter;
-        validateTopicByFilter();
-        fullRender();
-    }
-    
-    function renderTopicsList() {
-        let html = '';
-        for (let topic of allTopics) {
-            const isCompleted = getCompletedSet().has(topic.id);
-            const compDate = isCompleted ? getCompletionDate(topic.id) : null;
-            const dateStr = compDate ? `<span class="completion-date-badge ml-2"><i class="far fa-calendar-alt"></i> ${formatDate(compDate)}</span>` : '';
-            const statusHtml = isCompleted ? `<span class="text-green-700 text-xs font-medium bg-green-100 px-2 py-0.5 rounded-full"><i class="fas fa-check-circle"></i> সম্পন্ন ${dateStr}</span>` : '<span class="text-amber-600 text-xs font-medium bg-amber-100 px-2 py-0.5 rounded-full"><i class="fas fa-hourglass-half"></i> অপঠিত</span>';
-            const clickAttr = !isCompleted ? `onclick="selectTopicFromList(${topic.id})"` : '';
-            html += `<div class="${isCompleted ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200 cursor-pointer hover:shadow-md'} border rounded-xl p-3 flex flex-wrap justify-between items-center gap-2" ${clickAttr}>
-                        <div class="flex-1"><div class="flex gap-2 flex-wrap"><span class="text-xs font-mono text-gray-400">#${topic.id}</span><span class="badge-cat">${escapeHtml(topic.cat)}</span></div>
-                        <p class="text-sm font-medium text-gray-800 mt-1">${escapeHtml(topic.name)}</p></div><div>${statusHtml}</div></div>`;
-        }
-        topicsListContainer.innerHTML = html;
-    }
-    window.selectTopicFromList = function(topicId) {
-        const topic = allTopics.find(t => t.id === topicId);
-        if (!topic) return;
-        if (getCompletedSet().has(topic.id)) { alert("এই টপিক আগেই সম্পন্ন হয়েছে!"); return; }
-        if (currentFilter !== "ALL" && topic.cat !== currentFilter) {
-            if (confirm(`"${topic.cat}" বিষয়টি বর্তমান ফিল্টারের বাইরে। ফিল্টার পরিবর্তন করবেন?`)) {
-                currentFilter = topic.cat;
-                subjectFilterSelectElem.value = currentFilter;
-            } else return;
-        }
-        currentTopic = topic;
-        shuffleUsed = 0;
-        fullRender();
-        document.getElementById('currentTopicContainer').scrollIntoView({ behavior: 'smooth' });
     };
     
-    function renderSubjectWiseProgress() {
-        const completedSet = getCompletedSet();
-        const subjectStats = uniqueSubjects.map(sub => {
-            const total = allTopics.filter(t => t.cat === sub).length;
-            const completed = allTopics.filter(t => t.cat === sub && completedSet.has(t.id)).length;
-            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-            return { subject: sub, total, completed, percent };
-        }).sort((a,b) => b.percent - a.percent);
-        let html = '';
-        for (let stat of subjectStats) {
-            let borderColor = stat.percent === 100 ? '#10b981' : (stat.percent > 50 ? '#f59e0b' : '#3b82f6');
-            html += `<div class="subject-progress-card rounded-xl p-4 shadow-sm border border-gray-100" style="border-left-color: ${borderColor};">
-                        <div class="flex justify-between items-start mb-2"><h3 class="font-bold text-gray-800 text-md"><i class="fas fa-book-open text-indigo-500 mr-1"></i> ${escapeHtml(stat.subject)}</h3>
-                        <span class="text-xs font-bold px-2 py-1 rounded-full ${stat.percent === 100 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">${stat.completed}/${stat.total}</span></div>
-                        <div class="progress-bar-custom w-full mt-1"><div class="progress-fill bg-gradient-to-r from-indigo-500 to-purple-500" style="width: ${stat.percent}%;"></div></div>
-                        <div class="flex justify-between mt-2 text-xs text-gray-500"><span><i class="fas fa-check-circle text-green-600"></i> সম্পন্ন: ${stat.completed}</span><span><i class="fas fa-hourglass-half text-amber-500"></i> বাকি: ${stat.total - stat.completed}</span><span class="font-semibold">${stat.percent}%</span></div>
-                    </div>`;
-        }
-        subjectProgressContainerElem.innerHTML = html;
-    }
-    
-    function fullRender() {
-        if (!appContainerDiv || appContainerDiv.style.display === 'none') return;
-        const total = allTopics.length;
-        const completedCount = getCompletedSet().size;
-        studiedCountSpan.innerText = completedCount;
-        pendingCountSpan.innerText = total - completedCount;
-        totalTopicsCountSpan.innerText = total;
-        if (progressChart) { progressChart.data.datasets[0].data = [completedCount, total - completedCount]; progressChart.update(); }
-        const remaining = Math.max(0, MAX_SHUFFLE - shuffleUsed);
-        remainingShuffleSpan.innerText = remaining;
-        const filteredPending = getPendingFiltered();
-        if (filteredPending.length === 0 || !currentTopic) {
-            noTopicMsgDiv.classList.remove('hidden'); topicContentDiv.classList.add('hidden');
-            shuffleBtn.disabled = true; doneBtn.disabled = true;
-        } else {
-            noTopicMsgDiv.classList.add('hidden'); topicContentDiv.classList.remove('hidden');
-            currentTopicNameSpan.innerText = currentTopic.name;
-            currentTopicIdSpan.innerText = currentTopic.id;
-            topicCatBadge.innerText = currentTopic.cat;
-            const canShuffle = (shuffleUsed < MAX_SHUFFLE) && (getPendingFiltered().filter(t => t.id !== currentTopic.id).length > 0);
-            shuffleBtn.disabled = !canShuffle; doneBtn.disabled = false;
-        }
-        renderTopicsList();
-        renderSubjectWiseProgress();
-        saveToFirestore();
-    }
-    
-    function handleShuffle() {
-        if (shuffleUsed >= MAX_SHUFFLE) { alert(`সর্বোচ্চ ${MAX_SHUFFLE} বার শাফল করতে পারেন!`); return; }
-        const filtered = getPendingFiltered();
-        if (filtered.length <= 1) { alert("এই ফিল্টারে আর ভিন্ন টপিক নেই। সম্পন্ন করুন বা ফিল্টার বাড়ান।"); return; }
-        let newTopic = getRandomFilteredPending(currentTopic.id);
-        if (newTopic) { currentTopic = newTopic; shuffleUsed++; fullRender(); }
-        else alert("ভিন্ন টপিক পাওয়া যায়নি।");
-    }
-    
-    function handleDone() {
-        if (!currentTopic) { alert("কোন টপিক নেই!"); return; }
-        const completedSet = getCompletedSet();
-        if (!completedSet.has(currentTopic.id)) {
-            const now = new Date();
-            completedTopics.push({ id: currentTopic.id, completedAt: now });
-        }
-        const remaining = getPendingFiltered();
-        if (remaining.length === 0) { currentTopic = null; fullRender(); alert(`🎉 "${currentFilter === 'ALL' ? 'সব বিষয়' : currentFilter}" ফিল্টারের সব টপিক সম্পন্ন!`); return; }
-        let nextTopic = getRandomFilteredPending();
-        if (nextTopic) currentTopic = nextTopic;
-        else currentTopic = remaining[0];
-        shuffleUsed = 0;
-        fullRender();
-    }
-    
-    async function resetSection(sectionValue, password) {
-        if (!currentUserObj) return false;
-        const providerData = currentUserObj.providerData[0];
-        if (providerData.providerId === 'password') {
-            try { const credential = firebase.auth.EmailAuthProvider.credential(currentUserObj.email, password); await currentUserObj.reauthenticateWithCredential(credential); } 
-            catch(e) { alert(`পাসওয়ার্ড ভুল: ${e.message}`); return false; }
-        } else { if (!confirm("Google ব্যবহারকারী, পাসওয়ার্ড ছাড়াই রিসেট করবেন?")) return false; }
-        if (sectionValue === "ALL") completedTopics = [];
-        else completedTopics = completedTopics.filter(entry => { const t = allTopics.find(tp => tp.id === entry.id); return t && t.cat !== sectionValue; });
-        shuffleUsed = 0; currentFilter = "ALL";
-        if (subjectFilterSelectElem) subjectFilterSelectElem.value = "ALL";
-        const pendingNow = allTopics.filter(t => !getCompletedSet().has(t.id));
-        currentTopic = pendingNow.length ? pendingNow[Math.floor(Math.random() * pendingNow.length)] : null;
-        await saveToFirestore(); fullRender();
-        alert(`"${sectionValue}" বিভাগের অগ্রগতি সফলভাবে রিসেট করা হয়েছে।`);
-        return true;
-    }
-    
-    function showResetModal() {
-        resetModal.style.display = 'flex';
-        resetSectionSelect.innerHTML = '<option value="ALL">📚 সব বিভাগ (সম্পূর্ণ রিসেট)</option>';
-        uniqueSubjects.forEach(sub => { resetSectionSelect.innerHTML += `<option value="${sub}">📖 ${sub}</option>`; });
-        const hasPassword = currentUserObj?.providerData[0]?.providerId === 'password';
-        if (hasPassword) { resetPasswordInput.style.display = 'block'; resetPasswordHint.innerText = 'আপনার অ্যাকাউন্টের পাসওয়ার্ড দিন'; resetPasswordInput.value = ''; }
-        else { resetPasswordInput.style.display = 'block'; resetPasswordHint.innerText = 'Google লগইন, পাসওয়ার্ড ছাড়াই রিসেট হবে'; resetPasswordInput.placeholder = 'প্রযোজ্য নয়'; }
-    }
-    
-    // Chart init
-    function initChart() { const ctx = document.getElementById('progressChart').getContext('2d'); if(progressChart) progressChart.destroy(); progressChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['সম্পন্ন (পড়া)', 'বাকি'], datasets: [{ data: [0, allTopics.length], backgroundColor: ['#10b981', '#f97316'], borderWidth: 0, cutout: '60%' }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } } }); }
-    
-    function setupAuthUI() { /* same as original but with date tracking info */ 
-        const signInBtn = document.getElementById('signInBtn'), googleBtn = document.getElementById('googleSignInBtn'), signUpBtn = document.getElementById('signUpBtn');
-        const showSignup = document.getElementById('showSignup'), showLogin = document.getElementById('showLogin');
-        const loginFormDiv = document.getElementById('loginForm'), signupFormDiv = document.getElementById('signupForm');
-        const authErrorDiv = document.getElementById('authError');
-        const showError = (msg) => { authErrorDiv.innerText = msg; authErrorDiv.classList.remove('hidden'); setTimeout(()=>authErrorDiv.classList.add('hidden'),3000); };
-        showSignup.onclick = () => { loginFormDiv.style.display='none'; signupFormDiv.style.display='block'; authErrorDiv.classList.add('hidden'); };
-        showLogin.onclick = () => { loginFormDiv.style.display='block'; signupFormDiv.style.display='none'; authErrorDiv.classList.add('hidden'); };
-        signInBtn.onclick = async () => { const email=document.getElementById('loginEmail').value, pwd=document.getElementById('loginPassword').value; try{ await auth.signInWithEmailAndPassword(email,pwd); }catch(e){ showError(e.message); } };
-        signUpBtn.onclick = async () => { const email=document.getElementById('signupEmail').value, pwd=document.getElementById('signupPassword').value; try{ await auth.createUserWithEmailAndPassword(email,pwd); }catch(e){ showError(e.message); } };
-        googleBtn.onclick = async () => { try{ const provider = new firebase.auth.GoogleAuthProvider(); await auth.signInWithPopup(provider); }catch(e){ showError(e.message); } };
-    }
-    
-    // DOM elements binding
-    const authContainerDiv = document.getElementById('authContainer'), appContainerDiv = document.getElementById('appContainer');
-    const userEmailSpan = document.getElementById('userEmailSpan'), shuffleBtn = document.getElementById('shuffleBtn'), doneBtn = document.getElementById('doneBtn');
-    const remainingShuffleSpan = document.getElementById('remainingShuffleSpan'), currentTopicNameSpan = document.getElementById('currentTopicName');
-    const currentTopicIdSpan = document.getElementById('currentTopicId'), topicCatBadge = document.getElementById('topicCatBadge');
-    const studiedCountSpan = document.getElementById('studiedCount'), pendingCountSpan = document.getElementById('pendingCount');
-    const totalTopicsCountSpan = document.getElementById('totalTopicsCount'), noTopicMsgDiv = document.getElementById('noTopicMsg');
-    const topicContentDiv = document.getElementById('topicContent'), topicsListContainer = document.getElementById('topicsListContainer');
-    const subjectFilterSelectElem = document.getElementById('subjectFilterSelect'), subjectProgressContainerElem = document.getElementById('subjectProgressContainer');
-    const resetModalBtn = document.getElementById('resetModalBtn'), resetModal = document.getElementById('resetModal');
-    const closeResetModal = document.getElementById('closeResetModalBtn'), cancelReset = document.getElementById('cancelResetBtn');
-    const confirmResetBtn = document.getElementById('confirmResetBtn'), resetSectionSelect = document.getElementById('resetSectionSelect');
-    const resetPasswordInput = document.getElementById('resetPasswordInput'), resetPasswordHint = document.getElementById('resetPasswordHint');
-    
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUserObj = user; userEmailSpan.innerText = user.email; authContainerDiv.style.display = 'none'; appContainerDiv.style.display = 'block';
-            if (!progressChart) initChart();
-            if (subjectFilterSelectElem) { subjectFilterSelectElem.innerHTML = '<option value="ALL">📚 সব বিষয় (ALL)</option>'; uniqueSubjects.forEach(sub => { subjectFilterSelectElem.innerHTML += `<option value="${sub}">📖 ${sub}</option>`; }); }
-            await loadFromFirestore(user);
-            shuffleBtn.onclick = handleShuffle; doneBtn.onclick = handleDone;
-            subjectFilterSelectElem.onchange = () => { currentFilter = subjectFilterSelectElem.value; shuffleUsed = 0; validateTopicByFilter(); fullRender(); };
-            document.getElementById('logoutBtn').onclick = async () => { await auth.signOut(); };
-            closeResetModal.onclick = cancelReset.onclick = () => resetModal.style.display = 'none';
-            confirmResetBtn.onclick = async () => { const section = resetSectionSelect.value, pwd = (currentUserObj?.providerData[0]?.providerId === 'password') ? resetPasswordInput.value : ''; if (currentUserObj?.providerData[0]?.providerId === 'password' && !pwd) { alert("পাসওয়ার্ড দিন"); return; } resetModal.style.display = 'none'; await resetSection(section, pwd); };
-            resetModalBtn.onclick = () => showResetModal();
-        } else { currentUserObj = null; authContainerDiv.style.display = 'flex'; appContainerDiv.style.display = 'none'; if(progressChart) progressChart.destroy(); progressChart = null; }
+    // show/hide auth forms tab switching
+    loginTab.addEventListener('click', () => {
+        loginTab.classList.add('tab-active');
+        signupTab.classList.remove('tab-active');
+        loginFormDiv.classList.remove('hide');
+        signupFormDiv.classList.add('hide');
+        loginError.classList.add('hide');
+        signupError.classList.add('hide');
     });
-    setupAuthUI();
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    signupTab.addEventListener('click', () => {
+        signupTab.classList.add('tab-active');
+        loginTab.classList.remove('tab-active');
+        signupFormDiv.classList.remove('hide');
+        loginFormDiv.classList.add('hide');
+        loginError.classList.add('hide');
+        signupError.classList.add('hide');
+    });
+    
+    // লগইন ফাংশন
+    const handleLogin = async (email, password) => {
+        try {
+            loginError.classList.add('hide');
+            await signInWithEmailAndPassword(auth, email, password);
+            // সফল হলে onAuthStateChanged হ্যান্ডেল করবে
+        } catch (error) {
+            loginError.textContent = getBanglaErrorMessage(error.code);
+            loginError.classList.remove('hide');
+        }
+    };
+    
+    // সাইনআপ ফাংশন (নাম, ইমেইল, পাসওয়ার্ড)
+    const handleSignup = async (name, email, password, confirm) => {
+        if (password !== confirm) {
+            signupError.textContent = "পাসওয়ার্ড দুবার মেলেনি।";
+            signupError.classList.remove('hide');
+            return;
+        }
+        if (password.length < 6) {
+            signupError.textContent = "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।";
+            signupError.classList.remove('hide');
+            return;
+        }
+        if (!name.trim()) {
+            signupError.textContent = "আপনার নাম দিন।";
+            signupError.classList.remove('hide');
+            return;
+        }
+        try {
+            signupError.classList.add('hide');
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // ইউজারের প্রোফাইলে নাম সেট করুন
+            await updateProfile(userCredential.user, { displayName: name.trim() });
+            // রিলোড ইউজার দরকার নেই, onAuthStateChanged দেখাবে
+        } catch (error) {
+            signupError.textContent = getBanglaErrorMessage(error.code);
+            signupError.classList.remove('hide');
+        }
+    };
+    
+    loginBtn.addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) {
+            loginError.textContent = "ইমেল ও পাসওয়ার্ড দিন।";
+            loginError.classList.remove('hide');
+            return;
+        }
+        handleLogin(email, password);
+    });
+    
+    signupBtn.addEventListener('click', () => {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const confirm = document.getElementById('signupConfirm').value;
+        handleSignup(name, email, password, confirm);
+    });
+    
+    // লগআউট
+    const doLogout = async () => {
+        if (unsubscribeMessages) {
+            unsubscribeMessages();
+            unsubscribeMessages = null;
+        }
+        await signOut(auth);
+    };
+    logoutBtn.addEventListener('click', doLogout);
+    
+    // মেসেজ লোড এবং রিয়েল টাইম লিসেনার (শুধু লগইন অবস্থায়)
+    const loadAndListenMessages = (user) => {
+        if (unsubscribeMessages) unsubscribeMessages();
+        const messagesRef = collection(db, "messages");
+        const q = query(messagesRef, orderBy("createdAt", "asc"));
+        // clear container
+        messagesContainer.innerHTML = '';
+        let initialLoad = true;
+        unsubscribeMessages = onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) {
+                if (messagesContainer.children.length === 0 || !initialLoad) {
+                    messagesContainer.innerHTML = '<div class="empty-chat">🤝 কোনো বার্তা নেই, প্রথম মেসেজ পাঠান!</div>';
+                }
+                initialLoad = false;
+                return;
+            }
+            // remove empty-chat if exists
+            if (messagesContainer.children.length === 1 && messagesContainer.children[0].classList?.contains('empty-chat')) {
+                messagesContainer.innerHTML = '';
+            }
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const data = change.doc.data();
+                    const msgId = change.doc.id;
+                    const senderId = data.senderId;
+                    const senderName = data.senderName || "অজানা";
+                    const messageText = data.text || "";
+                    const timestamp = data.createdAt ? data.createdAt.toDate() : new Date();
+                    const timeStr = timestamp.toLocaleTimeString('bn-BD', { hour: '2-digit', minute:'2-digit' });
+                    const isOwn = (senderId === user.uid);
+                    
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('message');
+                    messageDiv.classList.add(isOwn ? 'message-own' : 'message-other');
+                    
+                    if (!isOwn) {
+                        const nameSpan = document.createElement('div');
+                        nameSpan.classList.add('sender-name');
+                        nameSpan.innerText = senderName;
+                        messageDiv.appendChild(nameSpan);
+                    }
+                    const bubble = document.createElement('div');
+                    bubble.classList.add('bubble');
+                    bubble.classList.add(isOwn ? 'bubble-own' : 'bubble-other');
+                    bubble.innerText = messageText;
+                    messageDiv.appendChild(bubble);
+                    
+                    const timeSpan = document.createElement('div');
+                    timeSpan.classList.add('message-time');
+                    timeSpan.innerText = timeStr;
+                    messageDiv.appendChild(timeSpan);
+                    
+                    messagesContainer.appendChild(messageDiv);
+                    // auto scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            });
+            initialLoad = false;
+        }, (error) => {
+            console.error("Firestore লিসেনিং ব্যর্থ:", error);
+            messagesContainer.innerHTML = '<div class="empty-chat">🔴 সংযোগ ত্রুটি, রিফ্রেশ করুন</div>';
+        });
+    };
+    
+    // বার্তা পাঠানোর ফাংশন
+    const sendMessage = async () => {
+        if (!currentUser) return;
+        const text = messageInput.value.trim();
+        if (text === "") return;
+        const displayName = currentUser.displayName || currentUser.email?.split('@')[0] || "ব্যবহারকারী";
+        try {
+            const messagesRef = collection(db, "messages");
+            await addDoc(messagesRef, {
+                text: text,
+                senderId: currentUser.uid,
+                senderName: displayName,
+                createdAt: serverTimestamp(),
+            });
+            messageInput.value = "";
+            messageInput.focus();
+        } catch (err) {
+            alert("বার্তা পাঠাতে ব্যর্থ: " + err.message);
+        }
+    };
+    
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+    
+    // অথেন্টিকেশন স্টেট পরিবর্তন হ্যান্ডলার
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // user logged in
+            currentUser = user;
+            // displayName সঠিকভাবে সেট করা আছে কিনা নিশ্চিত (সাইনআপে করা হয়েছে, তবে প্রোফাইল আপডেট পরেও)
+            if (!user.displayName) {
+                // ব্যাকআপ: নাম না থাকলে ইমেলের অংশ দেখানো
+                const fallbackName = user.email ? user.email.split('@')[0] : "বন্ধু";
+                await updateProfile(user, { displayName: fallbackName });
+                currentUser = auth.currentUser; // refresh
+            }
+            const userName = currentUser.displayName || "চ্যাটার";
+            currentUserNameSpan.innerText = userName;
+            // UI স্যুইচ: চ্যাট দেখাও, অথ হাইড করো
+            authSection.classList.add('hide');
+            chatSection.classList.remove('hide');
+            // মেসেজ লোড করা শুরু
+            loadAndListenMessages(currentUser);
+        } else {
+            // user logged out
+            if (unsubscribeMessages) {
+                unsubscribeMessages();
+                unsubscribeMessages = null;
+            }
+            currentUser = null;
+            authSection.classList.remove('hide');
+            chatSection.classList.add('hide');
+            // ফর্ম রিসেট ও ত্রুটি গোপন
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('signupName').value = '';
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('signupConfirm').value = '';
+            loginError.classList.add('hide');
+            signupError.classList.add('hide');
+            // ডিফল্ট ট্যাব লগইন
+            loginTab.click();
+        }
+    });
+    
+    // দ্রুত ট্যাব সেটআপ
+    loginTab.click();
+    
+    // Firestore নিরাপত্তা নোট (শুধু ডেভেলপার সতর্কতা)
+    console.log("✅ চ্যাট অ্যাপ প্রস্তুত। ফায়ারবেস কনফিগারেশন বৈধ। নিশ্চিত করুন Firestore rules: allow read, write if request.auth != null;");
+    
+    // ডিভাইস অ্যাডাপ্ট : স্ক্রলিং ঠিক রাখা
+    window.addEventListener('load', () => {
+        if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
 </script>
 </body>
 </html>
+```
