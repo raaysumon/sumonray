@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>আড্ডা চ্যাট — রিয়েলটাইম মজার আড্ডা</title>
+    <title>আড্ডা চ্যাট + অডিও কল — রিয়েলটাইম ভয়েস</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDK (modular) -->
+    <!-- Firebase SDK -->
     <script type="importmap">
         {
             "imports": {
@@ -46,15 +46,15 @@
             transition: all 0.2s ease;
         }
 
-        /* chat header */
         .chat-header {
             background: linear-gradient(120deg, #075e54, #128c7e);
             color: white;
-            padding: 18px 20px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .user-info {
             display: flex;
@@ -63,7 +63,7 @@
         }
         .user-name {
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -74,18 +74,12 @@
             color: #075e54;
             padding: 2px 8px;
             border-radius: 30px;
-            display: inline-block;
             width: fit-content;
             font-weight: 600;
         }
-        .online-badge {
-            background: #25d366;
-            color: #1e2a1e;
-            margin-left: 6px;
-        }
         .action-buttons {
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
         .icon-btn {
             background: rgba(255,255,255,0.2);
@@ -102,6 +96,13 @@
             background: rgba(255,255,255,0.4);
             transform: scale(1.05);
         }
+        .call-btn-primary {
+            background: #25d366;
+            color: #075e54;
+        }
+        .call-btn-primary:hover {
+            background: #20b859;
+        }
 
         /* messages area */
         .messages-area {
@@ -112,52 +113,29 @@
             flex-direction: column;
             gap: 14px;
             background-image: radial-gradient(circle at 25% 40%, rgba(200, 220, 210, 0.3) 1.5%, transparent 1.8%);
-            background-size: 32px 32px;
         }
-        .messages-area::-webkit-scrollbar {
-            width: 5px;
-        }
-        .messages-area::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        .messages-area::-webkit-scrollbar-thumb {
-            background: #075e54;
-            border-radius: 10px;
-        }
+        .messages-area::-webkit-scrollbar { width: 5px; }
+        .messages-area::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        .messages-area::-webkit-scrollbar-thumb { background: #075e54; border-radius: 10px; }
 
-        /* message bubbles */
         .message {
             display: flex;
             flex-direction: column;
             max-width: 82%;
-            animation: popIn 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            animation: popIn 0.2s ease;
+            cursor: pointer;
         }
-        .message-own {
-            align-self: flex-end;
-        }
-        .message-other {
-            align-self: flex-start;
-        }
+        .message-own { align-self: flex-end; }
+        .message-other { align-self: flex-start; }
         .bubble {
             padding: 10px 14px;
             border-radius: 22px;
             word-wrap: break-word;
             font-size: 0.95rem;
-            line-height: 1.45;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: transform 0.1s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .bubble-own {
-            background: #dcf8c5;
-            color: #111;
-            border-bottom-right-radius: 5px;
-        }
-        .bubble-other {
-            background: white;
-            border-bottom-left-radius: 5px;
-            border: 1px solid #efefef;
-        }
+        .bubble-own { background: #dcf8c5; border-bottom-right-radius: 5px; }
+        .bubble-other { background: white; border-bottom-left-radius: 5px; border: 1px solid #efefef; }
         .reply-quote {
             font-size: 0.75rem;
             background: rgba(0,0,0,0.05);
@@ -165,11 +143,6 @@
             border-radius: 14px;
             margin-bottom: 6px;
             border-left: 3px solid #075e54;
-            color: #2c3e2f;
-        }
-        .reply-quote span {
-            font-weight: 700;
-            color: #075e54;
         }
         .sender-name {
             font-size: 0.75rem;
@@ -189,19 +162,7 @@
             margin-right: 8px;
             display: flex;
             justify-content: flex-end;
-            gap: 6px;
         }
-        .message-other .message-time {
-            justify-content: flex-start;
-        }
-        .message {
-            cursor: pointer;
-        }
-        .message:hover .bubble {
-            transform: scale(1.01);
-            filter: brightness(0.98);
-        }
-        /* reply indicator */
         .reply-indicator {
             background: #e9f5e9;
             padding: 6px 12px;
@@ -209,24 +170,14 @@
             font-size: 0.75rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin: 0 16px 6px 16px;
             border-left: 4px solid #075e54;
         }
-        .cancel-reply {
-            background: none;
-            border: none;
-            color: #c0392b;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        /* input area */
         .input-area {
             background: #ffffffec;
             padding: 12px 16px;
             display: flex;
             gap: 12px;
-            align-items: center;
             border-top: 1px solid #e9ecef;
         }
         .message-input {
@@ -237,11 +188,6 @@
             border-radius: 40px;
             font-size: 0.95rem;
             outline: none;
-            transition: 0.2s;
-        }
-        .message-input:focus {
-            border-color: #128c7e;
-            background: white;
         }
         .send-btn {
             background: linear-gradient(135deg, #075e54, #0b8f7a);
@@ -251,107 +197,118 @@
             height: 48px;
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.2s;
             font-size: 1.3rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .send-btn:hover {
-            transform: scale(1.05);
-        }
-        /* nickname modal */
+        /* modal styles */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(6px);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 1100;
         }
         .modal-card {
             background: white;
             width: 85%;
-            max-width: 340px;
+            max-width: 360px;
             border-radius: 48px;
-            padding: 28px 22px;
+            padding: 24px 20px;
             text-align: center;
-            box-shadow: 0 30px 40px rgba(0,0,0,0.3);
-            animation: fadeUp 0.3s ease;
+            animation: fadeUp 0.2s ease;
         }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px);}
-            to { opacity: 1; transform: translateY(0);}
+        .modal-card h3 { margin-bottom: 12px; color: #075e54; }
+        .online-user-list {
+            max-height: 250px;
+            overflow-y: auto;
+            margin: 16px 0;
+            text-align: left;
         }
-        .modal-card i {
-            font-size: 3rem;
-            color: #075e54;
-            margin-bottom: 12px;
+        .online-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
         }
-        .modal-card h3 {
-            margin-bottom: 20px;
-            color: #0b2f26;
-        }
-        .modal-card input {
-            width: 100%;
-            padding: 14px 18px;
-            border-radius: 60px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .modal-card button {
-            background: #075e54;
-            color: white;
+        .call-user-btn {
+            background: #25d366;
             border: none;
-            padding: 12px 26px;
-            border-radius: 40px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            color: white;
             font-weight: bold;
-            font-size: 1rem;
             cursor: pointer;
         }
-        .empty-chat {
-            text-align: center;
-            color: #5f7f6e;
-            background: rgba(255,255,240,0.7);
-            padding: 20px;
-            border-radius: 60px;
-            font-style: italic;
-        }
-        @keyframes popIn {
-            from { opacity: 0; transform: translateY(12px);}
-            to { opacity: 1; transform: translateY(0);}
+        .incoming-call {
+            background: #ff9800;
+            color: #1e2a1e;
         }
         .hide { display: none; }
+        @keyframes popIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px);} to { opacity:1; transform:translateY(0);} }
+        .call-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1f2e2a;
+            border-radius: 60px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1050;
+            box-shadow: 0 10px 25px black;
+            color: white;
+        }
+        .call-end-btn {
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            color: white;
+        }
+        .call-mute-btn {
+            background: #34495e;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            margin: 0 6px;
+        }
+        .empty-chat { text-align: center; color: #5f7f6e; padding: 20px; font-style: italic; }
     </style>
 </head>
 <body>
 <div class="app-container" id="appRoot">
-    <!-- main chat interface (hidden until nickname set) -->
     <div id="chatSection" style="display: flex; flex-direction: column; height: 100%;">
         <div class="chat-header">
             <div class="user-info">
-                <div class="user-name"><i class="fas fa-comment-dots"></i> <span id="currentUserName">বন্ধু</span> <i class="fas fa-smile-wink"></i></div>
-                <div class="user-status" id="onlineStatusBadge"><i class="fas fa-circle" style="font-size: 8px; color: #25d366;"></i> <span id="onlineCountSpan">০ জন</span> অনলাইন</div>
+                <div class="user-name"><i class="fas fa-headset"></i> <span id="currentUserName">বন্ধু</span></div>
+                <div class="user-status"><i class="fas fa-circle" style="font-size: 8px; color: #25d366;"></i> <span id="onlineCountSpan">০ জন</span> অনলাইন</div>
             </div>
             <div class="action-buttons">
-                <button class="icon-btn" id="changeNameBtn" title="নাম পরিবর্তন"><i class="fas fa-user-edit"></i></button>
-                <button class="icon-btn" id="clearAllChatsBtn" title="সব চ্যাট মুছে ফেলুন"><i class="fas fa-trash-alt"></i></button>
+                <button class="icon-btn call-btn-primary" id="showOnlineUsersBtn" title="অডিও কল শুরু করুন"><i class="fas fa-phone-alt"></i></button>
+                <button class="icon-btn" id="changeNameBtn"><i class="fas fa-user-edit"></i></button>
+                <button class="icon-btn" id="clearAllChatsBtn"><i class="fas fa-trash-alt"></i></button>
             </div>
         </div>
 
-        <!-- reply indicator panel -->
         <div id="replyIndicator" class="reply-indicator hide">
             <span><i class="fas fa-reply-all"></i> <span id="replyToName"></span> এর জবাব দিচ্ছেন</span>
             <button id="cancelReplyBtn" class="cancel-reply"><i class="fas fa-times-circle"></i></button>
         </div>
 
         <div class="messages-area" id="messagesContainer">
-            <div class="empty-chat">🤗 স্বাগতম! প্রথম মেসেজ দিন 🚀</div>
+            <div class="empty-chat">🎧 অডিও কল ফিচার চালু! ফোন বাটনে ক্লিক করে যেকোনো অনলাইন ইউজারকে কল করুন 📞</div>
         </div>
         <div class="input-area">
             <input type="text" id="messageInput" class="message-input" placeholder="✍️ বাংলায় মেসেজ লিখুন...">
@@ -363,7 +320,7 @@
 <script type="module">
     import { initializeApp } from "firebase/app";
     import { getAuth, signInAnonymously, updateProfile, onAuthStateChanged } from "firebase/auth";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, deleteDoc, serverTimestamp, writeBatch, doc, setDoc, updateDoc, where, limit } from "firebase/firestore";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, deleteDoc, serverTimestamp, writeBatch, doc, setDoc, updateDoc, where, deleteDoc as deleteDocFirestore } from "firebase/firestore";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
@@ -378,7 +335,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     
-    // DOM elements
+    // DOM
     const chatSection = document.getElementById('chatSection');
     const messagesContainer = document.getElementById('messagesContainer');
     const messageInput = document.getElementById('messageInput');
@@ -390,356 +347,413 @@
     const replyIndicatorDiv = document.getElementById('replyIndicator');
     const replyToNameSpan = document.getElementById('replyToName');
     const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+    const showOnlineUsersBtn = document.getElementById('showOnlineUsersBtn');
 
-    let currentUser = null;          // Firebase anonymous user
+    let currentUser = null;
     let currentNickname = "";
     let unsubscribeMessages = null;
     let unsubscribePresence = null;
-    let activeReply = null;           // { id, senderName, text }
-    let presenceHeartbeatInterval = null;
+    let activeReply = null;
+    let presenceInterval = null;
 
-    // helper: escape HTML
-    function escapeHtml(str) { 
-        if(!str) return '';
-        return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); 
-    }
+    // WebRTC globals
+    let peerConnection = null;
+    let localStream = null;
+    let remoteAudio = null;
+    let currentCallDocId = null;
+    let currentCallRemoteUserId = null;
+    let isCallActive = false;
+    let callListenUnsubscribe = null;
 
-    // update presence (lastSeen) for current user
+    const configuration = {
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    };
+
+    // Helper
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+    // presence & online users
     async function updatePresence() {
         if (!currentUser) return;
-        const presenceRef = doc(db, "presence", currentUser.uid);
-        try {
-            await setDoc(presenceRef, {
-                uid: currentUser.uid,
-                nickname: currentNickname,
-                lastSeen: serverTimestamp(),
-                updatedAt: new Date()
-            }, { merge: true });
-        } catch(e) { console.warn(e); }
+        await setDoc(doc(db, "presence", currentUser.uid), {
+            uid: currentUser.uid,
+            nickname: currentNickname,
+            lastSeen: serverTimestamp(),
+        }, { merge: true });
     }
-
-    // start heartbeat every 20 seconds
     function startPresenceHeartbeat() {
-        if (presenceHeartbeatInterval) clearInterval(presenceHeartbeatInterval);
-        updatePresence(); // immediate
-        presenceHeartbeatInterval = setInterval(() => {
-            if (currentUser && currentNickname) updatePresence();
-        }, 20000);
-        
-        // on page close, mark lastSeen as old (40 sec ago) to remove quickly
+        if (presenceInterval) clearInterval(presenceInterval);
+        updatePresence();
+        presenceInterval = setInterval(() => { if(currentUser) updatePresence(); }, 20000);
         window.addEventListener('beforeunload', () => {
-            if (currentUser && presenceHeartbeatInterval) {
-                const presenceRef = doc(db, "presence", currentUser.uid);
-                setDoc(presenceRef, { lastSeen: new Date(Date.now() - 90000) }, { merge: true }).catch(()=>{});
-            }
+            if(currentUser) setDoc(doc(db, "presence", currentUser.uid), { lastSeen: new Date(Date.now() - 90000) }, { merge: true });
+        });
+    }
+    function listenOnlineUsers(callback = null) {
+        if (unsubscribePresence) unsubscribePresence();
+        const q = query(collection(db, "presence"));
+        unsubscribePresence = onSnapshot(q, (snapshot) => {
+            const now = Date.now();
+            let onlineList = [];
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                let last = data.lastSeen?.toDate ? data.lastSeen.toDate() : new Date(data.lastSeen);
+                if (last && (now - last.getTime()) < 45000) {
+                    onlineList.push({ uid: data.uid, nickname: data.nickname || "বন্ধু" });
+                }
+            });
+            const onlineCount = onlineList.length;
+            onlineCountSpan.innerText = onlineCount;
+            if (callback) callback(onlineList.filter(u => u.uid !== currentUser?.uid));
         });
     }
 
-    // listen online users count (lastSeen within last 45 seconds)
-    function listenOnlineUsers() {
-        if (unsubscribePresence) unsubscribePresence();
-        const cutoff = new Date(Date.now() - 45000);
-        const presenceQuery = query(collection(db, "presence"), orderBy("lastSeen", "desc"));
-        unsubscribePresence = onSnapshot(presenceQuery, (snapshot) => {
-            const now = Date.now();
-            let online = 0;
-            snapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                if (data.lastSeen) {
-                    let last = data.lastSeen.toDate ? data.lastSeen.toDate() : new Date(data.lastSeen);
-                    if ((now - last.getTime()) < 45000) online++;
-                } else if (data.updatedAt) {
-                    let upd = new Date(data.updatedAt);
-                    if ((now - upd.getTime()) < 45000) online++;
-                }
-            });
-            onlineCountSpan.innerText = online;
-        }, err => console.warn("presence listener", err));
-    }
-
-    // set user nickname and update firebase profile + presence
-    async function setNicknameAndProceed(newName) {
-        if (!currentUser) return false;
-        const trimmed = newName.trim();
-        if (!trimmed || trimmed.length < 1) return false;
-        try {
-            await updateProfile(currentUser, { displayName: trimmed });
-            currentNickname = trimmed;
-            currentUserNameSpan.innerText = trimmed;
-            // update presence doc with new nickname
-            await updatePresence();
-            return true;
-        } catch(e) { console.error(e); return false; }
-    }
-
-    // show nickname modal (used on first time or change)
-    function showNicknameModal(callback = null) {
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'modal-overlay';
-        modalDiv.innerHTML = `
-            <div class="modal-card">
-                <i class="fas fa-user-astronaut"></i>
-                <h3>📛 আপনার নাম দিন</h3>
-                <input type="text" id="nicknameInput" placeholder="যেমন: মজনু, রিতা, শামীম" maxlength="25" autocomplete="off">
-                <button id="confirmNicknameBtn"><i class="fas fa-check-circle"></i> চ্যাট শুরু</button>
-            </div>
-        `;
-        document.body.appendChild(modalDiv);
-        const input = modalDiv.querySelector('#nicknameInput');
-        const confirmBtn = modalDiv.querySelector('#confirmNicknameBtn');
-        const focusHandler = () => input.focus();
-        focusHandler();
-        
-        const finish = async () => {
-            const val = input.value.trim();
-            if (val === "") {
-                input.style.border = "1px solid #e74c3c";
-                return;
-            }
-            const success = await setNicknameAndProceed(val);
-            if (success) {
-                modalDiv.remove();
-                if (callback) callback();
-            } else {
-                alert("নাম সংরক্ষণে সমস্যা, আবার চেষ্টা করুন।");
-            }
-        };
-        confirmBtn.onclick = finish;
-        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') finish(); });
-    }
-
-    // Clear all messages from Firestore
-    async function clearAllMessages() {
-        if (!currentUser) return;
-        const confirmClear = confirm("⚠️ সব চ্যাট ইতিহাস মুছে ফেলবেন? পুরো আড্ডা খালি হয়ে যাবে!");
-        if (!confirmClear) return;
-        try {
-            const messagesRef = collection(db, "messages");
-            const snapshot = await getDocs(messagesRef);
-            if (snapshot.empty) return;
-            const batch = writeBatch(db);
-            snapshot.forEach(docSnap => batch.delete(docSnap.ref));
-            await batch.commit();
-        } catch (err) {
-            alert("মুছতে ব্যর্থ, আবার চেষ্টা করুন");
-        }
-    }
-
-    // send message
+    // Text chat functions
     async function sendMessage() {
-        if (!currentUser || !currentNickname) {
-            alert("দয়া করে প্রথমে নাম দিন");
-            return;
-        }
+        if (!currentUser || !currentNickname) return;
         const text = messageInput.value.trim();
         if (!text) return;
-        let replyData = null;
-        if (activeReply) {
-            replyData = {
-                replyToSender: activeReply.senderName,
-                replyToText: activeReply.text.length > 65 ? activeReply.text.slice(0,65) + "…" : activeReply.text
-            };
-        }
+        let replyData = activeReply ? { replyToSender: activeReply.senderName, replyToText: activeReply.text.slice(0,65) } : null;
         try {
             await addDoc(collection(db, "messages"), {
-                text: text,
-                senderId: currentUser.uid,
-                senderName: currentNickname,
-                createdAt: serverTimestamp(),
-                reply: replyData || null
+                text, senderId: currentUser.uid, senderName: currentNickname,
+                createdAt: serverTimestamp(), reply: replyData || null
             });
             messageInput.value = "";
-            if (activeReply) {
-                activeReply = null;
-                replyIndicatorDiv.classList.add('hide');
-            }
-            messageInput.focus();
-        } catch(e) {
-            alert("পাঠাতে ব্যর্থ: " + e.message);
-        }
+            if (activeReply) { activeReply = null; replyIndicatorDiv.classList.add('hide'); }
+        } catch(e) { alert("পাঠাতে ব্যর্থ"); }
     }
 
-    // load messages realtime + render
     function loadMessages() {
         if (unsubscribeMessages) unsubscribeMessages();
         const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
-        messagesContainer.innerHTML = '';
         unsubscribeMessages = onSnapshot(q, (snapshot) => {
-            if (snapshot.empty) {
-                messagesContainer.innerHTML = '<div class="empty-chat">💬 এখনো কোনো মেসেজ নেই! প্রথম কথা শুরু করুন 🎉</div>';
-                return;
-            }
-            // remove default empty placeholder if any
-            if (messagesContainer.children.length === 1 && messagesContainer.children[0].classList?.contains('empty-chat')) {
-                messagesContainer.innerHTML = '';
-            }
-            // we track changes better: rebuild full list for simplicity? but onSnapshot gives correct ordering
-            // Better: use snapshot.docChanges() to add new only. But to keep sync for deletions, full rebuild on any updates? Simpler: update whole container on each snapshot (but loses scroll?). fine for small scale.
-            // But to preserve animations and reply clicks, we rebuild all (preserves click handlers)
             messagesContainer.innerHTML = '';
+            if (snapshot.empty) { messagesContainer.innerHTML = '<div class="empty-chat">💬 প্রথম মেসেজ লিখুন 🎤</div>'; return; }
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
                 const msgId = docSnap.id;
-                const senderId = data.senderId;
-                const senderName = data.senderName || "বন্ধু";
-                const isOwn = (currentUser && senderId === currentUser.uid);
-                const time = data.createdAt ? data.createdAt.toDate() : new Date();
+                const isOwn = data.senderId === currentUser?.uid;
+                const time = data.createdAt?.toDate() || new Date();
                 const timeStr = time.toLocaleTimeString('bn-BD', { hour:'2-digit', minute:'2-digit' });
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.classList.add(isOwn ? 'message-own' : 'message-other');
-                messageDiv.dataset.messageId = msgId;
-                messageDiv.dataset.senderName = senderName;
-                messageDiv.dataset.messageText = data.text;
-                
-                // sender name for others
+                const msgDiv = document.createElement('div');
+                msgDiv.classList.add('message', isOwn ? 'message-own' : 'message-other');
+                msgDiv.dataset.messageId = msgId;
+                msgDiv.dataset.senderName = data.senderName;
+                msgDiv.dataset.messageText = data.text;
                 if (!isOwn) {
-                    const nameSpan = document.createElement('div');
-                    nameSpan.classList.add('sender-name');
-                    nameSpan.innerHTML = `<i class="fas fa-user-circle"></i> ${escapeHtml(senderName)}`;
-                    messageDiv.appendChild(nameSpan);
+                    const nameSpan = document.createElement('div'); nameSpan.classList.add('sender-name');
+                    nameSpan.innerHTML = `<i class="fas fa-user-circle"></i> ${escapeHtml(data.senderName)}`;
+                    msgDiv.appendChild(nameSpan);
                 } else {
-                    const nameSpan = document.createElement('div');
-                    nameSpan.classList.add('sender-name');
+                    const nameSpan = document.createElement('div'); nameSpan.classList.add('sender-name');
                     nameSpan.style.justifyContent = "flex-end";
-                    nameSpan.innerHTML = `<i class="fas fa-user-check"></i> আপনি (${escapeHtml(senderName)})`;
-                    messageDiv.appendChild(nameSpan);
+                    nameSpan.innerHTML = `<i class="fas fa-user-check"></i> আপনি (${escapeHtml(data.senderName)})`;
+                    msgDiv.appendChild(nameSpan);
                 }
-                
-                // reply quote
-                if (data.reply && data.reply.replyToSender) {
-                    const quoteDiv = document.createElement('div');
-                    quoteDiv.classList.add('reply-quote');
-                    quoteDiv.innerHTML = `<span><i class="fas fa-reply"></i> ${escapeHtml(data.reply.replyToSender)}:</span> “${escapeHtml(data.reply.replyToText)}”`;
-                    messageDiv.appendChild(quoteDiv);
+                if (data.reply) {
+                    const quote = document.createElement('div'); quote.classList.add('reply-quote');
+                    quote.innerHTML = `<span><i class="fas fa-reply"></i> ${escapeHtml(data.reply.replyToSender)}:</span> “${escapeHtml(data.reply.replyToText)}”`;
+                    msgDiv.appendChild(quote);
                 }
-                
-                const bubble = document.createElement('div');
-                bubble.classList.add('bubble');
-                bubble.classList.add(isOwn ? 'bubble-own' : 'bubble-other');
+                const bubble = document.createElement('div'); bubble.classList.add('bubble', isOwn ? 'bubble-own' : 'bubble-other');
                 bubble.innerText = data.text;
-                messageDiv.appendChild(bubble);
-                
-                const timeSpan = document.createElement('div');
-                timeSpan.classList.add('message-time');
-                timeSpan.innerHTML = `<i class="far fa-clock"></i> ${timeStr} ${!isOwn ? '' : '<i class="fas fa-check-double" style="color:#4fc3f7;"></i>'}`;
-                messageDiv.appendChild(timeSpan);
-                
-                // Click to reply
-                messageDiv.addEventListener('click', (e) => {
+                msgDiv.appendChild(bubble);
+                const timeSpan = document.createElement('div'); timeSpan.classList.add('message-time');
+                timeSpan.innerHTML = `<i class="far fa-clock"></i> ${timeStr}`;
+                msgDiv.appendChild(timeSpan);
+                msgDiv.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (activeReply && activeReply.id === msgId) return;
-                    activeReply = {
-                        id: msgId,
-                        senderName: senderName,
-                        text: data.text
-                    };
-                    replyToNameSpan.innerText = escapeHtml(senderName);
+                    activeReply = { id: msgId, senderName: data.senderName, text: data.text };
+                    replyToNameSpan.innerText = escapeHtml(data.senderName);
                     replyIndicatorDiv.classList.remove('hide');
                 });
-                messagesContainer.appendChild(messageDiv);
+                messagesContainer.appendChild(msgDiv);
             });
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, (error) => {
-            console.error("Snapshot error:", error);
         });
     }
 
-    // cancel reply
-    cancelReplyBtn.addEventListener('click', () => {
-        activeReply = null;
-        replyIndicatorDiv.classList.add('hide');
-    });
-
-    // change nickname (new)
-    async function changeNickname() {
-        if (!currentUser) return;
-        const newName = prompt("নতুন নাম লিখুন (সবার কাছে দেখা যাবে):", currentNickname);
-        if (newName && newName.trim() !== "" && newName.trim() !== currentNickname) {
-            const success = await setNicknameAndProceed(newName.trim());
-            if (success) {
-                alert(`হ্যালো ${newName.trim()}! আপনার নাম পরিবর্তন হয়েছে।`);
-                // update presence immediately
-                updatePresence();
-            } else {
-                alert("নাম পরিবর্তন ব্যর্থ, আবার চেষ্টা করুন");
-            }
+    // ---------- AUDIO CALL WEBRTC SIGNALING ----------
+    async function createPeerConnection(targetUserId, callDocId) {
+        if (peerConnection) {
+            peerConnection.close();
         }
-    }
-
-    // clears all messages
-    clearAllBtn.addEventListener('click', clearAllMessages);
-    changeNameBtn.addEventListener('click', changeNickname);
-    sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-    // initialize anonymous auth and whole flow
-    async function initAnonymousSession() {
-        try {
-            const userCred = await signInAnonymously(auth);
-            currentUser = userCred.user;
-            // check if already has displayName ?
-            let existingName = currentUser.displayName;
-            if (existingName && existingName !== "") {
-                currentNickname = existingName;
-                currentUserNameSpan.innerText = currentNickname;
-                // start presence
-                startPresenceHeartbeat();
-                listenOnlineUsers();
-                loadMessages();
-            } else {
-                // first time: show nickname modal, then after set -> load chat
-                showNicknameModal(() => {
-                    // after nickname set
-                    currentNickname = currentUser.displayName;
-                    currentUserNameSpan.innerText = currentNickname;
-                    startPresenceHeartbeat();
-                    listenOnlineUsers();
-                    loadMessages();
+        peerConnection = new RTCPeerConnection(configuration);
+        if (localStream) {
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+        }
+        peerConnection.onicecandidate = async (event) => {
+            if (event.candidate) {
+                await addDoc(collection(db, "calls", callDocId, "candidates"), {
+                    candidate: event.candidate.toJSON(),
+                    type: "candidate",
+                    senderId: currentUser.uid
                 });
             }
-        } catch(err) {
-            console.error("Anon sign in failed", err);
-            alert("সংযোগ সমস্যা, রিফ্রেশ করুন।");
-        }
+        };
+        peerConnection.ontrack = (event) => {
+            if (!remoteAudio) {
+                remoteAudio = new Audio();
+                remoteAudio.srcObject = event.streams[0];
+                remoteAudio.play().catch(e=>console.log);
+            } else {
+                remoteAudio.srcObject = event.streams[0];
+            }
+        };
+        peerConnection.onconnectionstatechange = () => {
+            if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed" || peerConnection.connectionState === "closed") {
+                endCall();
+            }
+        };
+        return peerConnection;
     }
 
-    // listen auth state (preserve if already anonymous)
-    onAuthStateChanged(auth, async (user) => {
+    async function startCall(targetUserId, targetNickname) {
+        if (isCallActive) { alert("আগে কল শেষ করুন"); return; }
+        if (!localStream) {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch(e) { alert("মাইক্রোফোন অনুমতি দরকার"); return; }
+        }
+        // create call document
+        const callRef = collection(db, "calls");
+        const callDoc = await addDoc(callRef, {
+            from: currentUser.uid,
+            fromName: currentNickname,
+            to: targetUserId,
+            toName: targetNickname,
+            status: "calling",
+            createdAt: serverTimestamp(),
+            offer: null
+        });
+        currentCallDocId = callDoc.id;
+        currentCallRemoteUserId = targetUserId;
+        const pc = await createPeerConnection(targetUserId, currentCallDocId);
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await updateDoc(doc(db, "calls", currentCallDocId), { offer: { sdp: offer.sdp, type: offer.type }, status: "offer_sent" });
+        // listen for answer
+        const unsubAnswer = onSnapshot(doc(db, "calls", currentCallDocId), async (snap) => {
+            const data = snap.data();
+            if (data && data.answer && peerConnection && peerConnection.signalingState !== "stable") {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                unsubAnswer();
+            }
+            if (data && data.status === "rejected") {
+                unsubAnswer(); endCall(); alert("কল reject হয়েছে");
+            }
+            if (data && data.status === "ended") { unsubAnswer(); endCall(); }
+        });
+        callListenUnsubscribe = unsubAnswer;
+        listenForCandidates(currentCallDocId);
+        showCallPanel(true, targetNickname);
+        isCallActive = true;
+    }
+
+    async function listenForIncomingCalls() {
+        if (!currentUser) return;
+        const q = query(collection(db, "calls"), where("to", "==", currentUser.uid), where("status", "in", ["calling", "offer_sent"]));
+        onSnapshot(q, async (snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added") {
+                    const callData = change.doc.data();
+                    const callId = change.doc.id;
+                    if (callData.status === "calling" || callData.status === "offer_sent") {
+                        // show incoming call notification
+                        if (isCallActive) {
+                            await updateDoc(doc(db, "calls", callId), { status: "rejected" });
+                            return;
+                        }
+                        const acceptCall = confirm(`${callData.fromName || "অজানা"} আপনাকে অডিও কল করছেন। রিসিভ করবেন?`);
+                        if (acceptCall) {
+                            if (!localStream) {
+                                try { localStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch(e) { alert("মাইক্রোফোন অনুমতি নেই"); return; }
+                            }
+                            currentCallDocId = callId;
+                            currentCallRemoteUserId = callData.from;
+                            const pc = await createPeerConnection(callData.from, callId);
+                            await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
+                            const answer = await pc.createAnswer();
+                            await pc.setLocalDescription(answer);
+                            await updateDoc(doc(db, "calls", callId), { answer: { sdp: answer.sdp, type: answer.type }, status: "active" });
+                            listenForCandidates(callId);
+                            showCallPanel(true, callData.fromName);
+                            isCallActive = true;
+                            // listen for status changes on this call
+                            const statusUnsub = onSnapshot(doc(db, "calls", callId), (snap) => {
+                                if (snap.data()?.status === "ended") { statusUnsub(); endCall(); }
+                            });
+                        } else {
+                            await updateDoc(doc(db, "calls", callId), { status: "rejected" });
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    async function listenForCandidates(callId) {
+        const candRef = collection(db, "calls", callId, "candidates");
+        onSnapshot(candRef, (snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added" && peerConnection && peerConnection.remoteDescription) {
+                    const candData = change.doc.data();
+                    if (candData.senderId !== currentUser?.uid) {
+                        try {
+                            await peerConnection.addIceCandidate(new RTCIceCandidate(candData.candidate));
+                        } catch(e) { }
+                    }
+                }
+            });
+        });
+    }
+
+    async function endCall() {
+        if (currentCallDocId) {
+            await updateDoc(doc(db, "calls", currentCallDocId), { status: "ended" }).catch(()=>{});
+        }
+        if (peerConnection) { peerConnection.close(); peerConnection = null; }
+        if (remoteAudio) { remoteAudio.srcObject = null; remoteAudio = null; }
+        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+        if (callListenUnsubscribe) callListenUnsubscribe();
+        isCallActive = false;
+        currentCallDocId = null;
+        currentCallRemoteUserId = null;
+        document.querySelectorAll(".call-panel").forEach(el => el.remove());
+    }
+
+    function showCallPanel(show, remoteName = "") {
+        document.querySelectorAll(".call-panel").forEach(el => el.remove());
+        if (!show) return;
+        const panel = document.createElement("div");
+        panel.className = "call-panel";
+        panel.innerHTML = `
+            <div><i class="fas fa-phone-alt"></i> <strong>${escapeHtml(remoteName)}</strong> এর সাথে কথা বলছেন</div>
+            <div>
+                <button class="call-mute-btn" id="muteCallBtn"><i class="fas fa-microphone"></i></button>
+                <button class="call-end-btn" id="hangupCallBtn"><i class="fas fa-phone-slash"></i></button>
+            </div>
+        `;
+        document.body.appendChild(panel);
+        document.getElementById("hangupCallBtn")?.addEventListener("click", () => { endCall(); panel.remove(); });
+        const muteBtn = document.getElementById("muteCallBtn");
+        let muted = false;
+        muteBtn?.addEventListener("click", () => {
+            if (localStream) {
+                muted = !muted;
+                localStream.getAudioTracks()[0].enabled = !muted;
+                muteBtn.innerHTML = muted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
+            }
+        });
+    }
+
+    async function showOnlineUsersModal() {
+        if (!currentUser) return;
+        const snapshot = await getDocs(collection(db, "presence"));
+        const now = Date.now();
+        let onlineUsers = [];
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            let last = data.lastSeen?.toDate ? data.lastSeen.toDate() : new Date(data.lastSeen);
+            if (last && (now - last.getTime()) < 45000 && data.uid !== currentUser.uid) {
+                onlineUsers.push({ uid: data.uid, nickname: data.nickname || "বন্ধু" });
+            }
+        });
+        const modal = document.createElement("div"); modal.className = "modal-overlay";
+        modal.innerHTML = `
+            <div class="modal-card">
+                <i class="fas fa-users"></i>
+                <h3>অনলাইন সদস্য (কল করুন)</h3>
+                <div class="online-user-list" id="onlineUserList"></div>
+                <button id="closeCallModal" style="background:#ccc; margin-top:10px; padding:8px 16px; border-radius:40px;">বন্ধ করুন</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        const listDiv = modal.querySelector("#onlineUserList");
+        if (onlineUsers.length === 0) listDiv.innerHTML = "<div style='text-align:center'>কেউ অনলাইনে নেই</div>";
+        onlineUsers.forEach(u => {
+            const item = document.createElement("div"); item.className = "online-user-item";
+            item.innerHTML = `<span><i class="fas fa-circle" style="color:#25d366; font-size:10px;"></i> ${escapeHtml(u.nickname)}</span>
+                              <button class="call-user-btn" data-uid="${u.uid}" data-name="${escapeHtml(u.nickname)}"><i class="fas fa-phone"></i> কল</button>`;
+            listDiv.appendChild(item);
+        });
+        document.querySelectorAll(".call-user-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const targetUid = btn.dataset.uid;
+                const targetName = btn.dataset.name;
+                modal.remove();
+                await startCall(targetUid, targetName);
+            });
+        });
+        modal.querySelector("#closeCallModal").onclick = () => modal.remove();
+    }
+
+    // UI initializers
+    async function setNickname(newName) {
+        if (!currentUser) return false;
+        const trimmed = newName.trim();
+        if (!trimmed) return false;
+        await updateProfile(currentUser, { displayName: trimmed });
+        currentNickname = trimmed;
+        currentUserNameSpan.innerText = trimmed;
+        await updatePresence();
+        return true;
+    }
+    function changeNicknameUI() {
+        const newName = prompt("নতুন নাম লিখুন:", currentNickname);
+        if (newName && newName.trim() !== "" && newName.trim() !== currentNickname) setNickname(newName.trim());
+    }
+    async function clearAllMessages() {
+        if (!confirm("সব চ্যাট মুছে ফেলবেন?")) return;
+        const snap = await getDocs(collection(db, "messages"));
+        const batch = writeBatch(db);
+        snap.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+    }
+
+    cancelReplyBtn.addEventListener("click", () => { activeReply = null; replyIndicatorDiv.classList.add('hide'); });
+    sendBtn.addEventListener("click", sendMessage);
+    messageInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+    changeNameBtn.addEventListener("click", changeNicknameUI);
+    clearAllBtn.addEventListener("click", clearAllMessages);
+    showOnlineUsersBtn.addEventListener("click", showOnlineUsersModal);
+
+    // auth & start
+    async function initAnonymous() {
+        const cred = await signInAnonymously(auth);
+        currentUser = cred.user;
+        if (currentUser.displayName) {
+            currentNickname = currentUser.displayName;
+            currentUserNameSpan.innerText = currentNickname;
+        } else {
+            let name = prompt("চ্যাটে আপনার নাম দিন (সকলের কাছে দৃশ্যমান):", "মজার বন্ধু");
+            if (!name) name = "আড্ডাবাজ";
+            await setNickname(name);
+        }
+        startPresenceHeartbeat();
+        listenOnlineUsers();
+        loadMessages();
+        listenForIncomingCalls();
+    }
+    onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
-            if (user.displayName && user.displayName !== "") {
+            if (user.displayName) {
                 currentNickname = user.displayName;
                 currentUserNameSpan.innerText = currentNickname;
                 startPresenceHeartbeat();
                 listenOnlineUsers();
                 loadMessages();
+                listenForIncomingCalls();
             } else {
-                // no nickname yet
-                showNicknameModal(() => {
-                    currentNickname = currentUser.displayName;
-                    currentUserNameSpan.innerText = currentNickname;
-                    startPresenceHeartbeat();
-                    listenOnlineUsers();
-                    loadMessages();
-                });
+                initAnonymous().catch(console.error);
             }
         } else {
-            // no user, sign in anonymously
-            initAnonymousSession();
+            initAnonymous();
         }
     });
-    
-    // initial manual trigger (in case not signed)
-    if (!auth.currentUser) {
-        initAnonymousSession();
-    }
-    
-    // Fix online count fallback timer for disconnected
-    setInterval(() => {
-        if (currentUser && currentNickname) updatePresence();
-    }, 35000);
+    if (!auth.currentUser) initAnonymous();
 </script>
 </body>
 </html>
