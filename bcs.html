@@ -3,182 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>দৈনিক পাঠ পরিকল্পক | টপিকভিত্তিক অগ্রগতি ও বিশ্লেষণ (ফায়ারবেস সমর্থিত)</title>
-    <!-- TailwindCSS + Font Awesome + Chart.js -->
+    <title>দৈনিক পাঠ পরিকল্পক | টপিক সময় ট্র্যাকার ও বিশ্লেষণ (ফায়ারবেস)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
-        }
+        body { background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%); font-family: 'Segoe UI', system-ui; }
         .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1); }
-        .scrollable-list { max-height: 420px; overflow-y: auto; scrollbar-width: thin; }
-        .progress-bar-custom { height: 8px; border-radius: 20px; background-color: #e2e8f0; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 20px; transition: width 0.3s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); }
+        .progress-bar-custom { height: 8px; border-radius: 20px; background: #e2e8f0; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 20px; transition: width 0.3s; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         button:disabled { opacity: 0.55; cursor: not-allowed; }
         .badge-cat { background: #e0f2fe; color: #0369a1; font-size: 0.7rem; font-weight: 500; }
         .subject-progress-card { transition: all 0.2s; background: white; border-left: 4px solid; }
-        .auth-card {
-            backdrop-filter: blur(12px);
-            background: rgba(255, 255, 255, 0.92);
-            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.2);
-        }
+        .auth-card { backdrop-filter: blur(12px); background: rgba(255,255,255,0.92); box-shadow: 0 25px 40px -12px rgba(0,0,0,0.2); }
         .toggle-link { cursor: pointer; color: #4f46e5; font-weight: 500; }
-        .toggle-link:hover { text-decoration: underline; }
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000;
-        }
-        .reset-modal {
-            background: white; max-width: 450px; width: 90%;
-            border-radius: 1.5rem; box-shadow: 0 25px 40px -12px black;
-            padding: 1.5rem;
-        }
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000; }
+        .reset-modal { background:white; max-width:450px; width:90%; border-radius:1.5rem; padding:1.5rem; }
+        .analytics-tab { cursor: pointer; padding: 0.5rem 1rem; border-radius: 2rem; transition: all 0.2s; }
+        .analytics-tab.active { background: #4f46e5; color: white; }
+        .stats-card { background: white; border-radius: 1.25rem; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .time-badge { font-size: 0.7rem; background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 1rem; display: inline-block; }
     </style>
 </head>
 <body class="antialiased p-4 md:p-6">
-
 <div class="max-w-7xl mx-auto">
     <!-- Authentication Panel -->
     <div id="authContainer" class="flex items-center justify-center min-h-[80vh]">
         <div class="auth-card rounded-2xl p-8 max-w-md w-full border border-indigo-100 shadow-2xl">
-            <div class="text-center mb-6">
-                <i class="fas fa-chalkboard-user text-5xl text-indigo-600 mb-2"></i>
-                <h2 class="text-2xl font-bold text-gray-800">পাঠ পরিকল্পক</h2>
-                <p class="text-gray-500 text-sm">আপনার অগ্রগতি ক্লাউডে সংরক্ষিত হবে</p>
-            </div>
+            <div class="text-center mb-6"><i class="fas fa-chalkboard-user text-5xl text-indigo-600 mb-2"></i><h2 class="text-2xl font-bold text-gray-800">পাঠ পরিকল্পক</h2><p class="text-gray-500 text-sm">আপনার অগ্রগতি ক্লাউডে সংরক্ষিত হবে</p></div>
             <div id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label>
-                    <input type="email" id="loginEmail" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="you@example.com">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label>
-                    <input type="password" id="loginPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="********">
-                </div>
-                <button id="signInBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2"><i class="fas fa-sign-in-alt"></i> লগইন</button>
+                <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="loginEmail" class="w-full border border-gray-300 rounded-xl px-4 py-2"></div>
+                <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label><input type="password" id="loginPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2"></div>
+                <button id="signInBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl"><i class="fas fa-sign-in-alt"></i> লগইন</button>
                 <div class="text-center my-3 text-sm text-gray-500">অথবা</div>
-                <button id="googleSignInBtn" class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2"><i class="fab fa-google text-red-500"></i> Google দিয়ে লগইন</button>
+                <button id="googleSignInBtn" class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 rounded-xl"><i class="fab fa-google text-red-500"></i> Google দিয়ে লগইন</button>
                 <div class="text-center mt-4 text-sm">নতুন ব্যবহারকারী? <span id="showSignup" class="toggle-link">অ্যাকাউন্ট তৈরি করুন</span></div>
             </div>
             <div id="signupForm" style="display:none;">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label>
-                    <input type="email" id="signupEmail" class="w-full border border-gray-300 rounded-xl px-4 py-2" placeholder="you@example.com">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label>
-                    <input type="password" id="signupPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2" placeholder="৬+ অক্ষর">
-                </div>
-                <button id="signUpBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition"><i class="fas fa-user-plus"></i> সাইন আপ</button>
+                <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="signupEmail" class="w-full border border-gray-300 rounded-xl px-4 py-2"></div>
+                <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label><input type="password" id="signupPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2"></div>
+                <button id="signUpBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl"><i class="fas fa-user-plus"></i> সাইন আপ</button>
                 <div class="text-center mt-4 text-sm">ইতিমধ্যে অ্যাকাউন্ট আছে? <span id="showLogin" class="toggle-link">লগইন করুন</span></div>
             </div>
             <div id="authError" class="text-red-600 text-sm text-center mt-3 hidden"></div>
         </div>
     </div>
 
-    <!-- Main App (visible after login) -->
+    <!-- Main App -->
     <div id="appContainer" style="display:none;">
         <!-- Header -->
         <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                    <i class="fas fa-chart-line text-indigo-600 mr-2"></i>টপিকভিত্তিক অগ্রগতি ট্র্যাকার
-                </h1>
-                <p class="text-gray-600 text-sm mt-1">প্রতিটি টপিক/লেকচার আলাদা | 'সম্পন্ন' করলে অগ্রগতি নিজেই আপডেট হবে | ফায়ারবেসে সংরক্ষিত</p>
-            </div>
-            <div class="flex gap-3 items-center">
-                <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm text-sm text-gray-700"><i class="fas fa-user-circle text-indigo-500"></i> <span id="userEmailSpan">user@example.com</span></div>
-                <button id="logoutBtn" class="bg-white/80 border border-red-200 text-red-600 px-4 py-2 rounded-xl shadow-sm hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium"><i class="fas fa-sign-out-alt"></i> লগআউট</button>
-                <button id="resetModalBtn" class="bg-white/80 border border-red-200 text-red-600 px-4 py-2 rounded-xl shadow-sm hover:bg-red-50 transition flex items-center gap-2 text-sm font-medium"><i class="fas fa-undo-alt"></i> রিসেট (বিভাগ নির্বাচন)</button>
-            </div>
+            <div><h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent"><i class="fas fa-chart-line text-indigo-600 mr-2"></i>টপিক টাইম ট্র্যাকার</h1><p class="text-gray-600 text-sm mt-1">প্রতিটি টপিক নির্বাচন থেকে সম্পন্ন হওয়ার সময় গণনা করে | বিশ্লেষণ ও CSV রিপোর্ট</p></div>
+            <div class="flex gap-3 items-center"><div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm"><i class="fas fa-user-circle text-indigo-500"></i> <span id="userEmailSpan"></span></div><button id="logoutBtn" class="bg-white/80 border border-red-200 text-red-600 px-4 py-2 rounded-xl hover:bg-red-50"><i class="fas fa-sign-out-alt"></i> লগআউট</button><button id="resetModalBtn" class="bg-white/80 border border-red-200 text-red-600 px-4 py-2 rounded-xl hover:bg-red-50"><i class="fas fa-undo-alt"></i> রিসেট (বিভাগ)</button></div>
         </div>
 
         <!-- Main grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div class="lg:col-span-2 bg-white rounded-2xl shadow-md p-5 md:p-6 border border-indigo-100 card-hover">
-                <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-calendar-day text-indigo-500"></i> আজকের নির্ধারিত পাঠ</h2>
-                    <div class="bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 text-sm font-medium"><i class="fas fa-exchange-alt mr-1"></i> বাকি শাফল: <span id="remainingShuffleSpan">20</span></div>
+                <div class="flex flex-wrap justify-between items-start gap-3 mb-4"><h2 class="text-xl font-bold text-gray-800"><i class="fas fa-calendar-day text-indigo-500"></i> আজকের নির্ধারিত পাঠ</h2><div class="bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 text-sm"><i class="fas fa-exchange-alt mr-1"></i> বাকি শাফল: <span id="remainingShuffleSpan">20</span></div></div>
+                <div class="mb-5 p-3 bg-slate-50 rounded-xl flex flex-wrap items-center gap-3"><label class="font-semibold text-gray-700 text-sm"><i class="fas fa-filter text-amber-500"></i> বিষয় ফিল্টার :</label><select id="subjectFilterSelect" class="bg-white border rounded-lg px-3 py-2 text-sm flex-1"></select><span class="text-xs text-gray-400"><i class="fas fa-info-circle"></i> ফিল্টার অনুযায়ী শাফল</span></div>
+                <div id="currentTopicContainer" class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 mb-6 border border-indigo-200">
+                    <div id="noTopicMsg" class="hidden text-center py-6 text-gray-500"><i class="fas fa-trophy text-4xl text-amber-400 mb-2"></i><p class="font-medium">সব টপিক সম্পন্ন! ফিল্টার পরিবর্তন বা রিসেট করুন।</p></div>
+                    <div id="topicContent">
+                        <span id="topicCatBadge" class="badge-cat inline-block px-3 py-1 rounded-full text-xs mb-3"></span>
+                        <h3 id="currentTopicName" class="text-xl md:text-2xl font-bold text-gray-800"></h3>
+                        <p class="text-gray-500 text-sm mt-1"><i class="far fa-id-card"></i> টপিক আইডি: <span id="currentTopicId"></span></p>
+                        <div class="mt-3 flex flex-wrap gap-3 text-xs text-indigo-700 bg-indigo-50 p-2 rounded-lg">
+                            <div><i class="fas fa-calendar-alt"></i> <span id="selectedDateDisplay">—</span></div>
+                            <div><i class="fas fa-check-circle text-green-600"></i> <span id="completedDateDisplay">—</span></div>
+                            <div><i class="fas fa-hourglass-half"></i> <span id="durationDisplay">—</span></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-5 p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center gap-3">
-                    <label class="font-semibold text-gray-700 text-sm"><i class="fas fa-filter text-amber-500"></i> বিষয় ফিল্টার :</label>
-                    <select id="subjectFilterSelect" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400 outline-none flex-1 min-w-[180px]"></select>
-                    <span class="text-xs text-gray-400"><i class="fas fa-info-circle"></i> ফিল্টার অনুযায়ী শাফল ও পাঠ নির্বাচন</span>
-                </div>
-                <div id="currentTopicContainer" class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 mb-6 border border-indigo-200 transition-all">
-                    <div id="noTopicMsg" class="hidden text-center py-6 text-gray-500"><i class="fas fa-trophy text-4xl text-amber-400 mb-2"></i><p class="font-medium">🎉 চমৎকার! এই ফিল্টারের সব টপিক সম্পন্ন হয়েছে। <br> ফিল্টার পরিবর্তন করুন বা রিসেট করুন।</p></div>
-                    <div id="topicContent"><span id="topicCatBadge" class="badge-cat inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3"></span><h3 id="currentTopicName" class="text-xl md:text-2xl font-bold text-gray-800 leading-tight"></h3><p class="text-gray-500 text-sm mt-2"><i class="far fa-id-card"></i> টপিক আইডি: <span id="currentTopicId"></span></p></div>
-                </div>
-                <div class="flex flex-wrap gap-4 items-center">
-                    <button id="shuffleBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300"><i class="fas fa-random"></i> শাফল করুন (সর্বোচ্চ ২০ বার)</button>
-                    <button id="doneBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-8 rounded-xl shadow-md transition flex items-center gap-2 disabled:bg-gray-300"><i class="fas fa-check-circle"></i> সম্পন্ন (Done)</button>
-                    <div class="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1.5"><i class="fas fa-lightbulb"></i> 'সম্পন্ন' দিলে টপিক পড়া শেষ ও শাফল রিসেট হয়।</div>
-                </div>
+                <div class="flex flex-wrap gap-4 items-center"><button id="shuffleBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md disabled:bg-gray-300"><i class="fas fa-random"></i> শাফল (max 20)</button><button id="doneBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-8 rounded-xl shadow-md disabled:bg-gray-300"><i class="fas fa-check-circle"></i> সম্পন্ন (Done)</button><div class="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1.5"><i class="fas fa-lightbulb"></i> 'সম্পন্ন' দিলে সময় রেকর্ড হবে।</div></div>
             </div>
-            <div class="bg-white rounded-2xl shadow-md p-5 border border-slate-100">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 mb-3"><i class="fas fa-chart-pie text-purple-500"></i> সামগ্রিক অগ্রগতি</h2>
-                <div class="w-full h-44 md:h-48 relative mx-auto"><canvas id="progressChart" width="200" height="200" class="w-full h-full"></canvas></div>
-                <div class="flex justify-around mt-4 text-center">
-                    <div class="bg-green-50 p-2 rounded-xl flex-1 mx-1"><p class="text-xs text-green-700 font-medium">সম্পন্ন (পড়া)</p><p class="text-2xl font-bold text-green-700" id="studiedCount">0</p></div>
-                    <div class="bg-red-50 p-2 rounded-xl flex-1 mx-1"><p class="text-xs text-red-600 font-medium">বাকি (বাদ)</p><p class="text-2xl font-bold text-red-600" id="pendingCount">0</p></div>
-                </div>
-                <div class="mt-2 text-sm text-center text-gray-600 bg-slate-50 rounded-lg p-2"><i class="fas fa-database"></i> মোট টপিক: <strong id="totalTopicsCount">0</strong></div>
-            </div>
+            <div class="bg-white rounded-2xl shadow-md p-5 border border-slate-100"><h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 mb-3"><i class="fas fa-chart-pie text-purple-500"></i> সামগ্রিক অগ্রগতি</h2><div class="w-full h-44 relative"><canvas id="progressChart"></canvas></div><div class="flex justify-around mt-4 text-center"><div class="bg-green-50 p-2 rounded-xl flex-1"><p class="text-xs text-green-700">সম্পন্ন</p><p class="text-2xl font-bold text-green-700" id="studiedCount">0</p></div><div class="bg-red-50 p-2 rounded-xl flex-1"><p class="text-xs text-red-600">বাকি</p><p class="text-2xl font-bold text-red-600" id="pendingCount">0</p></div></div><div class="mt-2 text-sm text-center text-gray-600"><i class="fas fa-database"></i> মোট টপিক: <strong id="totalTopicsCount">0</strong></div></div>
         </div>
 
-        <!-- Subject-wise progress -->
+        <!-- Analytics Section with Tabs and Download -->
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-md p-5 border border-indigo-50 mb-8">
-            <div class="flex flex-wrap justify-between items-center gap-3 mb-4"><h2 class="text-xl font-bold text-gray-800"><i class="fas fa-chart-simple text-indigo-600 mr-2"></i> বিষয়ভিত্তিক অগ্রগতি (টপিক অনুযায়ী)</h2><span class="text-xs bg-indigo-100 px-3 py-1 rounded-full text-indigo-700"><i class="far fa-clock"></i> সম্পন্ন টপিকের হার দেখুন</span></div>
-            <div id="subjectProgressContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-2"></div>
+            <div class="flex flex-wrap justify-between items-center gap-3 mb-4"><h2 class="text-xl font-bold text-gray-800"><i class="fas fa-chart-line text-indigo-600 mr-2"></i> সময়ভিত্তিক বিশ্লেষণ ও রিপোর্ট</h2><button id="downloadCsvBtn" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium"><i class="fas fa-download"></i> CSV রিপোর্ট ডাউনলোড</button></div>
+            <div class="flex gap-2 mb-6 border-b pb-2"><div data-tab="weekly" class="analytics-tab active bg-indigo-50 text-indigo-700">সাপ্তাহিক অগ্রগতি</div><div data-tab="monthly" class="analytics-tab bg-gray-100 text-gray-600">মাসিক অগ্রগতি</div><div data-tab="duration" class="analytics-tab bg-gray-100 text-gray-600">টপিক ভিত্তিক সময় (দিন/ঘণ্টা)</div></div>
+            <div id="weeklyChartContainer" class="stats-card"><canvas id="weeklyChart" height="200" style="max-height:250px"></canvas></div>
+            <div id="monthlyChartContainer" class="stats-card hidden"><canvas id="monthlyChart" height="200" style="max-height:250px"></canvas></div>
+            <div id="durationTableContainer" class="stats-card hidden overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-100"><tr><th class="p-2 text-left">টপিক আইডি</th><th class="p-2 text-left">বিষয়</th><th class="p-2 text-left">টপিক নাম (সংক্ষেপ)</th><th class="p-2 text-left">নির্বাচনের সময়</th><th class="p-2 text-left">সম্পন্নের সময়</th><th class="p-2 text-left">সময়কাল</th></tr></thead><tbody id="durationTableBody"></tbody></table></div>
         </div>
 
-        <!-- All topics list -->
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-md p-5 border border-indigo-50">
-            <div class="flex flex-wrap justify-between items-center mb-3 gap-2"><h2 class="text-lg font-bold text-gray-800"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (স্থিতি ও বিষয়সহ)</h2><span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-500">টপিক সম্পন্ন করলে অবস্থা পরিবর্তিত হয়</span></div>
-            <div class="scrollable-list"><div id="topicsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-1"></div></div>
-        </div>
+        <!-- Subject-wise progress & All topics list -->
+        <div class="bg-white/95 rounded-2xl shadow-md p-5 border border-indigo-50 mb-8"><h2 class="text-xl font-bold text-gray-800 mb-3"><i class="fas fa-chart-simple text-indigo-600 mr-2"></i> বিষয়ভিত্তিক অগ্রগতি</h2><div id="subjectProgressContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto"></div></div>
+        <div class="bg-white/90 rounded-2xl shadow-md p-5 border border-indigo-50"><h2 class="text-lg font-bold text-gray-800 mb-2"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (নির্বাচন করলে সময় রেকর্ড হবে)</h2><div class="scrollable-list"><div id="topicsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div></div></div>
     </div>
 </div>
 
 <!-- Reset Modal -->
-<div id="resetModal" class="modal-overlay" style="display: none;">
-    <div class="reset-modal">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-trash-alt text-red-500 mr-2"></i>বিভাগ অনুযায়ী রিসেট</h3>
-            <button id="closeResetModalBtn" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-        </div>
-        <p class="text-sm text-gray-600 mb-4">যে বিভাগের অগ্রগতি রিসেট করতে চান নির্বাচন করুন। <br> <span class="font-semibold">পাসওয়ার্ড প্রয়োজন (ইমেইল লগইন থাকলে)</span></p>
-        <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-1">বিভাগ নির্বাচন করুন</label>
-            <select id="resetSectionSelect" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-red-400"></select>
-        </div>
-        <div id="passwordResetField" class="mb-4">
-            <label class="block text-gray-700 font-medium mb-1">পাসওয়ার্ড নিশ্চিতকরণ</label>
-            <input type="password" id="resetPasswordInput" class="w-full border border-gray-300 rounded-xl px-4 py-2" placeholder="আপনার অ্যাকাউন্টের পাসওয়ার্ড">
-            <p id="resetPasswordHint" class="text-xs text-gray-500 mt-1"></p>
-        </div>
-        <div class="flex gap-3 justify-end">
-            <button id="cancelResetBtn" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300">বাতিল</button>
-            <button id="confirmResetBtn" class="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center gap-2"><i class="fas fa-check-circle"></i> রিসেট করুন</button>
-        </div>
-    </div>
-</div>
+<div id="resetModal" class="modal-overlay" style="display: none;"><div class="reset-modal"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold"><i class="fas fa-trash-alt text-red-500 mr-2"></i>বিভাগ অনুযায়ী রিসেট</h3><button id="closeResetModalBtn" class="text-gray-400 text-2xl">&times;</button></div><p class="text-sm text-gray-600 mb-4">পাসওয়ার্ড প্রয়োজন (ইমেইল লগইন থাকলে)</p><select id="resetSectionSelect" class="w-full border rounded-xl px-4 py-2 mb-4"></select><input type="password" id="resetPasswordInput" class="w-full border rounded-xl px-4 py-2 mb-2" placeholder="আপনার অ্যাকাউন্টের পাসওয়ার্ড"><p id="resetPasswordHint" class="text-xs text-gray-500 mb-4"></p><div class="flex gap-3 justify-end"><button id="cancelResetBtn" class="px-4 py-2 bg-gray-200 rounded-xl">বাতিল</button><button id="confirmResetBtn" class="px-5 py-2 bg-red-600 text-white rounded-xl">রিসেট</button></div></div></div>
 
 <script>
-    // ======================= সম্পূর্ণ মূল টপিক ডেটাসেট (পূর্ণ বিবরণ, কোন পরিবর্তন নয়) =======================
+    // ======================= সম্পূর্ণ মূল টপিক ডেটাসেট (পূর্ণ বিবরণ, আগের মতোই) =======================
     const topicsDataRaw = [];
 
     // 1. বাংলা সাহিত্য (Bangla Literature) লেকচার ১-১৪ (পূর্ণ)
@@ -361,306 +289,185 @@
     
     let currentUserObj = null;
     let completedIds = [], currentTopic = null, shuffleUsed = 0, currentFilter = "ALL";
-    let progressChart = null;
+    let topicStats = {}; // { topicId: { selectedAt: timestamp_ms, completedAt: ms or null } }
+    let progressChart, weeklyChart, monthlyChart;
     const MAX_SHUFFLE = 20;
 
     // DOM elements
-    const authContainerDiv = document.getElementById('authContainer');
-    const appContainerDiv = document.getElementById('appContainer');
-    const userEmailSpan = document.getElementById('userEmailSpan');
-    const shuffleBtn = document.getElementById('shuffleBtn');
-    const doneBtn = document.getElementById('doneBtn');
-    const remainingShuffleSpan = document.getElementById('remainingShuffleSpan');
-    const currentTopicNameSpan = document.getElementById('currentTopicName');
-    const currentTopicIdSpan = document.getElementById('currentTopicId');
-    const topicCatBadge = document.getElementById('topicCatBadge');
-    const studiedCountSpan = document.getElementById('studiedCount');
-    const pendingCountSpan = document.getElementById('pendingCount');
-    const totalTopicsCountSpan = document.getElementById('totalTopicsCount');
-    const noTopicMsgDiv = document.getElementById('noTopicMsg');
-    const topicContentDiv = document.getElementById('topicContent');
-    const topicsListContainer = document.getElementById('topicsListContainer');
-    const subjectFilterSelectElem = document.getElementById('subjectFilterSelect');
-    const subjectProgressContainerElem = document.getElementById('subjectProgressContainer');
-    const resetModalBtn = document.getElementById('resetModalBtn'), resetModal = document.getElementById('resetModal');
-    const closeResetModal = document.getElementById('closeResetModalBtn'), cancelReset = document.getElementById('cancelResetBtn');
-    const confirmResetBtn = document.getElementById('confirmResetBtn');
-    const resetSectionSelect = document.getElementById('resetSectionSelect');
-    const resetPasswordInput = document.getElementById('resetPasswordInput');
-    const resetPasswordHint = document.getElementById('resetPasswordHint');
-
-    function getPendingTopics(filter = null) {
-        let pending = allTopics.filter(t => !completedIds.includes(t.id));
-        if (filter && filter !== "ALL") pending = pending.filter(t => t.cat === filter);
-        return pending;
+    const authDiv=document.getElementById('authContainer'), appDiv=document.getElementById('appContainer');
+    const shuffleBtn=document.getElementById('shuffleBtn'), doneBtn=document.getElementById('doneBtn'), remainingSpan=document.getElementById('remainingShuffleSpan');
+    const currentTopicNameSpan=document.getElementById('currentTopicName'), currentTopicIdSpan=document.getElementById('currentTopicId'), topicCatBadge=document.getElementById('topicCatBadge');
+    const studiedSpan=document.getElementById('studiedCount'), pendingSpan=document.getElementById('pendingCount'), totalSpan=document.getElementById('totalTopicsCount');
+    const noTopicDiv=document.getElementById('noTopicMsg'), topicContentDiv=document.getElementById('topicContent');
+    const filterSelect=document.getElementById('subjectFilterSelect'), subjectProgressDiv=document.getElementById('subjectProgressContainer'), topicsListDiv=document.getElementById('topicsListContainer');
+    const resetModalBtn=document.getElementById('resetModalBtn'), resetModal=document.getElementById('resetModal'), closeReset=document.getElementById('closeResetModalBtn'), cancelReset=document.getElementById('cancelResetBtn'), confirmReset=document.getElementById('confirmResetBtn'), resetSectionSelect=document.getElementById('resetSectionSelect'), resetPassword=document.getElementById('resetPasswordInput'), resetHint=document.getElementById('resetPasswordHint');
+    const downloadBtn=document.getElementById('downloadCsvBtn');
+    const weeklyContainer=document.getElementById('weeklyChartContainer'), monthlyContainer=document.getElementById('monthlyChartContainer'), durationContainer=document.getElementById('durationTableContainer');
+    const weeklyCanvas=document.getElementById('weeklyChart'), monthlyCanvas=document.getElementById('monthlyChart'), durationBody=document.getElementById('durationTableBody');
+    const selectedDateSpan=document.getElementById('selectedDateDisplay'), completedDateSpan=document.getElementById('completedDateDisplay'), durationSpan=document.getElementById('durationDisplay');
+    
+    // Helper: format duration
+    function formatDuration(ms) {
+        if(!ms) return '—';
+        const days = Math.floor(ms / (1000*60*60*24));
+        const hours = Math.floor((ms % (1000*60*60*24)) / (1000*60*60));
+        const minutes = Math.floor((ms % (1000*60*60)) / (1000*60));
+        if(days > 0) return `${days} দিন ${hours} ঘণ্টা ${minutes} মিনিট`;
+        if(hours > 0) return `${hours} ঘণ্টা ${minutes} মিনিট`;
+        return `${minutes} মিনিট`;
     }
-    function getPendingFiltered() { return getPendingTopics(currentFilter); }
-    function getRandomFilteredPending(excludeId = null) {
-        let pending = getPendingFiltered();
-        if (!pending.length) return null;
-        if (excludeId !== null) pending = pending.filter(t => t.id !== excludeId);
-        return pending.length ? pending[Math.floor(Math.random() * pending.length)] : null;
+    
+    function formatDateTime(timestamp) {
+        if(!timestamp) return '—';
+        const d = new Date(timestamp);
+        return d.toLocaleString('bn-BD', {year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
     }
-    function validateTopicByFilter() {
-        const filteredPending = getPendingFiltered();
-        if (!filteredPending.length) { currentTopic = null; return; }
-        if (!currentTopic || completedIds.includes(currentTopic.id) || (currentFilter !== "ALL" && currentTopic.cat !== currentFilter)) {
-            currentTopic = getRandomFilteredPending();
-            shuffleUsed = 0;
+    
+    // Record selection time
+    function recordTopicSelection(topicId) {
+        if(!topicId) return;
+        if(!topicStats[topicId] || !topicStats[topicId].selectedAt) {
+            if(!topicStats[topicId]) topicStats[topicId] = {};
+            topicStats[topicId].selectedAt = Date.now();
+            if(topicStats[topicId].completedAt && topicStats[topicId].completedAt < topicStats[topicId].selectedAt) topicStats[topicId].completedAt = null;
+            saveToFirestore();
         }
     }
+    function recordTopicCompletion(topicId) {
+        if(!topicId) return;
+        if(!topicStats[topicId]) topicStats[topicId] = {};
+        if(!topicStats[topicId].selectedAt) topicStats[topicId].selectedAt = Date.now();
+        if(!topicStats[topicId].completedAt) {
+            topicStats[topicId].completedAt = Date.now();
+            saveToFirestore();
+        }
+    }
+    function getDurationDays(selected, completed) { if(!selected || !completed) return null; return (completed - selected) / (1000*60*60*24); }
+    
+    // Firestore
     async function saveToFirestore() {
-        if (!currentUserObj) return;
-        await db.collection("users").doc(currentUserObj.uid).set({
-            completedIds, shuffleUsed, currentTopicId: currentTopic?.id || null,
-            currentFilter, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+        if(!currentUserObj) return;
+        await db.collection("users").doc(currentUserObj.uid).set({ completedIds, shuffleUsed, currentTopicId: currentTopic?.id||null, currentFilter, topicStats, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
     }
     async function loadFromFirestore(user) {
         const doc = await db.collection("users").doc(user.uid).get();
-        if (doc.exists) {
-            const data = doc.data();
-            completedIds = data.completedIds || [];
-            shuffleUsed = data.shuffleUsed || 0;
-            currentFilter = data.currentFilter || "ALL";
-            const topicId = data.currentTopicId;
-            if (topicId && !completedIds.includes(topicId)) {
-                currentTopic = allTopics.find(t => t.id === topicId) || null;
-            } else { currentTopic = null; }
-            if (subjectFilterSelectElem) subjectFilterSelectElem.value = currentFilter;
-        } else {
-            completedIds = []; shuffleUsed = 0; currentFilter = "ALL";
-            currentTopic = null;
-            if (subjectFilterSelectElem) subjectFilterSelectElem.value = "ALL";
-        }
+        if(doc.exists){
+            const d=doc.data();
+            completedIds=d.completedIds||[];
+            shuffleUsed=d.shuffleUsed||0;
+            currentFilter=d.currentFilter||"ALL";
+            topicStats=d.topicStats||{};
+            const tid=d.currentTopicId;
+            if(tid && !completedIds.includes(tid)) currentTopic=allTopics.find(t=>t.id===tid)||null;
+            else currentTopic=null;
+            filterSelect.value=currentFilter;
+        } else { completedIds=[]; shuffleUsed=0; currentFilter="ALL"; topicStats={}; currentTopic=null; filterSelect.value="ALL"; }
+        // ensure every completed topic has completion record
+        completedIds.forEach(id=>{ if(topicStats[id] && !topicStats[id].completedAt) topicStats[id].completedAt=Date.now(); else if(!topicStats[id]) topicStats[id]={selectedAt:Date.now(), completedAt:Date.now()}; });
         validateTopicByFilter();
         fullRender();
+        updateAllAnalytics();
     }
-
-    function renderTopicsList() {
-        let html = '';
-        for (let topic of allTopics) {
-            const isCompleted = completedIds.includes(topic.id);
-            const statusClass = isCompleted ? 'bg-green-100 border-green-200' : 'bg-white border-gray-200 cursor-pointer hover:shadow-md';
-            const clickHandler = !isCompleted ? `onclick="selectTopicFromList(${topic.id})"` : '';
-            const statusText = isCompleted ? '<span class="text-green-700 text-xs font-medium bg-green-200 px-2 py-0.5 rounded-full"><i class="fas fa-check-circle"></i> সম্পন্ন</span>' : '<span class="text-amber-600 text-xs font-medium bg-amber-100 px-2 py-0.5 rounded-full"><i class="fas fa-hourglass-half"></i> অপঠিত</span>';
-            html += `<div class="${statusClass} border rounded-xl p-3 flex flex-wrap justify-between items-center gap-2" ${clickHandler}>
-                        <div class="flex-1"><div class="flex gap-2 flex-wrap"><span class="text-xs font-mono text-gray-400">#${topic.id}</span><span class="badge-cat">${escapeHtml(topic.cat)}</span></div>
-                        <p class="text-sm font-medium text-gray-800 mt-1">${escapeHtml(topic.name)}</p></div><div>${statusText}</div></div>`;
-        }
-        topicsListContainer.innerHTML = html;
+    function getPendingTopics(filter=null){ let p=allTopics.filter(t=>!completedIds.includes(t.id)); if(filter && filter!=="ALL") p=p.filter(t=>t.cat===filter); return p; }
+    function getPendingFiltered(){ return getPendingTopics(currentFilter); }
+    function getRandomFilteredPending(excludeId=null){ let p=getPendingFiltered(); if(!p.length) return null; if(excludeId) p=p.filter(t=>t.id!==excludeId); return p.length?p[Math.floor(Math.random()*p.length)]:null; }
+    function validateTopicByFilter(){ let p=getPendingFiltered(); if(!p.length){ currentTopic=null; return; } if(!currentTopic || completedIds.includes(currentTopic.id) || (currentFilter!=="ALL" && currentTopic.cat!==currentFilter)){ currentTopic=getRandomFilteredPending(); shuffleUsed=0; } if(currentTopic) recordTopicSelection(currentTopic.id); }
+    
+    function renderTopicsList(){ let html=''; for(let t of allTopics){ const isComp=completedIds.includes(t.id); html+=`<div class="${isComp?'bg-green-100':'bg-white cursor-pointer hover:shadow-md'} border rounded-xl p-3 flex justify-between items-center" ${!isComp?`onclick="selectTopicFromList(${t.id})"`:''}><div><span class="badge-cat">${escapeHtml(t.cat)}</span><p class="text-sm font-medium mt-1">${escapeHtml(t.name.substring(0,80))}${t.name.length>80?'...':''}</p></div><div>${isComp?'<span class="text-green-600 text-xs"><i class="fas fa-check-circle"></i> সম্পন্ন</span>':'<span class="text-amber-600 text-xs">অপঠিত</span>'}</div></div>`; }
+        topicsListDiv.innerHTML=html;
     }
-
-    window.selectTopicFromList = function(topicId) {
-        const selectedTopic = allTopics.find(t => t.id === topicId);
-        if (!selectedTopic) return;
-        if (completedIds.includes(selectedTopic.id)) { alert("এই টপিক আগেই সম্পন্ন হয়েছে!"); return; }
-        if (currentFilter !== "ALL" && selectedTopic.cat !== currentFilter) {
-            if (confirm(`"${selectedTopic.cat}" বিষয়টি বর্তমান ফিল্টারের বাইরে। ফিল্টার পরিবর্তন করবেন?`)) {
-                currentFilter = selectedTopic.cat;
-                subjectFilterSelectElem.value = currentFilter;
-            } else return;
-        }
-        currentTopic = selectedTopic;
-        shuffleUsed = 0;
-        fullRender();
-        document.getElementById('currentTopicContainer').scrollIntoView({ behavior: 'smooth' });
+    window.selectTopicFromList = function(topicId){
+        const t=allTopics.find(x=>x.id===topicId); if(!t||completedIds.includes(t.id)) return;
+        if(currentFilter!=="ALL" && t.cat!==currentFilter && confirm(`"${t.cat}" ফিল্টার পরিবর্তন করবেন?`)){ currentFilter=t.cat; filterSelect.value=currentFilter; }
+        currentTopic=t; shuffleUsed=0; recordTopicSelection(currentTopic.id); fullRender(); updateAllAnalytics(); document.getElementById('currentTopicContainer').scrollIntoView({behavior:'smooth'});
     };
-
-    function renderSubjectWiseProgress() {
-        const subjectStats = uniqueSubjects.map(sub => {
-            const total = allTopics.filter(t => t.cat === sub).length;
-            const completed = completedIds.filter(id => allTopics.find(t => t.id === id)?.cat === sub).length;
-            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-            return { subject: sub, total, completed, percent };
-        }).sort((a,b) => b.percent - a.percent);
-        let html = '';
-        for (let stat of subjectStats) {
-            let borderColor = stat.percent === 100 ? '#10b981' : (stat.percent > 50 ? '#f59e0b' : '#3b82f6');
-            html += `<div class="subject-progress-card rounded-xl p-4 shadow-sm border border-gray-100" style="border-left-color: ${borderColor};">
-                        <div class="flex justify-between items-start mb-2"><h3 class="font-bold text-gray-800 text-md"><i class="fas fa-book-open text-indigo-500 mr-1"></i> ${escapeHtml(stat.subject)}</h3>
-                        <span class="text-xs font-bold px-2 py-1 rounded-full ${stat.percent === 100 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">${stat.completed}/${stat.total}</span></div>
-                        <div class="progress-bar-custom w-full mt-1"><div class="progress-fill bg-gradient-to-r from-indigo-500 to-purple-500" style="width: ${stat.percent}%;"></div></div>
-                        <div class="flex justify-between mt-2 text-xs text-gray-500"><span><i class="fas fa-check-circle text-green-600"></i> সম্পন্ন: ${stat.completed}</span><span><i class="fas fa-hourglass-half text-amber-500"></i> বাকি: ${stat.total - stat.completed}</span><span class="font-semibold">${stat.percent}%</span></div>
-                    </div>`;
-        }
-        subjectProgressContainerElem.innerHTML = html;
+    function renderSubjectWiseProgress(){ let html=''; for(let sub of uniqueSubjects){ const total=allTopics.filter(t=>t.cat===sub).length; const comp=completedIds.filter(id=>allTopics.find(t=>t.id===id)?.cat===sub).length; const pct=total===0?0:Math.round(comp/total*100); html+=`<div class="subject-progress-card rounded-xl p-3 shadow-sm border-l-4" style="border-left-color:${pct===100?'#10b981':(pct>50?'#f59e0b':'#3b82f6')}"><div class="flex justify-between"><h3 class="font-bold">${escapeHtml(sub)}</h3><span>${comp}/${total}</span></div><div class="progress-bar-custom mt-1"><div class="progress-fill bg-indigo-500" style="width:${pct}%"></div></div></div>`; }
+        subjectProgressDiv.innerHTML=html;
     }
-
-    function fullRender() {
-        if (!appContainerDiv || appContainerDiv.style.display === 'none') return;
-        const total = allTopics.length;
-        const completedCount = completedIds.length;
-        studiedCountSpan.innerText = completedCount;
-        pendingCountSpan.innerText = total - completedCount;
-        totalTopicsCountSpan.innerText = total;
-        if (progressChart) {
-            progressChart.data.datasets[0].data = [completedCount, total - completedCount];
-            progressChart.update();
-        }
-        const remaining = Math.max(0, MAX_SHUFFLE - shuffleUsed);
-        remainingShuffleSpan.innerText = remaining;
-        const filteredPending = getPendingFiltered();
-        if (filteredPending.length === 0 || !currentTopic) {
-            noTopicMsgDiv.classList.remove('hidden');
-            topicContentDiv.classList.add('hidden');
-            if(shuffleBtn) shuffleBtn.disabled = true;
-            if(doneBtn) doneBtn.disabled = true;
-        } else {
-            noTopicMsgDiv.classList.add('hidden');
-            topicContentDiv.classList.remove('hidden');
-            currentTopicNameSpan.innerText = currentTopic.name;
-            currentTopicIdSpan.innerText = currentTopic.id;
-            topicCatBadge.innerText = currentTopic.cat;
-            const canShuffle = (shuffleUsed < MAX_SHUFFLE) && (getPendingFiltered().filter(t => t.id !== currentTopic.id).length > 0);
-            if(shuffleBtn) shuffleBtn.disabled = !canShuffle;
-            if(doneBtn) doneBtn.disabled = false;
-        }
-        renderTopicsList();
-        renderSubjectWiseProgress();
-        saveToFirestore();
-    }
-
-    function handleShuffle() {
-        if (shuffleUsed >= MAX_SHUFFLE) { alert(`সর্বোচ্চ ${MAX_SHUFFLE} বার শাফল করতে পারেন!`); return; }
-        const filtered = getPendingFiltered();
-        if (filtered.length <= 1) { alert("এই ফিল্টারে আর ভিন্ন টপিক নেই। সম্পন্ন করুন বা ফিল্টার বাড়ান।"); return; }
-        let newTopic = getRandomFilteredPending(currentTopic.id);
-        if (newTopic) { currentTopic = newTopic; shuffleUsed++; fullRender(); }
-        else alert("ভিন্ন টপিক পাওয়া যায়নি।");
-    }
-
-    function handleDone() {
-        if (!currentTopic) { alert("কোন টপিক নেই!"); return; }
-        if (!completedIds.includes(currentTopic.id)) completedIds.push(currentTopic.id);
-        const remaining = getPendingFiltered();
-        if (remaining.length === 0) { currentTopic = null; fullRender(); alert(`🎉 "${currentFilter === 'ALL' ? 'সব বিষয়' : currentFilter}" ফিল্টারের সব টপিক সম্পন্ন!`); return; }
-        let nextTopic = getRandomFilteredPending();
-        if (nextTopic) currentTopic = nextTopic;
-        else currentTopic = remaining[0];
-        shuffleUsed = 0;
-        fullRender();
-    }
-
-    async function resetSection(sectionValue, password) {
-        if (!currentUserObj) return false;
-        const providerData = currentUserObj.providerData[0];
-        if (providerData.providerId === 'password') {
-            try {
-                const credential = firebase.auth.EmailAuthProvider.credential(currentUserObj.email, password);
-                await currentUserObj.reauthenticateWithCredential(credential);
-            } catch(e) {
-                alert(`পাসওয়ার্ড ভুল বা পুনঃপ্রমাণ ব্যর্থ: ${e.message}`);
-                return false;
+    function fullRender(){
+        const completedCount=completedIds.length, total=allTopics.length;
+        studiedSpan.innerText=completedCount; pendingSpan.innerText=total-completedCount; totalSpan.innerText=total;
+        if(progressChart) progressChart.data.datasets[0].data=[completedCount, total-completedCount], progressChart.update();
+        remainingSpan.innerText=Math.max(0, MAX_SHUFFLE-shuffleUsed);
+        const fp=getPendingFiltered();
+        if(fp.length===0 || !currentTopic){ noTopicDiv.classList.remove('hidden'); topicContentDiv.classList.add('hidden'); shuffleBtn.disabled=true; doneBtn.disabled=true; }
+        else{
+            noTopicDiv.classList.add('hidden'); topicContentDiv.classList.remove('hidden');
+            currentTopicNameSpan.innerText=currentTopic.name; currentTopicIdSpan.innerText=currentTopic.id; topicCatBadge.innerText=currentTopic.cat;
+            const stat=topicStats[currentTopic.id];
+            if(stat && stat.selectedAt){
+                selectedDateSpan.innerText=formatDateTime(stat.selectedAt);
+                if(stat.completedAt){
+                    completedDateSpan.innerText=formatDateTime(stat.completedAt);
+                    const durationMs = stat.completedAt - stat.selectedAt;
+                    durationSpan.innerText=formatDuration(durationMs);
+                } else {
+                    completedDateSpan.innerText="এখনো সম্পন্ন হয়নি";
+                    const durationMs = Date.now() - stat.selectedAt;
+                    durationSpan.innerText=`চলমান: ${formatDuration(durationMs)}`;
+                }
+            } else {
+                selectedDateSpan.innerText="আজকে প্রথম নির্বাচিত";
+                completedDateSpan.innerText="—";
+                durationSpan.innerText="—";
             }
-        } else {
-            if (!confirm("Google ব্যবহারকারী, পাসওয়ার্ড ছাড়াই রিসেট করবেন?")) return false;
+            shuffleBtn.disabled=!(shuffleUsed<MAX_SHUFFLE && getPendingFiltered().filter(t=>t.id!==currentTopic.id).length>0);
+            doneBtn.disabled=false;
         }
-        if (sectionValue === "ALL") {
-            completedIds = [];
-        } else {
-            completedIds = completedIds.filter(id => {
-                const t = allTopics.find(tp => tp.id === id);
-                return t && t.cat !== sectionValue;
-            });
-        }
-        shuffleUsed = 0;
-        currentFilter = "ALL";
-        if (subjectFilterSelectElem) subjectFilterSelectElem.value = "ALL";
-        const pendingNow = allTopics.filter(t => !completedIds.includes(t.id));
-        currentTopic = pendingNow.length ? pendingNow[Math.floor(Math.random() * pendingNow.length)] : null;
-        await saveToFirestore();
-        fullRender();
-        alert(`"${sectionValue}" বিভাগের অগ্রগতি সফলভাবে রিসেট করা হয়েছে।`);
-        return true;
+        renderTopicsList(); renderSubjectWiseProgress(); saveToFirestore(); updateAllAnalytics();
     }
-
-    function showResetModal() {
-        resetModal.style.display = 'flex';
-        resetSectionSelect.innerHTML = '<option value="ALL">📚 সব বিভাগ (সম্পূর্ণ রিসেট)</option>';
-        uniqueSubjects.forEach(sub => {
-            resetSectionSelect.innerHTML += `<option value="${sub}">📖 ${sub}</option>`;
-        });
-        const hasPassword = currentUserObj?.providerData[0]?.providerId === 'password';
-        if (hasPassword) {
-            resetPasswordInput.style.display = 'block';
-            resetPasswordHint.innerText = 'আপনার অ্যাকাউন্টের পাসওয়ার্ড দিন';
-            resetPasswordInput.value = '';
-        } else {
-            resetPasswordInput.style.display = 'block';
-            resetPasswordHint.innerText = 'আপনি Google দিয়ে লগইন করেছেন, পাসওয়ার্ড ছাড়াই রিসেট হবে (নিচে ক্লিক করুন)';
-            resetPasswordInput.placeholder = 'প্রযোজ্য নয়';
-        }
+    function handleShuffle(){ if(shuffleUsed>=MAX_SHUFFLE){ alert(`সর্বোচ্চ ${MAX_SHUFFLE} বার`); return; } const newT=getRandomFilteredPending(currentTopic?.id); if(newT){ currentTopic=newT; shuffleUsed++; recordTopicSelection(currentTopic.id); fullRender(); } else alert("ভিন্ন টপিক নেই"); }
+    function handleDone(){ if(!currentTopic) return; if(!completedIds.includes(currentTopic.id)){ completedIds.push(currentTopic.id); recordTopicCompletion(currentTopic.id); } const rem=getPendingFiltered(); if(rem.length===0){ currentTopic=null; fullRender(); alert("সব টপিক সম্পন্ন!"); return; } currentTopic=getRandomFilteredPending(); if(!currentTopic) currentTopic=rem[0]; shuffleUsed=0; if(currentTopic) recordTopicSelection(currentTopic.id); fullRender(); }
+    
+    // Analytics
+    function getCompletionsByPeriod(periodType='week'){
+        const completions={}; 
+        for(let [id,stat] of Object.entries(topicStats)){ if(stat.completedAt && completedIds.includes(parseInt(id))){ const date=new Date(stat.completedAt); let key; if(periodType==='week'){ const weekStart=new Date(date); weekStart.setDate(date.getDate()-date.getDay()); key=weekStart.toISOString().slice(0,10); } else { key=date.toISOString().slice(0,7); } completions[key]=(completions[key]||0)+1; } }
+        return completions;
     }
-
-    closeResetModal.onclick = cancelReset.onclick = () => resetModal.style.display = 'none';
-    confirmResetBtn.onclick = async () => {
-        const section = resetSectionSelect.value;
-        let pwd = '';
-        const hasPass = currentUserObj?.providerData[0]?.providerId === 'password';
-        if (hasPass) pwd = resetPasswordInput.value;
-        if (hasPass && !pwd) { alert("পাসওয়ার্ড দিন"); return; }
-        resetModal.style.display = 'none';
-        await resetSection(section, pwd);
-    };
-    resetModalBtn.onclick = () => showResetModal();
-
-    function initChart() {
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        if (progressChart) progressChart.destroy();
-        progressChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: ['সম্পন্ন (পড়া)', 'বাকি'], datasets: [{ data: [0, allTopics.length], backgroundColor: ['#10b981', '#f97316'], borderWidth: 0, cutout: '60%' }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
-        });
+    function updateWeeklyChart(){ const data=getCompletionsByPeriod('week'); const labels=Object.keys(data).sort().slice(-8); const values=labels.map(l=>data[l]); if(weeklyChart) weeklyChart.destroy(); weeklyChart=new Chart(weeklyCanvas,{type:'bar',data:{labels,datasets:[{label:'সম্পন্ন টপিক সংখ্যা',data:values,backgroundColor:'#4f46e5'}]},options:{responsive:true,maintainAspectRatio:true}}); }
+    function updateMonthlyChart(){ const data=getCompletionsByPeriod('month'); const labels=Object.keys(data).sort().slice(-6); const values=labels.map(l=>data[l]); if(monthlyChart) monthlyChart.destroy(); monthlyChart=new Chart(monthlyCanvas,{type:'bar',data:{labels,datasets:[{label:'সম্পন্ন টপিক সংখ্যা',data:values,backgroundColor:'#f59e0b'}]}}); }
+    function updateDurationTable(){ let html=''; for(let id of completedIds){ const stat=topicStats[id]; if(stat && stat.selectedAt && stat.completedAt){ const topic=allTopics.find(t=>t.id===id); if(topic){ const durMs = stat.completedAt - stat.selectedAt; html+=`<tr class="border-b"><td class="p-2">${id}</td><td class="p-2">${escapeHtml(topic.cat)}</td><td class="p-2">${escapeHtml(topic.name.substring(0,55))}..</td><td class="p-2">${formatDateTime(stat.selectedAt)}</td><td class="p-2">${formatDateTime(stat.completedAt)}</td><td class="p-2 font-semibold">${formatDuration(durMs)}</td></tr>`; } } }
+        durationBody.innerHTML=html||'<tr><td colspan="6" class="text-center p-4">কোনো সম্পন্ন টপিক নেই</td></tr>';
     }
-
-    function setupAuthUI() {
-        const signInBtn = document.getElementById('signInBtn');
-        const googleBtn = document.getElementById('googleSignInBtn');
-        const signUpBtn = document.getElementById('signUpBtn');
-        const showSignup = document.getElementById('showSignup');
-        const showLogin = document.getElementById('showLogin');
-        const loginFormDiv = document.getElementById('loginForm');
-        const signupFormDiv = document.getElementById('signupForm');
-        const authErrorDiv = document.getElementById('authError');
-        const showError = (msg) => { authErrorDiv.innerText = msg; authErrorDiv.classList.remove('hidden'); setTimeout(()=>authErrorDiv.classList.add('hidden'),3000); };
-        showSignup.onclick = () => { loginFormDiv.style.display='none'; signupFormDiv.style.display='block'; authErrorDiv.classList.add('hidden'); };
-        showLogin.onclick = () => { loginFormDiv.style.display='block'; signupFormDiv.style.display='none'; authErrorDiv.classList.add('hidden'); };
-        signInBtn.onclick = async () => { const email=document.getElementById('loginEmail').value, pwd=document.getElementById('loginPassword').value; try{ await auth.signInWithEmailAndPassword(email,pwd); }catch(e){ showError(e.message); } };
-        signUpBtn.onclick = async () => { const email=document.getElementById('signupEmail').value, pwd=document.getElementById('signupPassword').value; try{ await auth.createUserWithEmailAndPassword(email,pwd); }catch(e){ showError(e.message); } };
-        googleBtn.onclick = async () => { try{ const provider = new firebase.auth.GoogleAuthProvider(); await auth.signInWithPopup(provider); }catch(e){ showError(e.message); } };
+    function updateAllAnalytics(){ updateWeeklyChart(); updateMonthlyChart(); updateDurationTable(); }
+    
+    // CSV Export
+    function downloadCSV(){
+        let csvRows=[["Topic ID","Subject","Topic Name","Selected Date & Time","Completed Date & Time","Duration (Days+Hours)"]];
+        for(let id of completedIds){ const stat=topicStats[id]; if(stat && stat.selectedAt && stat.completedAt){ const topic=allTopics.find(t=>t.id===id); if(topic){ const durMs = stat.completedAt - stat.selectedAt; const days = durMs/(1000*60*60*24); csvRows.push([id, topic.cat, topic.name, new Date(stat.selectedAt).toISOString(), new Date(stat.completedAt).toISOString(), days.toFixed(2)+" days"]); } } }
+        const csvContent=csvRows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
+        const blob=new Blob(["\uFEFF"+csvContent],{type:"text/csv;charset=utf-8;"}); const link=document.createElement("a"); const url=URL.createObjectURL(blob); link.href=url; link.setAttribute("download","topic_progress_report.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
     }
-
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUserObj = user;
-            userEmailSpan.innerText = user.email;
-            authContainerDiv.style.display = 'none';
-            appContainerDiv.style.display = 'block';
-            if (!progressChart) initChart();
-            if (subjectFilterSelectElem) {
-                subjectFilterSelectElem.innerHTML = '<option value="ALL">📚 সব বিষয় (ALL)</option>';
-                uniqueSubjects.forEach(sub => { subjectFilterSelectElem.innerHTML += `<option value="${sub}">📖 ${sub}</option>`; });
-            }
-            await loadFromFirestore(user);
-            if (shuffleBtn && doneBtn) {
-                shuffleBtn.onclick = handleShuffle;
-                doneBtn.onclick = handleDone;
-                subjectFilterSelectElem.onchange = () => { currentFilter = subjectFilterSelectElem.value; shuffleUsed = 0; validateTopicByFilter(); fullRender(); };
-                document.getElementById('logoutBtn').onclick = async () => { await auth.signOut(); };
-            }
-        } else {
-            currentUserObj = null;
-            authContainerDiv.style.display = 'flex';
-            appContainerDiv.style.display = 'none';
-            if (progressChart) progressChart.destroy();
-            progressChart = null;
-        }
-    });
-    setupAuthUI();
-
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    
+    // Reset section with password
+    async function resetSection(section, pwd){
+        if(!currentUserObj) return false;
+        const prov=currentUserObj.providerData[0];
+        if(prov.providerId==='password'){ try{ const cred=firebase.auth.EmailAuthProvider.credential(currentUserObj.email,pwd); await currentUserObj.reauthenticateWithCredential(cred); }catch(e){ alert("পাসওয়ার্ড ভুল"); return false; } }
+        else if(!confirm("Google অ্যাকাউন্ট, পাসওয়ার্ড ছাড়া রিসেট?")) return false;
+        if(section==="ALL"){ completedIds=[]; topicStats={}; } else { const toRemove=allTopics.filter(t=>t.cat===section).map(t=>t.id); completedIds=completedIds.filter(id=>!toRemove.includes(id)); for(let id of toRemove) delete topicStats[id]; }
+        shuffleUsed=0; currentFilter="ALL"; filterSelect.value="ALL";
+        const pendingNow=allTopics.filter(t=>!completedIds.includes(t.id));
+        currentTopic=pendingNow.length?pendingNow[Math.floor(Math.random()*pendingNow.length)]:null;
+        if(currentTopic) recordTopicSelection(currentTopic.id);
+        await saveToFirestore(); fullRender(); alert(`"${section}" রিসেট সম্পন্ন`); return true;
+    }
+    function showResetModal(){ resetModal.style.display='flex'; resetSectionSelect.innerHTML='<option value="ALL">📚 সব বিভাগ</option>'+uniqueSubjects.map(s=>`<option value="${s}">📖 ${s}</option>`).join(''); const hasPass=currentUserObj?.providerData[0]?.providerId==='password'; resetPassword.style.display=hasPass?'block':'block'; resetHint.innerText=hasPass?'পাসওয়ার্ড দিন':'Google ব্যবহারকারী, পাসওয়ার্ড ছাড়াই রিসেট হবে'; if(!hasPass) resetPassword.placeholder='প্রযোজ্য নয়'; resetPassword.value=''; }
+    closeReset.onclick=cancelReset.onclick=()=>resetModal.style.display='none';
+    confirmReset.onclick=async()=>{ const sec=resetSectionSelect.value; let pwd=''; if(currentUserObj?.providerData[0]?.providerId==='password'){ pwd=resetPassword.value; if(!pwd){ alert("পাসওয়ার্ড দিন"); return; } } resetModal.style.display='none'; await resetSection(sec,pwd); };
+    resetModalBtn.onclick=showResetModal;
+    downloadBtn.onclick=downloadCSV;
+    
+    // Chart init & UI tabs
+    function initChart(){ const ctx=document.getElementById('progressChart').getContext('2d'); if(progressChart) progressChart.destroy(); progressChart=new Chart(ctx,{type:'doughnut',data:{labels:['সম্পন্ন','বাকি'],datasets:[{data:[0,allTopics.length],backgroundColor:['#10b981','#f97316'],cutout:'60%'}]},options:{responsive:true}}); }
+    function setupTabs(){ document.querySelectorAll('.analytics-tab').forEach(tab=>{ tab.onclick=()=>{ document.querySelectorAll('.analytics-tab').forEach(t=>t.classList.remove('active','bg-indigo-50','text-indigo-700','bg-gray-100','text-gray-600')); tab.classList.add('active','bg-indigo-50','text-indigo-700'); const type=tab.dataset.tab; weeklyContainer.classList.toggle('hidden',type!=='weekly'); monthlyContainer.classList.toggle('hidden',type!=='monthly'); durationContainer.classList.toggle('hidden',type!=='duration'); if(type==='weekly') updateWeeklyChart(); if(type==='monthly') updateMonthlyChart(); }; }); }
+    
+    // Auth
+    function setupAuth(){ const signIn=document.getElementById('signInBtn'), google=document.getElementById('googleSignInBtn'), signUp=document.getElementById('signUpBtn'), showSignup=document.getElementById('showSignup'), showLogin=document.getElementById('showLogin'), loginForm=document.getElementById('loginForm'), signupForm=document.getElementById('signupForm'), errDiv=document.getElementById('authError'); const showErr=(msg)=>{ errDiv.innerText=msg; errDiv.classList.remove('hidden'); setTimeout(()=>errDiv.classList.add('hidden'),3000); }; showSignup.onclick=()=>{ loginForm.style.display='none'; signupForm.style.display='block'; }; showLogin.onclick=()=>{ loginForm.style.display='block'; signupForm.style.display='none'; }; signIn.onclick=async()=>{ try{ await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }catch(e){ showErr(e.message); } }; signUp.onclick=async()=>{ try{ await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPassword').value); }catch(e){ showErr(e.message); } }; google.onclick=async()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ showErr(e.message); } }; }
+    auth.onAuthStateChanged(async(user)=>{ if(user){ currentUserObj=user; document.getElementById('userEmailSpan').innerText=user.email; authDiv.style.display='none'; appDiv.style.display='block'; if(!progressChart) initChart(); filterSelect.innerHTML='<option value="ALL">📚 সব বিষয়</option>'+uniqueSubjects.map(s=>`<option value="${s}">📖 ${s}</option>`).join(''); await loadFromFirestore(user); shuffleBtn.onclick=handleShuffle; doneBtn.onclick=handleDone; filterSelect.onchange=()=>{ currentFilter=filterSelect.value; shuffleUsed=0; validateTopicByFilter(); fullRender(); }; document.getElementById('logoutBtn').onclick=()=>auth.signOut(); setupTabs(); } else { currentUserObj=null; authDiv.style.display='flex'; appDiv.style.display='none'; if(progressChart) progressChart.destroy(); progressChart=null; } });
+    setupAuth();
+    function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 </script>
 </body>
 </html>
