@@ -486,7 +486,7 @@
     }
 
     function handleShuffle() {
-        if (shuffleUsed >= 4) { alert(`সর্বোচ্চ ৪ বার শাফল করতে পারেন!`); return; }
+        if (shuffleUsed >= 18) { alert(`সর্বোচ্চ 18 বার শাফল করতে পারেন!`); return; }
         const filtered = getPendingFiltered();
         if (filtered.length <= 1) { alert("এই ফিল্টারে আর ভিন্ন টপিক নেই। সম্পন্ন করুন বা ফিল্টার বাড়ান।"); return; }
         let newTopic = getRandomFilteredPending(currentTopic.id);
