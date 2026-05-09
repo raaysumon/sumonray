@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>আড্ডা চ্যাট + অডিও ও ভিডিও কল</title>
+    <title>আড্ডা চ্যাট + অডিও ও ভিডিও কল (বিশ্বব্যাপী)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script type="importmap">
         {
@@ -246,7 +246,6 @@
         @keyframes popIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px);} to { opacity:1; transform:translateY(0);} }
         
-        /* call panel with video */
         .call-panel {
             position: fixed;
             bottom: 0;
@@ -311,6 +310,19 @@
         }
         .call-mute-btn, .call-video-toggle { background: #34495e; }
         .empty-chat { text-align: center; color: #5f7f6e; padding: 20px; font-style: italic; }
+        .toast-error {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 30px;
+            text-align: center;
+            z-index: 2000;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -385,27 +397,51 @@
 
     // WebRTC globals
     let peerConnection = null;
-    let localStream = null;      // could be audio only or audio+video
+    let localStream = null;
     let remoteAudio = null;
-    let remoteVideo = null;      // <video> element for remote stream
-    let localVideo = null;       // <video> element for local preview
+    let remoteVideo = null;
+    let localVideo = null;
     let currentCallDocId = null;
     let currentCallRemoteUserId = null;
     let isCallActive = false;
     let callSignalUnsubscribe = null;
-    let isVideoCall = false;      // track current call type
+    let isVideoCall = false;
     let callPanelDiv = null;
 
+    // ✅ TURN servers (free, works globally) - using Metered.ca free TURN
     const iceServers = [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
         { urls: "stun:stun2.l.google.com:19302" },
         { urls: "stun:stun3.l.google.com:19302" },
         { urls: "stun:stun4.l.google.com:19302" },
-        { urls: "stun:stun.ekiga.net" }
+        {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443?transport=tcp",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        }
     ];
 
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    function showToast(msg) {
+        let toast = document.querySelector('.toast-error');
+        if(toast) toast.remove();
+        toast = document.createElement('div');
+        toast.className = 'toast-error';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
 
     // presence
     async function updatePresence() {
@@ -452,7 +488,7 @@
             });
             messageInput.value = "";
             if (activeReply) { activeReply = null; replyIndicatorDiv.classList.add('hide'); }
-        } catch(e) { alert("পাঠাতে ব্যর্থ"); }
+        } catch(e) { showToast("পাঠাতে ব্যর্থ"); }
     }
 
     function loadMessages() {
@@ -469,7 +505,6 @@
                 const msgDiv = document.createElement('div');
                 msgDiv.classList.add('message', isOwn ? 'message-own' : 'message-other');
                 msgDiv.dataset.messageId = docSnap.id;
-                msgDiv.dataset.senderName = data.senderName;
                 if (!isOwn) {
                     const nameSpan = document.createElement('div'); nameSpan.classList.add('sender-name');
                     nameSpan.innerHTML = `<i class="fas fa-user-circle"></i> ${escapeHtml(data.senderName)}`;
@@ -502,7 +537,7 @@
         });
     }
 
-    // ---------- WEBCORE (Audio/Video Call) ----------
+    // ---------- WebRTC with TURN ----------
     async function getMediaStream(videoEnabled) {
         if (localStream) {
             localStream.getTracks().forEach(t => t.stop());
@@ -514,7 +549,7 @@
             localStream = stream;
             return stream;
         } catch(err) {
-            alert(videoEnabled ? "ভিডিও ক্যামেরার অনুমতি প্রয়োজন।" : "মাইক্রোফোনের অনুমতি প্রয়োজন।");
+            showToast(videoEnabled ? "ক্যামেরা/মাইক্রোফোন অনুমতি প্রয়োজন" : "মাইক্রোফোন অনুমতি প্রয়োজন");
             throw err;
         }
     }
@@ -543,15 +578,20 @@
                     remoteAudio.srcObject = event.streams[0];
                 }
             } else if (event.track.kind === "video") {
-                if (remoteVideo) {
-                    remoteVideo.srcObject = event.streams[0];
-                }
+                if (remoteVideo) remoteVideo.srcObject = event.streams[0];
             }
         };
         pc.onconnectionstatechange = () => {
-            if (pc.connectionState === "failed" || pc.connectionState === "disconnected" || pc.connectionState === "closed") {
+            console.log("Connection state:", pc.connectionState);
+            if (pc.connectionState === "failed") {
+                showToast("সংযোগ ব্যর্থ হয়েছে (TURN প্রয়োজন হতে পারে)");
                 endCall();
             }
+            if (pc.connectionState === "disconnected" || pc.connectionState === "closed") endCall();
+        };
+        pc.oniceconnectionstatechange = () => {
+            console.log("ICE state:", pc.iceConnectionState);
+            if (pc.iceConnectionState === "failed") showToast("ICE সংযোগ ব্যর্থ, নেটওয়ার্কে TURN লাগতে পারে");
         };
         return pc;
     }
@@ -573,7 +613,7 @@
     }
 
     async function startCall(targetUserId, targetNickname, videoEnabled) {
-        if (isCallActive) { alert("কল চলছে, আগে কল শেষ করুন।"); return; }
+        if (isCallActive) { showToast("কল চলছে, আগে কল শেষ করুন।"); return; }
         try {
             isVideoCall = videoEnabled;
             await getMediaStream(videoEnabled);
@@ -600,7 +640,7 @@
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                     unsubAnswer();
                 }
-                if (data.status === "rejected") { unsubAnswer(); endCall(); alert("কল প্রত্যাখ্যান করা হয়েছে।"); }
+                if (data.status === "rejected") { unsubAnswer(); endCall(); showToast("কল প্রত্যাখ্যান করা হয়েছে।"); }
                 if (data.status === "ended") { unsubAnswer(); endCall(); }
                 if (data.status === "active" && !isCallActive) {
                     isCallActive = true;
@@ -610,7 +650,7 @@
             callSignalUnsubscribe = unsubAnswer;
             showCallPanel(true, targetNickname, videoEnabled);
             isCallActive = true;
-        } catch(err) { console.error(err); alert("কল শুরু ব্যর্থ"); endCall(); }
+        } catch(err) { console.error(err); showToast("কল শুরু ব্যর্থ"); endCall(); }
     }
 
     async function answerCall(callId, fromName, fromUid, videoRequired) {
@@ -636,7 +676,7 @@
                 if (snap.data()?.status === "ended") { statusUnsub(); endCall(); }
             });
             callSignalUnsubscribe = statusUnsub;
-        } catch(err) { console.error(err); alert("কল রিসিভ করতে ব্যর্থ"); endCall(); }
+        } catch(err) { console.error(err); showToast("কল রিসিভ করতে ব্যর্থ"); endCall(); }
     }
 
     async function endCall() {
@@ -683,7 +723,6 @@
             remoteVideo = document.getElementById('remoteVideo');
             if (localVideo) localVideo.srcObject = localStream;
             if (peerConnection && remoteVideo) {
-                // remote stream will be attached via ontrack
                 const originalOntrack = peerConnection.ontrack;
                 peerConnection.ontrack = (event) => {
                     if (event.track.kind === 'video' && remoteVideo) remoteVideo.srcObject = event.streams[0];
@@ -696,7 +735,7 @@
                 };
             }
         } else if (!isVideo && localStream) {
-            // only audio
+            // audio only
         }
         const muteBtn = document.getElementById("muteCallBtn");
         let muted = false;
@@ -711,7 +750,7 @@
             const videoToggle = document.getElementById("toggleVideoBtn");
             let videoOff = false;
             videoToggle?.addEventListener("click", () => {
-                if (localStream) {
+                if (localStream && localStream.getVideoTracks().length) {
                     videoOff = !videoOff;
                     localStream.getVideoTracks()[0].enabled = !videoOff;
                     videoToggle.innerHTML = videoOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>';
@@ -745,7 +784,6 @@
         });
     }
 
-    // Online user selection modal (audio/video separate)
     async function showCallModal(videoType) {
         if (!currentUser) return;
         const now = Date.now();
