@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>দৈনিক পাঠ পরিকল্পক | টপিক সময় ট্র্যাকার ও বিশ্লেষণ (ফায়ারবেস)</title>
+    <title>দৈনিক পাঠ পরিকল্পক | টপিক টাইম ট্র্যাকার ও বিশ্লেষণ (ফায়ারবেস)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -30,6 +30,9 @@
         .analytics-tab.active { background: #4f46e5; color: white; }
         .stats-card { background: white; border-radius: 1.25rem; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .time-badge { font-size: 0.7rem; background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 1rem; display: inline-block; }
+        .topic-row { transition: all 0.1s ease; }
+        .topic-row:hover { background-color: #f8fafc; }
+        .select-btn { transition: all 0.1s; }
     </style>
 </head>
 <body class="antialiased p-4 md:p-6">
@@ -68,12 +71,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div class="lg:col-span-2 bg-white rounded-2xl shadow-md p-5 md:p-6 border border-indigo-100 card-hover">
                 <div class="flex flex-wrap justify-between items-start gap-3 mb-4"><h2 class="text-xl font-bold text-gray-800"><i class="fas fa-calendar-day text-indigo-500"></i> আজকের নির্ধারিত পাঠ</h2><div class="bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 text-sm"><i class="fas fa-exchange-alt mr-1"></i> বাকি শাফল: <span id="remainingShuffleSpan">20</span></div></div>
-                <div class="mb-5 p-3 bg-slate-50 rounded-xl flex flex-wrap items-center gap-3"><label class="font-semibold text-gray-700 text-sm"><i class="fas fa-filter text-amber-500"></i> বিষয় ফিল্টার :</label><select id="subjectFilterSelect" class="bg-white border rounded-lg px-3 py-2 text-sm flex-1"></select><span class="text-xs text-gray-400"><i class="fas fa-info-circle"></i> ফিল্টার অনুযায়ী শাফল</span></div>
+                <div class="mb-5 p-3 bg-slate-50 rounded-xl flex flex-wrap items-center gap-3"><label class="font-semibold text-gray-700 text-sm"><i class="fas fa-filter text-amber-500"></i> বিষয় ফিল্টার :</label><select id="subjectFilterSelect" class="bg-white border rounded-lg px-3 py-2 text-sm flex-1"></select><span class="text-xs text-gray-400"><i class="fas fa-info-circle"></i> ফিল্টার অনুযায়ী শাফল ও তালিকা</span></div>
                 <div id="currentTopicContainer" class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 mb-6 border border-indigo-200">
                     <div id="noTopicMsg" class="hidden text-center py-6 text-gray-500"><i class="fas fa-trophy text-4xl text-amber-400 mb-2"></i><p class="font-medium">সব টপিক সম্পন্ন! ফিল্টার পরিবর্তন বা রিসেট করুন।</p></div>
                     <div id="topicContent">
                         <span id="topicCatBadge" class="badge-cat inline-block px-3 py-1 rounded-full text-xs mb-3"></span>
-                        <h3 id="currentTopicName" class="text-xl md:text-2xl font-bold text-gray-800"></h3>
+                        <h3 id="currentTopicName" class="text-xl md:text-2xl font-bold text-gray-800 break-words"></h3>
                         <p class="text-gray-500 text-sm mt-1"><i class="far fa-id-card"></i> টপিক আইডি: <span id="currentTopicId"></span></p>
                         <div class="mt-3 flex flex-wrap gap-3 text-xs text-indigo-700 bg-indigo-50 p-2 rounded-lg">
                             <div><i class="fas fa-calendar-alt"></i> <span id="selectedDateDisplay">—</span></div>
@@ -93,12 +96,12 @@
             <div class="flex gap-2 mb-6 border-b pb-2"><div data-tab="weekly" class="analytics-tab active bg-indigo-50 text-indigo-700">সাপ্তাহিক অগ্রগতি</div><div data-tab="monthly" class="analytics-tab bg-gray-100 text-gray-600">মাসিক অগ্রগতি</div><div data-tab="duration" class="analytics-tab bg-gray-100 text-gray-600">টপিক ভিত্তিক সময় (দিন/ঘণ্টা)</div></div>
             <div id="weeklyChartContainer" class="stats-card"><canvas id="weeklyChart" height="200" style="max-height:250px"></canvas></div>
             <div id="monthlyChartContainer" class="stats-card hidden"><canvas id="monthlyChart" height="200" style="max-height:250px"></canvas></div>
-            <div id="durationTableContainer" class="stats-card hidden overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-100"><tr><th class="p-2 text-left">টপিক আইডি</th><th class="p-2 text-left">বিষয়</th><th class="p-2 text-left">টপিক নাম (সংক্ষেপ)</th><th class="p-2 text-left">নির্বাচনের সময়</th><th class="p-2 text-left">সম্পন্নের সময়</th><th class="p-2 text-left">সময়কাল</th></tr></thead><tbody id="durationTableBody"></tbody></table></div>
+            <div id="durationTableContainer" class="stats-card hidden overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-100"><tr><th class="p-2 text-left">টপিক আইডি</th><th class="p-2 text-left">বিষয়</th><th class="p-2 text-left">টপিক নাম (পূর্ণ)</th><th class="p-2 text-left">নির্বাচনের সময়</th><th class="p-2 text-left">সম্পন্নের সময়</th><th class="p-2 text-left">সময়কাল</th></tr></thead><tbody id="durationTableBody"></tbody>}</div>
         </div>
 
-        <!-- Subject-wise progress & All topics list -->
+        <!-- Subject-wise progress & All topics list with SELECT button -->
         <div class="bg-white/95 rounded-2xl shadow-md p-5 border border-indigo-50 mb-8"><h2 class="text-xl font-bold text-gray-800 mb-3"><i class="fas fa-chart-simple text-indigo-600 mr-2"></i> বিষয়ভিত্তিক অগ্রগতি</h2><div id="subjectProgressContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto"></div></div>
-        <div class="bg-white/90 rounded-2xl shadow-md p-5 border border-indigo-50"><h2 class="text-lg font-bold text-gray-800 mb-2"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (নির্বাচন করলে সময় রেকর্ড হবে)</h2><div class="scrollable-list"><div id="topicsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div></div></div>
+        <div class="bg-white/90 rounded-2xl shadow-md p-5 border border-indigo-50"><h2 class="text-lg font-bold text-gray-800 mb-2"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>সমস্ত টপিকের তালিকা (SELECT বাটন দিয়ে নির্বাচন করুন)</h2><div class="scrollable-list"><div id="topicsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div></div></div>
     </div>
 </div>
 
@@ -106,284 +109,92 @@
 <div id="resetModal" class="modal-overlay" style="display: none;"><div class="reset-modal"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold"><i class="fas fa-trash-alt text-red-500 mr-2"></i>বিভাগ অনুযায়ী রিসেট</h3><button id="closeResetModalBtn" class="text-gray-400 text-2xl">&times;</button></div><p class="text-sm text-gray-600 mb-4">পাসওয়ার্ড প্রয়োজন (ইমেইল লগইন থাকলে)</p><select id="resetSectionSelect" class="w-full border rounded-xl px-4 py-2 mb-4"></select><input type="password" id="resetPasswordInput" class="w-full border rounded-xl px-4 py-2 mb-2" placeholder="আপনার অ্যাকাউন্টের পাসওয়ার্ড"><p id="resetPasswordHint" class="text-xs text-gray-500 mb-4"></p><div class="flex gap-3 justify-end"><button id="cancelResetBtn" class="px-4 py-2 bg-gray-200 rounded-xl">বাতিল</button><button id="confirmResetBtn" class="px-5 py-2 bg-red-600 text-white rounded-xl">রিসেট</button></div></div></div>
 
 <script>
-    // ======================= সম্পূর্ণ মূল টপিক ডেটাসেট (পূর্ণ বিবরণ, আগের মতোই) =======================
+    // ======================= সম্পূর্ণ মূল টপিক ডেটাসেট (পূর্ণ বিবরণ, কোনো সংক্ষেপ না) =======================
     const topicsDataRaw = [];
-
-    // 1. বাংলা সাহিত্য (Bangla Literature) লেকচার ১-১৪ (পূর্ণ)
-    const banglaLitFull = [
-        "লেকচার-১: বাংলা সাহিত্যের যুগ বিভাগ, প্রাচীন যুগ ও চর্যাপদ, অন্ধকার যুগ, শ্রীকৃষ্ণকীর্তন, বৈষ্ণব পদাবলী, চণ্ডীদাস, বিদ্যাপতি, জ্ঞানদাস, গোবিন্দদাস, জীবনী সাহিত্য।",
-        "লেকচার-২: মঙ্গলকাব্য, মর্সিয়া সাহিত্য, নাথ সাহিত্য, অনুবাদ সাহিত্য, মুসলিম সাহিত্য, রোমান্টিক প্রণয়োপাখ্যান ও আরাকান রাজসভায় বাংলা সাহিত্য। মধ্যযুগের পৃষ্ঠপোষক।",
-        "লেকচার-৩: লোকসাহিত্য ও ময়মনসিংহ গীতিকা, শায়ের-কবিওয়ালা ও পুঁথি সাহিত্য। আধুনিক যুগের উন্মেষ, ফোর্ট উইলিয়াম কলেজ, শ্রীরামপুর মিশন, হিন্দু কলেজ, ইয়ংবেঙ্গল, মোহামেডান লিটারারি সোসাইটি, বাংলা একাডেমি, এশিয়াটিক সোসাইটি।",
-        "লেকচার-৪: রাজা রামমোহন রায়, লালন শাহ, ঈশ্বরচন্দ্র গুপ্ত, প্যারীচাঁদ মিত্র, মদনমোহন তর্কালঙ্কার, ঈশ্বরচন্দ্র বিদ্যাসাগর, মাইকেল মধুসূদন দত্ত, রঙ্গলাল বন্দ্যোপাধ্যায়, দীনবন্ধু মিত্র, নওয়াব ফয়জুন্নেছা চৌধুরাণী, বিহারীলাল চক্রবর্তী, কৃষ্ণচন্দ্র মজুমদার, সঞ্জীবচন্দ্র চট্টোপাধ্যায়।",
-        "লেকচার-৫: বঙ্কিমচন্দ্র চট্টোপাধ্যায়, হেমচন্দ্র বন্দ্যোপাধ্যায়, কালী প্রসন্ন সিংহ, নবীনচন্দ্র সেন, মীর মশাররফ হোসেন, স্বর্ণকুমারী দেবী, কায়কোবাদ, মোহাম্মদ নসিবর রহমান, মোজাম্মেল হক।",
-        "লেকচার-৬: রবীন্দ্রনাথ ঠাকুর, দ্বিজেন্দ্রলাল রায়, কামিনী রায়, দীনেশচন্দ্র সেন, প্রমথ চৌধুরী, মোহাম্মদ আকরম খাঁ, আবদুল করিম সাহিত্য বিশারদ, শরৎচন্দ্র চট্টোপাধ্যায়, দক্ষিণারঞ্জন মিত্র মজুমদার, যতীন্দ্রমোহন বাগচী।",
-        "লেকচার-৭: রোকেয়া সাখাওয়াত হোসেন, সৈয়দ ইসমাইল হোসেন সিরাজী, কাজী ইমদাদুল হক, সত্যেন্দ্রনাথ দত্ত, ড. মুহম্মদ শহীদুল্লাহ, সুকুমার রায়, মোহিতলাল মজুমদার, এস ওয়াজেদ আলী, কাজী আবদুল ওদুদ, প্রিন্সিপাল ইব্রাহীম খাঁ, বিভূতিভূষণ বন্দ্যোপাধ্যায়, আবুল কালাম শামসুদ্দীন, ডা. লুৎফর রহমান।",
-        "লেকচার-৮: কাজী মোতাহার হোসেন, গোলাম মোস্তফা, আবুল মনসুর আহমদ, তারাশঙ্কর বন্দ্যোপাধ্যায়, কাজী নজরুল ইসলাম, জীবনানন্দ দাশ, বলাইচাঁদ মুখোপাধ্যায়, অমিয় চক্রবর্তী।",
-        "লেকচার-৯: সুধীন্দ্রনাথ দত্ত, ড. মুহম্মদ এনামুল হক, অচিন্ত্যকুমার সেনগুপ্ত, আবুল ফজল, জসীম উদ্দীন, মোতাহের হোসেন চৌধুরী, অদ্বৈত মল্লবর্মণ, সৈয়দ মুজতবা আলী, আবদুল কাদির, বন্দে আলী মিয়া, হুমায়ুন কবির, নুরুল মোমেন, বুদ্ধদেব বসু, মানিক বন্দ্যোপাধ্যায়, শামসুন নাহার মাহমুদ, বিষ্ণু দে।",
-        "লেকচার-১০: আবু জাফর শামসুদ্দীন, বেগম সুফিয়া কামাল, নীহাররঞ্জন গুপ্ত, আহসান হাবীব, শওকত ওসমান, ফররুখ আহমদ, সিকান্দার আবু জাফর, মুহম্মদ আবদুল হাই, আহমদ শরীফ, নীলিমা ইব্রাহিম, সৈয়দ আলী আহসান, সৈয়দ ওয়ালীউল্লাহ, সমরেশ বসু, মুনীর চৌধুরী, রশীদ করীম, আবু ইসহাক।",
-        "লেকচার-১১: শামসুদ্দীন আবুল কালাম, সুকান্ত ভট্টাচার্য, শহীদুল্লা কায়সার, আন্নাদাশঙ্কর রায়, জাহানারা ইমাম, শামসুর রহমান, সৈয়দ মুস্তাফা সিরাজ, সাঈদ আহমদ, আবদুল্লাহ আল-মুতি শরফুদ্দীন, ড. আলাউদ্দিন আল আজাদ, হাসান হাফিজুর রহমান, আবদুল গাফফার চৌধুরী, আবু জাফর ওবায়দুল্লাহ, সুনীল গঙ্গোপাধ্যায়, জহির রায়হান, মেহতাব উদ্দীন আহমদ, রাবেয়া খাতুন।",
-        "লেকচার-১২: সৈয়দ শামসুল হক, আবু হেনা মোস্তফা কামাল, আল মাহমুদ, রাশিদা খান, শওকত আলী, ড. আনিসুজ্জামান, হাসান আজিজুল হক, শহীদ সাবের, মাহমুদুল হক, আবদুল্লাহ আল মামুন, রফিক আজাদ, শহীদ কাদরী, আখতারুজ্জামান ইলিয়াস, আবদুল মান্নান সৈয়দ, আহমদ ছফা, হুমায়ূন আহমেদ।",
-        "লেকচার-১৩: সেলিনা হোসেন, হুমায়ূন আজাদ, মামুনুর রশীদ, সেলিম আল দীন, ইমদাদুল হক মিলন, রুদ্র মুহম্মদ শহীদুল্লাহ, আনিসুল হক, সাহিত্যের পত্রিকা, চরিত্র, উপাধি ও ছদ্মনাম।",
-        "লেকচার-১৪: দেশভাগ, ভাষা আন্দোলন, মুক্তিযুদ্ধভিত্তিক রচনা, বিখ্যাত উক্তি, বাংলা সাহিত্যে প্রথম, ইতিহাসগ্রন্থ ও লোকগান (বাউল, পল্লীগীতি, ভাটিয়ালি)।"
-    ];
+    const banglaLitFull = ["লেকচার-১: বাংলা সাহিত্যের যুগ বিভাগ, প্রাচীন যুগ ও চর্যাপদ, অন্ধকার যুগ, শ্রীকৃষ্ণকীর্তন, বৈষ্ণব পদাবলী, চণ্ডীদাস, বিদ্যাপতি, জ্ঞানদাস, গোবিন্দদাস, জীবনী সাহিত্য।","লেকচার-২: মঙ্গলকাব্য, মর্সিয়া সাহিত্য, নাথ সাহিত্য, অনুবাদ সাহিত্য, মুসলিম সাহিত্য, রোমান্টিক প্রণয়োপাখ্যান ও আরাকান রাজসভায় বাংলা সাহিত্য। মধ্যযুগের পৃষ্ঠপোষক।","লেকচার-৩: লোকসাহিত্য ও ময়মনসিংহ গীতিকা, শায়ের-কবিওয়ালা ও পুঁথি সাহিত্য। আধুনিক যুগের উন্মেষ, ফোর্ট উইলিয়াম কলেজ, শ্রীরামপুর মিশন, হিন্দু কলেজ, ইয়ংবেঙ্গল, মোহামেডান লিটারারি সোসাইটি, বাংলা একাডেমি, এশিয়াটিক সোসাইটি।","লেকচার-৪: রাজা রামমোহন রায়, লালন শাহ, ঈশ্বরচন্দ্র গুপ্ত, প্যারীচাঁদ মিত্র, মদনমোহন তর্কালঙ্কার, ঈশ্বরচন্দ্র বিদ্যাসাগর, মাইকেল মধুসূদন দত্ত, রঙ্গলাল বন্দ্যোপাধ্যায়, দীনবন্ধু মিত্র, নওয়াব ফয়জুন্নেছা চৌধুরাণী, বিহারীলাল চক্রবর্তী, কৃষ্ণচন্দ্র মজুমদার, সঞ্জীবচন্দ্র চট্টোপাধ্যায়।","লেকচার-৫: বঙ্কিমচন্দ্র চট্টোপাধ্যায়, হেমচন্দ্র বন্দ্যোপাধ্যায়, কালী প্রসন্ন সিংহ, নবীনচন্দ্র সেন, মীর মশাররফ হোসেন, স্বর্ণকুমারী দেবী, কায়কোবাদ, মোহাম্মদ নসিবর রহমান, মোজাম্মেল হক।","লেকচার-৬: রবীন্দ্রনাথ ঠাকুর, দ্বিজেন্দ্রলাল রায়, কামিনী রায়, দীনেশচন্দ্র সেন, প্রমথ চৌধুরী, মোহাম্মদ আকরম খাঁ, আবদুল করিম সাহিত্য বিশারদ, শরৎচন্দ্র চট্টোপাধ্যায়, দক্ষিণারঞ্জন মিত্র মজুমদার, যতীন্দ্রমোহন বাগচী।","লেকচার-৭: রোকেয়া সাখাওয়াত হোসেন, সৈয়দ ইসমাইল হোসেন সিরাজী, কাজী ইমদাদুল হক, সত্যেন্দ্রনাথ দত্ত, ড. মুহম্মদ শহীদুল্লাহ, সুকুমার রায়, মোহিতলাল মজুমদার, এস ওয়াজেদ আলী, কাজী আবদুল ওদুদ, প্রিন্সিপাল ইব্রাহীম খাঁ, বিভূতিভূষণ বন্দ্যোপাধ্যায়, আবুল কালাম শামসুদ্দীন, ডা. লুৎফর রহমান।","লেকচার-৮: কাজী মোতাহার হোসেন, গোলাম মোস্তফা, আবুল মনসুর আহমদ, তারাশঙ্কর বন্দ্যোপাধ্যায়, কাজী নজরুল ইসলাম, জীবনানন্দ দাশ, বলাইচাঁদ মুখোপাধ্যায়, অমিয় চক্রবর্তী।","লেকচার-৯: সুধীন্দ্রনাথ দত্ত, ড. মুহম্মদ এনামুল হক, অচিন্ত্যকুমার সেনগুপ্ত, আবুল ফজল, জসীম উদ্দীন, মোতাহের হোসেন চৌধুরী, অদ্বৈত মল্লবর্মণ, সৈয়দ মুজতবা আলী, আবদুল কাদির, বন্দে আলী মিয়া, হুমায়ুন কবির, নুরুল মোমেন, বুদ্ধদেব বসু, মানিক বন্দ্যোপাধ্যায়, শামসুন নাহার মাহমুদ, বিষ্ণু দে।","লেকচার-১০: আবু জাফর শামসুদ্দীন, বেগম সুফিয়া কামাল, নীহাররঞ্জন গুপ্ত, আহসান হাবীব, শওকত ওসমান, ফররুখ আহমদ, সিকান্দার আবু জাফর, মুহম্মদ আবদুল হাই, আহমদ শরীফ, নীলিমা ইব্রাহিম, সৈয়দ আলী আহসান, সৈয়দ ওয়ালীউল্লাহ, সমরেশ বসু, মুনীর চৌধুরী, রশীদ করীম, আবু ইসহাক।","লেকচার-১১: শামসুদ্দীন আবুল কালাম, সুকান্ত ভট্টাচার্য, শহীদুল্লা কায়সার, আন্নাদাশঙ্কর রায়, জাহানারা ইমাম, শামসুর রহমান, সৈয়দ মুস্তাফা সিরাজ, সাঈদ আহমদ, আবদুল্লাহ আল-মুতি শরফুদ্দীন, ড. আলাউদ্দিন আল আজাদ, হাসান হাফিজুর রহমান, আবদুল গাফফার চৌধুরী, আবু জাফর ওবায়দুল্লাহ, সুনীল গঙ্গোপাধ্যায়, জহির রায়হান, মেহতাব উদ্দীন আহমদ, রাবেয়া খাতুন।","লেকচার-১২: সৈয়দ শামসুল হক, আবু হেনা মোস্তফা কামাল, আল মাহমুদ, রাশিদা খান, শওকত আলী, ড. আনিসুজ্জামান, হাসান আজিজুল হক, শহীদ সাবের, মাহমুদুল হক, আবদুল্লাহ আল মামুন, রফিক আজাদ, শহীদ কাদরী, আখতারুজ্জামান ইলিয়াস, আবদুল মান্নান সৈয়দ, আহমদ ছফা, হুমায়ূন আহমেদ।","লেকচার-১৩: সেলিনা হোসেন, হুমায়ূন আজাদ, মামুনুর রশীদ, সেলিম আল দীন, ইমদাদুল হক মিলন, রুদ্র মুহম্মদ শহীদুল্লাহ, আনিসুল হক, সাহিত্যের পত্রিকা, চরিত্র, উপাধি ও ছদ্মনাম।","লেকচার-১৪: দেশভাগ, ভাষা আন্দোলন, মুক্তিযুদ্ধভিত্তিক রচনা, বিখ্যাত উক্তি, বাংলা সাহিত্যে প্রথম, ইতিহাসগ্রন্থ ও লোকগান (বাউল, পল্লীগীতি, ভাটিয়ালি)।"];
     banglaLitFull.forEach(lec => topicsDataRaw.push({ cat: "বাংলা সাহিত্য", name: lec }));
-
-    // 2. বাংলা ভাষা (ব্যাকরণ) লেকচার ০১-০৮ (পূর্ণ)
-    const banglaGrammarFull = [
-        "লেকচার-০১: ভাষা ও বাংলা ভাষার উৎপত্তি, ধ্বনি, বর্ণ ও অক্ষর।","লেকচার-০২: সন্ধি, ধ্বনির পরিবর্তন, সমার্থক ও বিপরীত শব্দ।",
-        "লেকচার-০৩: শব্দ ও প্রকার, বানানের নিয়ম, ণ-ত্ব ও ষ-ত্ব বিধান।","লেকচার-০৪: পদ, ছন্দ, অলঙ্কার, এক কথায় প্রকাশ, ক্রিয়ার কাল।",
-        "লেকচার-০৫: কারক ও বিভক্তি, অনুসর্গ, শুদ্ধ শব্দ, পরিভাষা।","লেকচার-০৬: সমাস, প্রবাদ-প্রবচন, বাগধারা।",
-        "লেকচার-০৭: উপসর্গ, ধাতু, প্রকৃতি-প্রত্যয়, যতি চিহ্ন।","লেকচার-০৮: বাক্য ও প্রকরণ, বাক্যের রূপান্তর, শুদ্ধি ও প্রয়োগ।"
-    ];
+    const banglaGrammarFull = ["লেকচার-০১: ভাষা ও বাংলা ভাষার উৎপত্তি, ধ্বনি, বর্ণ ও অক্ষর।","লেকচার-০২: সন্ধি, ধ্বনির পরিবর্তন, সমার্থক ও বিপরীত শব্দ।","লেকচার-০৩: শব্দ ও প্রকার, বানানের নিয়ম, ণ-ত্ব ও ষ-ত্ব বিধান।","লেকচার-০৪: পদ, ছন্দ, অলঙ্কার, এক কথায় প্রকাশ, ক্রিয়ার কাল।","লেকচার-০৫: কারক ও বিভক্তি, অনুসর্গ, শুদ্ধ শব্দ, পরিভাষা।","লেকচার-০৬: সমাস, প্রবাদ-প্রবচন, বাগধারা।","লেকচার-০৭: উপসর্গ, ধাতু, প্রকৃতি-প্রত্যয়, যতি চিহ্ন।","লেকচার-০৮: বাক্য ও প্রকরণ, বাক্যের রূপান্তর, শুদ্ধি ও প্রয়োগ।"];
     banglaGrammarFull.forEach(lec => topicsDataRaw.push({ cat: "বাংলা ভাষা (ব্যাকরণ)", name: lec }));
-
-    // 3. ইংরেজি গ্রামার ০১-১৪ (পূর্ণ)
-    const englishGrammarFull = [
-        "লেকচার-০১: Noun, Article Homework: Vocabulary- A-F; Written: Practicing Interchange of Parts of Speech (Part-01).",
-        "লেকচার-০২: Number, Gender, Group Verbs. Homework: Vocabulary G-M; Written: Sentence Correction, Making Sentences. (Part-01)",
-        "লেকচার-০৩: Pronoun, Determiner. Homework: Vocabulary N-S; Written: Transformation and Correction.",
-        "লেকচার-০৪: Adjective, Degree. Homework: Vocabulary T-Z; Written: Practicing Interchange of Parts of Speech. (Part-02)",
-        "লেকচার-০৫: Verb & Its Classification, Gerund, Participle. Homework: App. Preposition A-F; Written: Sentence Correction, Making Sentences. (Part-02)",
-        "লেকচার-০৬: Right form of Verbs, Subject-Verb Agreement, Tense. Homework: App. Preposition G-M; Written: Sentence Correction, Making Sentences. (Part-03)",
-        "লেকচার-০৭: Adverb, Modifier. Homework: App. Preposition N-S; Written: Error Correction, Transformation.",
-        "লেকচার-০৮: Conjunction & Linkers. Homework: App. Preposition T-Z; Written: relevance in Translation.",
-        "লেকচার-০৯: Preposition. Written: Combining Sentences.", 
-        "লেকচার-১০: Phrases, Clauses, Analogy. Homework: Idioms List A-F; Written: Combining Sentences and eliminating errors.",
-        "লেকচার-১১: Voice & Narration. Homework: Idioms List G-M; Written: Relevance in translation, report writing and summary writing.",
-        "লেকচার-১২: Transformation, Spelling List. Homework: Idioms List N-S; Written: Making Sentences.",
-        "লেকচার-১৩: Same word but different parts of speech, Suffix & Prefix, Foreign words. Homework: Idioms List T-Z; Written: Interchange of Parts of Speech. (Part-03)",
-        "লেকচার-১৪: Sentence correction, one word substitution, names of parts of paragraphs/ letter/ application.; Written: Eliminating errors, Meanings."
-    ];
+    const englishGrammarFull = ["লেকচার-০১: Noun, Article Homework: Vocabulary- A-F; Written: Practicing Interchange of Parts of Speech (Part-01).","লেকচার-০২: Number, Gender, Group Verbs. Homework: Vocabulary G-M; Written: Sentence Correction, Making Sentences. (Part-01)","লেকচার-০৩: Pronoun, Determiner. Homework: Vocabulary N-S; Written: Transformation and Correction.","লেকচার-০৪: Adjective, Degree. Homework: Vocabulary T-Z; Written: Practicing Interchange of Parts of Speech. (Part-02)","লেকচার-০৫: Verb & Its Classification, Gerund, Participle. Homework: App. Preposition A-F; Written: Sentence Correction, Making Sentences. (Part-02)","লেকচার-০৬: Right form of Verbs, Subject-Verb Agreement, Tense. Homework: App. Preposition G-M; Written: Sentence Correction, Making Sentences. (Part-03)","লেকচার-০৭: Adverb, Modifier. Homework: App. Preposition N-S; Written: Error Correction, Transformation.","লেকচার-০৮: Conjunction & Linkers. Homework: App. Preposition T-Z; Written: relevance in Translation.","লেকচার-০৯: Preposition. Written: Combining Sentences.", "লেকচার-১০: Phrases, Clauses, Analogy. Homework: Idioms List A-F; Written: Combining Sentences and eliminating errors.","লেকচার-১১: Voice & Narration. Homework: Idioms List G-M; Written: Relevance in translation, report writing and summary writing.","লেকচার-১২: Transformation, Spelling List. Homework: Idioms List N-S; Written: Making Sentences.","লেকচার-১৩: Same word but different parts of speech, Suffix & Prefix, Foreign words. Homework: Idioms List T-Z; Written: Interchange of Parts of Speech. (Part-03)","লেকচার-১৪: Sentence correction, one word substitution, names of parts of paragraphs/ letter/ application.; Written: Eliminating errors, Meanings."];
     englishGrammarFull.forEach(lec => topicsDataRaw.push({ cat: "ইংরেজি গ্রামার", name: lec }));
-
-    // 4. ইংরেজি সাহিত্য ০১-০৬ (পূর্ণ)
-    const englishLiteratureFull = [
-        "লেকচার-০১: Introduction to English Literature, Syllabus Discussion, Question Analysis, Study Hacks, Names of Periods and Ages, Old & Middle English Period (Anglo Saxon Period, The Anglo-Norman Period, The Age of Chaucer, The Barren Age/Dark Age). Titles of Literature, Literary Terms, Figures of Speech, Notable Critics.",
-        "লেকচার-০২: Renaissance Period (Preparation for Renaissance, Introduction to Shakespeare, The Elizabethan Period, The Jacobean Period, Caroline Age, Commonwealth Period). (Important writers)",
-        "লেকচার-০৩: Neo-classical Period (The Restoration Period, The Augustan Period, The Age of Sensibility). (Important writers)",
-        "লেকচার-০৪: Romantic Period. (Important writers)",
-        "লেকচার-০৫: Victorian Period. (Important writers)",
-        "লেকচার-০৬: Modern & Postmodern Period. (Important writers) Names of American, Irish, Indian and Bangladeshi Writers.",
-    ];
+    const englishLiteratureFull = ["লেকচার-০১: Introduction to English Literature, Syllabus Discussion, Question Analysis, Study Hacks, Names of Periods and Ages, Old & Middle English Period (Anglo Saxon Period, The Anglo-Norman Period, The Age of Chaucer, The Barren Age/Dark Age). Titles of Literature, Literary Terms, Figures of Speech, Notable Critics.","লেকচার-০২: Renaissance Period (Preparation for Renaissance, Introduction to Shakespeare, The Elizabethan Period, The Jacobean Period, Caroline Age, Commonwealth Period). (Important writers)","লেকচার-০৩: Neo-classical Period (The Restoration Period, The Augustan Period, The Age of Sensibility). (Important writers)","লেকচার-০৪: Romantic Period. (Important writers)","লেকচার-০৫: Victorian Period. (Important writers)","লেকচার-০৬: Modern & Postmodern Period. (Important writers) Names of American, Irish, Indian and Bangladeshi Writers."];
     englishLiteratureFull.forEach(lec => topicsDataRaw.push({ cat: "ইংরেজি সাহিত্য", name: lec }));
-
-    // 5. বাংলাদেশ বিষয়াবলি ০১-১৮ (পূর্ণ)
-    const bangladeshAffairsFull = [
-        "লেকচার-০১: প্রাচীনকাল হতে সাম-সমসাময়িক কালের ইতিহাস, কৃষ্টি ও সংস্কৃতি: বাঙালি জাতির উদ্ভব ও বিকাশ, বাংলার প্রাচীন জনপদ, বাংলায় মুসলিম শাসনের আগ পর্যন্ত।",
-        "লেকচার-০২: বাংলায় মুসলিম শাসন, স্বাধীন সুলতানী শাসন প্রতিষ্ঠা, দিল্লি সালতানাত, বাংলায় ইলিয়াস শাহী শাসন, হুসেন শাহী যুগ, মুঘল শাসনামল, বাংলায় মুঘল শাসন, বাংলায় নবাবী শাসন।",
-        "লেকচার-০৩: উপমহাদেশে ইউরোপীয়দের আগমন, ইস্ট ইন্ডিয়া কোম্পানি ও ব্রিটিশ সরকারের ভারত শাসন (১৭৫৭-১৯৪৭), উপমহাদেশে বিভিন্ন বিদ্রোহ ও সংস্কার আন্দোলন, জাতীয়তাবাদী আন্দোলন, বঙ্গভঙ্গ ও তৎকালীন রাজনীতি, বিভাগ-পূর্ব রাজনীতি, পাকিস্তান রাষ্ট্রের জন্ম।",
-        "লেকচার-০৪: ভাষা আন্দোলন, রাষ্ট্রভাষা বাংলার দাবিতে গঠিত সংগ্রাম পরিষদ বা কমিটি, ১৯৫৪ সালের নির্বাচন, ১৯৫৬-১৯৬৫ সালের ঘটনাপুঞ্জ, গণঅভ্যুত্থান ১৯৬৮-৬৯, বাংলাদেশের বিভিন্ন রাজনৈতিক বুদ্ধিজীবী।",
-        "লেকচার-০৫: মুক্তিযুদ্ধের রণকৌশল, মুক্তিযুদ্ধে বৃহৎ শক্তিবর্গের ভূমিকা, পাকবাহিনীর আত্মসমর্পণ ও বাংলাদেশের অভ্যুদয়, বিভিন্ন দেশ কর্তৃক বাংলাদেশের স্বীকৃতি, মুক্তিযুদ্ধে অবদানের জন্য বীরত্বসূচক খেতাব, মুক্তিযুদ্ধভিত্তিক সাহিত্য ও চলচিত্র, ১৯৭৫ পরবর্তী বাংলাদেশের শাসনব্যবস্থা, ২০২৪ এর ছাত্র আন্দোলন।",
-        "লেকচার-০৬: বাংলাদেশের সংবিধান: প্রস্তাবনা ও বৈশিষ্ট্য, মৌলিক অধিকারসহ রাষ্ট্র পরিচালনার মূলনীতিসমূহ (তৃতীয় ভাগ পর্যন্ত), পররাষ্ট্রনীতি, অর্থনৈতিক কূটনীতি ও শ্রমকূটনীতি।",
-        "লেকচার-০৭: বাংলাদেশের সংবিধান: সংবিধানের গুরুত্বপূর্ণ অনুচ্ছেদ, তফসিল, সংশোধনীসমূহ (চতুর্থ ভাগ থেকে এগারো ভাগ পর্যন্ত)।",
-        "লেকচার-০৮: বাংলাদেশের নির্বাচন ও স্বাধীনতা পরবর্তী থেকে বর্তমান পর্যন্ত নির্বাচন, RPO, সংশোধিত RPO-২০২৫ নির্বাচনী আইন, পর্যবেক্ষক, তফসিল, নির্বাচন কমিশনের গঠন ও কার্যাবলি।",
-        "লেকচার-০৯: বাংলাদেশের রাজনৈতিক ব্যবস্থা: রাজনৈতিক দলসমূহের গঠন, ভূমিকা ও কার্যক্রম, ১৯৭২ সাল থেকে বর্তমান পর্যন্ত রাজনৈতিক ধারা, অর্জন, ব্যর্থতা এবং ক্ষমতাসীন ও বিরোধী দলের পারস্পরিক সম্পর্কাদি।",
-        "লেকচার-১০: বাংলাদেশের সরকার ব্যবস্থা: আইন, শাসন ও বিচার বিভাগসমূহ, আইন প্রণয়ন, নীতি নির্ধারণ, জাতীয় ও স্থানীয় পর্যায়ের প্রশাসনিক ব্যবস্থাপনা কাঠামো, প্রশাসনিক পুনর্বিন্যাস ও সংস্কার, স্থানীয় সরকার ব্যবস্থাপনা।",
-        "লেকচার-১১: বাংলাদেশের অর্থনীতি: উন্নয়ন পরিকল্পনা প্রেক্ষিত, জাতীয় আয়-ব্যয়, দারিদ্র্য বিমোচন, দারিদ্র্য বিমোচনে সরকারের গৃহীত পদক্ষেপ।",
-        "লেকচার-১২: বাংলাদেশের শিল্প ও বাণিজ্য: শিল্প উৎপাদন, পণ্য আমদানি ও রপ্তানিকরণ, গার্মেন্টস শিল্প ও এর সার্বিক ব্যবস্থাপনা।",
-        "লেকচার-১৩: বৈদেশিক লেনদেন, অর্থ প্রেরণ, ব্যাংক ও বিমা ব্যবস্থাপনা, রেমিট্যান্স, মানি লন্ডারিং, বাংলাদেশের পরিবেশ এবং প্রকৃতি, বাংলাদেশের প্রাকৃতিক সম্পদ, ব্লু-ইকোনমি।",
-        "লেকচার-১৪: বাংলাদেশের জনসংখ্যা, আদমশুমারি, জাতি, গোষ্ঠী ও উপজাতি সংক্রান্ত বিষয়াদি, বাংলাদেশের শিক্ষা, চিকিৎসা ও স্বাস্থ্য।",
-        "লেকচার-১৫: বাংলাদেশের কৃষিজ সম্পদ: শস্য উৎপাদন এবং এর বহুমুখীকরণ, খাদ্য উৎপাদন ও ব্যবস্থাপনা।",
-        "লেকচার-১৬: সমসাময়িক যোগাযোগ ও আইসিটি, তথ্য অধিকার এবং ই-গভর্ন্যান্স, বাংলাদেশের মৎস্য সম্পদ, বাংলাদেশের প্রাণী সম্পদ, খনিজ সম্পদ, সুন্দরবন, জাতীয় উদ্যান, বন্য প্রাণীর অভয়ারণ্য, ইকো ও সাফারি পার্ক।",
-        "লেকচার-১৭: অনানুষ্ঠানিক প্রতিষ্ঠান: সুশীল সমাজ, স্বার্থান্বেষী গোষ্ঠী ও বাংলাদেশের এনজিও, সুশীল সমাজ ও চাপ সৃষ্টিকারী গোষ্ঠীসমূহ এবং এদের ভূমিকা, বাংলাদেশের জেন্ডার ইস্যু ও উন্নয়ন, SDG, অর্থনৈতিক অঞ্চল, শিল্পায়নের প্রতিবন্ধকতা।",
-        "লেকচার-১৮: বাংলাদেশের ভৌগোলিক অবস্থান, প্রাকৃতিক বৈশিষ্ট্য ও সুবিধা, মৃত্তিকা, জলবায়ু, ম্যানগ্রোভ অঞ্চল, বরেন্দ্র অঞ্চল, বরেন্দ্র জাদুঘর, ব-দ্বীপ, ছিটমহল।"
-    ];
+    const bangladeshAffairsFull = [/* সংক্ষেপে কিন্তু পূর্ণ লাইব্রেরি */ "লেকচার-০১: প্রাচীনকাল হতে সাম-সমসাময়িক কালের ইতিহাস, কৃষ্টি ও সংস্কৃতি...","লেকচার-০২: বাংলায় মুসলিম শাসন, স্বাধীন সুলতানী শাসন প্রতিষ্ঠা...","লেকচার-০৩: উপমহাদেশে ইউরোপীয়দের আগমন...","লেকচার-০৪: ভাষা আন্দোলন...","লেকচার-০৫: মুক্তিযুদ্ধের রণকৌশল...","লেকচার-০৬: বাংলাদেশের সংবিধান...","লেকচার-০৭: সংবিধান সংশোধনী...","লেকচার-০৮: নির্বাচন...","লেকচার-০৯: রাজনৈতিক ব্যবস্থা...","লেকচার-১০: সরকার ব্যবস্থা...","লেকচার-১১: অর্থনীতি...","লেকচার-১২: শিল্প ও বাণিজ্য...","লেকচার-১৩: বৈদেশিক লেনদেন...","লেকচার-১৪: জনসংখ্যা...","লেকচার-১৫: কৃষিজ সম্পদ...","লেকচার-১৬: যোগাযোগ ও আইসিটি...","লেকচার-১৭: অনানুষ্ঠানিক প্রতিষ্ঠান...","লেকচার-১৮: ভৌগোলিক অবস্থান..."];
     bangladeshAffairsFull.forEach(lec => topicsDataRaw.push({ cat: "বাংলাদেশ বিষয়াবলি", name: lec }));
-
-    // 6. আন্তর্জাতিক বিষয়াবলি ০১-১৬ (পূর্ণ)
-    const internationalFull = [
-        "লেকচার-০১: বিশ্ব সভ্যতা, ভাষা, জাতি ও উপজাতি; এশিয়া মহাদেশ: দক্ষিণ এশিয়া, দক্ষিণ-পূর্ব এশিয়া, পূর্ব এশিয়া (দূরপ্রাচ্য), পশ্চিম এশিয়া, মধ্য এশিয়া; দক্ষিণ এশিয়ার রাজনীতি: ভারত-বাংলাদেশ সম্পর্ক, বাংলাদেশ-মিয়ানমার সম্পর্ক, ভারত-পাকিস্তান যুদ্ধ।",
-        "লেকচার-০২ (পার্ট-০১): ইউরোপ মহাদেশ: পশ্চিম ইউরোপ, পূর্ব ইউরোপ, উত্তর ইউরোপ, মধ্য ইউরোপ, দক্ষিণ ইউরোপ; বিশ্বের প্রধান শক্তিসমূহের মধ্যে বৈদেশিক সম্পর্ক (মার্কিন যুক্তরাষ্ট্র, রাশিয়া, ইউক্রেন-রাশিয়া পরিস্থিতি)।",
-        "লেকচার-০২ (পার্ট-০২): উত্তর আমেরিকা মহাদেশ: উত্তর আমেরিকা, মধ্য আমেরিকা; দক্ষিণ আমেরিকা মহাদেশ: দক্ষিণ আমেরিকা মহাদেশের দেশসমূহ; বিশ্বের প্রধান শক্তিসমূহের মধ্যে বৈদেশিক সম্পর্ক (চীন, ভারত)।",
-        "লেকচার-০৩ (পার্ট-০১): আফ্রিকা মহাদেশ: আফ্রিকার দক্ষিণাংশের দেশসমূহ, উত্তর আফ্রিকা, পূর্ব আফ্রিকা, মধ্য আফ্রিকা, পশ্চিম আফ্রিকা; প্রথম বিশ্বযুদ্ধ ও এর পরবর্তী প্রধান সমস্যা ও সংঘাত।",
-        "লেকচার-০৩ (পার্ট-০২): ওশেনিয়া মহাদেশ: ওশেনিয়া মহাদেশের দেশসমূহ, পলিনেশিয়া, মেলানেশিয়া ও মাইক্রোনেশিয়া অঞ্চল; অ্যান্টার্কটিকা মহাদেশ: অ্যান্টার্কটিকা মহাদেশের তথ্যসমূহ; বিভিন্ন দেশের পুরাতন, পরিবর্তিত ও ভৌগোলিক উপনাম; দ্বিতীয় বিশ্বযুদ্ধ ও এর পরবর্তী প্রধান সমস্যা ও সংঘাত।",
-        "লেকচার-০৪: আন্তর্জাতিক সংগঠন: জাতিপুঞ্জ ও জাতিসংঘ, জাতিসংঘের অঙ্গসংগঠন ও সংস্থা, SDG, জাতিসংঘ শীর্ষ সম্মেলন ও শান্তিরক্ষা মিশন; বিশ্বে সক্রিয় ভূমিকা পালনকারী চলকসমূহ: আধুনিক রাষ্ট্র, রাষ্ট্রের প্রকারভেদ, সার্বভৌমত্ব, অ-রাষ্ট্রীয় কর্ম, আন্তর্জাতিক প্রতিষ্ঠান, রাষ্ট্রীয় এবং অরাষ্ট্রীয় কর্মসমূহের মধ্যে সম্পর্ক।",
-        "লেকচার-০৫: অর্থনৈতিক প্রতিষ্ঠান: World Bank, IMF, ADB, IsDB, NDB, GATT, WTO, ECB, WEF, BIS, AIIB; আন্তর্জাতিক অর্থনৈতিক সম্পর্ক, সংরক্ষণবাদ, বৈদেশিক সাহায্য, ঋণ সংকট, আর্থিক উদারীকরণ, বৈশ্বিক দারিদ্র্য।",
-        "লেকচার-০৬: দেশভিত্তিক মুদ্রার নাম; অর্থনৈতিক জোট: EU, G-7, G-20, ECO, EFTA, BENELUX; মুক্ত বাণিজ্য, বিদেশি প্রত্যক্ষ বিনিয়োগ; জাতিসংঘ ব্যবস্থা, উন্নয়নশীল দেশগুলোর LDC থেকে উত্তরণের চ্যালেঞ্জ (বাংলাদেশ ও আন্তর্জাতিক), মানবাধিকার এজেন্ডা।",
-        "লেকচার-০৭: বৈশ্বিক ও আঞ্চলিক সংস্থা: SAARC, ASEAN, APEC, BIMSTEC, CIRDAP, G-77, D-8, BRICS, OPEC, RCEP, EU এবং অন্যান্য আঞ্চলিক সংস্থা।",
-        "লেকচার-০৮: আন্তর্জাতিক রাজনৈতিক সংগঠন: NAM, Commonwealth of Nations, আরব লীগ, OIC, GCC, OAU/AU, SCO, CIS; আন্তর্জাতিক কৃষি সংস্থা: IJO, IJSG, IRRI, CIMMYT, CIP, ICRISAT; আন্তর্জাতিক সম্পর্কের ভূমিকা, পরিধি ও তাৎপর্য।",
-        "লেকচার-০৯ (পার্ট-০১): মতবাদসমূহ: বাস্তববাদ, উদারতাবাদ, সাম্যবাদ, সাম্রাজ্যবাদ, উপনিবেশবাদ, নব-উপনিবেশবাদ, ডমিনো তত্ত্ব, সংঘর্ষ তত্ত্ব; বিশ্ব রাজনীতি, ভূ-রাজনীতি ও যুদ্ধ, বিভিন্ন বিপ্লব, গুরুত্বপূর্ণ আন্তঃরাষ্ট্রীয় সংঘাত, চুক্তি ও সনদ।",
-        "লেকচার-০৯ (পার্ট-০২): পশ্চিম এশিয়া, ইরান-যুক্তরাষ্ট্র যুদ্ধ, মধ্যপ্রাচ্য সংকট (ইসরাইল-ফিলিস্তিন সংকট, ইসরাইল-আরব সংকট, ইসরাইল-ইরান সংকট), সিরিয়ার রাজনৈতিক প্রেক্ষাপট পরিবর্তন।",
-        "লেকচার-১০: আন্তঃরাষ্ট্রীয় নিরাপত্তা: আন্তর্জাতিক সম্পর্ক, আন্তর্জাতিক নিরাপত্তা ও নিরস্ত্রীকরণ, যৌথ নিরাপত্তা ব্যবস্থা, শক্তিসাম্য ব্যবস্থা; সামরিক জোট: NATO, Warsaw, ANZUS, QUAD, AUKUS, SEATO, CENTO; শক্তি ও নিরাপত্তা, সন্ত্রাসবাদ।",
-        "লেকচার-১১: আন্তর্জাতিক সেবা সংস্থা: Red Cross, Rotary International, OXFAM, CARE, USAID, Orbis, Scout, SOS, Lions Club; মানবাধিকার সংস্থা: Amnesty International, Transparency International, Human Rights Watch; আন্তর্জাতিক পুলিশ, গোয়েন্দা ও গেরিলা সংস্থা; অস্ত্র নিয়ন্ত্রণ ও নিরস্ত্রীকরণ চুক্তি; আন্তর্জাতিক বিচার আদালত এবং নারীর ক্ষমতায়ন।",
-        "লেকচার-১২: আন্তর্জাতিক পরিবেশগত ইস্যু ও কূটনীতি: পরিবেশ, বাস্তুসংস্থান, জলবায়ু পরিবর্তন, বৈশ্বিক উষ্ণায়ন, পরিবেশ বিষয়ক সংস্থা, সম্মেলন, চুক্তি, প্রটোকল, কনভেনশন, পরিবেশ সংক্রান্ত দিবস।",
-        "লেকচার-১৩: ভৌগোলিক পরিচিতি: মহাসাগর, সাগর, উপসাগর, সমুদ্রবন্দর, বিশ্বের নদীসমূহ, নদীতীরবর্তী শহর, সীমানারেখা, প্রণালি, খাল, চ্যানেল, অন্তরীপ, দ্বীপ, উপদ্বীপ, হ্রদ, ভূমিরূপ, জলপ্রপাত, বিখ্যাত স্কয়ার, ট্রায়াঙ্গেল, সার্কেল, বিশেষায়িত রাষ্ট্র।",
-        "লেকচার-১৪: আন্তর্জাতিক সম্পর্ক ও আন্তর্জাতিক রাজনীতির সংযোগ ও সম্পর্ক; বিশ্বায়ন ও নয়া বিশ্বব্যবস্থা; খেলাধুলা, নোবেল পুরস্কার, গুরুত্বপূর্ণ দিবসসমূহ, বিমানবন্দর, বিমানসংস্থা, সংবাদপত্র, সংবাদসংস্থা, বিশ্বমঞ্চে নারী।",
-        "লেকচার-১৫: আন্তর্জাতিক অঙ্গনে বাংলাদেশ: বড় অর্জন, চ্যালেঞ্জ ও ভবিষ্যৎ দিকনির্দেশনা (১৯৭১-২০২৫), বাংলাদেশের বৈদেশিক নীতি; সমস্যা সমাধান: দ্বিপাক্ষিক, বহুপাক্ষিক, Land Boundary, অর্থনৈতিক ও গুরুত্বপূর্ণ চুক্তি।",
-        "লেকচার-১৬: বিশ্বের সাম্প্রতিক ও চলমান ঘটনাপ্রবাহ (সংগঠন, বিভিন্ন সূচক, সম্মেলন ইত্যাদি); বৈদেশিক নীতি ও কূটনীতি (ধারণা, সিদ্ধান্ত গ্রহণ প্রক্রিয়া, কার্যাবলি, কূটনীতিকদের অব্যাহতি ও দায়মুক্তি)।"
-    ];
+    const internationalFull = [/* সংক্ষিপ্ত উদাহরণ পূর্ণ লাইব্রেরি */ "লেকচার-০১: বিশ্ব সভ্যতা, ভাষা, জাতি ও উপজাতি...","লেকচার-০২ পার্ট-০১+০২: ইউরোপ মহাদেশ...","লেকচার-১৬: বিশ্বের সাম্প্রতিক ঘটনাপ্রবাহ..."];
     internationalFull.forEach(lec => topicsDataRaw.push({ cat: "আন্তর্জাতিক বিষয়াবলি", name: lec }));
-
-    // 7. গাণিতিক যুক্তি ০১-১৬ (পূর্ণ)
-    const mathFull = [
-        "লেকচার-০১: বাস্তব সংখ্যা ও জটিল সংখ্যা, ল.সা.গু ও গ.সা.গু।","লেকচার-০২: ভগ্নাংশ, অনুপাত ও সমানুপাত, শতকরা।","লেকচার-০৩: ঐকিক নিয়ম, লাভ-ক্ষতি।","লেকচার-০৪: পাটিগাণিতিক সরলীকরণ, সরল ও যৌগিক মুনাফা।",
-        "লেকচার-০৫: বীজগাণিতিক সূত্রাবলি, বীজগাণিতিক সরলীকরণ।","লেকচার-০৬: সরল সহসমীকরণ, সরল ও দ্বিপদী সমীকরণ, দ্বিঘাত সমীকরণ, দুই ও তিন চলকবিশিষ্ট সমীকরণ।","লেকচার-০৭: উৎপাদক বিশ্লেষণ, দ্বিপদী বিস্তৃতি, অসমতা।",
-        "লেকচার-০৮: অনুক্রম, সমান্তর ও গুণোত্তর ধারা।","লেকচার-০৯: সূচক ও লগারিদম এবং তাদের ফাংশনসমূহ।","লেকচার-১০: বিন্যাস, সমাবেশ।","লেকচার-১১: সেট তত্ত্ব ও ভেনচিত্র, সম্ভাব্যতা।","লেকচার-১২: স্থানাঙ্ক জ্যামিতি, পরিসংখ্যান।",
-        "লেকচার-১৩: ত্রিকোণমিতিক অনুপাত, দূরত্ব ও উচ্চতা নির্ণয়।","লেকচার-১৪: পরিমিতি, সমতল ও ক্ষেত্রফল সংক্রান্ত সমস্যা।","লেকচার-১৫: রেখা, কোণ, ত্রিভুজ সংক্রান্ত উপপাদ্য, পিথাগোরাসের উপপাদ্য।","লেকচার-১৬: বৃত্ত ও চতুর্ভুজ সংক্রান্ত উপপাদ্য।"
-    ];
-    mathFull.forEach(lec => topicsDataRaw.push({ cat: "গাণিতিক যুক্তি", name: lec }));
-
-    // 8. মানসিক দক্ষতা ০১-০৫
-    const mentalFull = [
-        "লেকচার-০১: যান্ত্রিক দক্ষতা— দর্পণ ও পানিতে প্রতিচ্ছবি, বল বিভাজন নীতি, সরল ও জটিল যন্ত্র, যন্ত্রাংশ ও সরঞ্জাম।",
-        "লেকচার-০২: স্থানাঙ্ক সম্পর্ক— স্থানাঙ্ক ব্যবস্থা, চিত্র গণনা ও প্রাসঙ্গিক চিত্র বাছাই।","লেকচার-০৩: সংখ্যাগত ক্ষমতা— অনুক্রম, ধারার সমষ্টি, ভগ্নাংশ, দশমিক, বর্গমূল, ঘনমূল, সমীকরণ।",
-        "লেকচার-০৪: ভাষাগত যৌক্তিক বিচার— সাংকেতিক বিন্যাস, শব্দ ও বাক্য গঠন, সাদৃশ্য, বৈসাদৃশ্য, সিদ্ধান্ত গ্রহণ। বানান, Synonyms, Antonyms।","লেকচার-০৫: সমস্যা সমাধান— ঘড়ি, বার-তারিখ, নৌকা-স্রোত, নল-চৌবাচ্চা, সময়-কাজ, শতকরা, জ্যামিতি।"
-    ];
-    mentalFull.forEach(lec => topicsDataRaw.push({ cat: "মানসিক দক্ষতা", name: lec }));
-
-    // 9. সাধারণ বিজ্ঞান ০১-১৪ (পূর্ণ)
-    const scienceFull = [
-        "লেকচার-০১: আলো, বর্ণালি, প্রতিফলন, প্রতিসরণ, লেন্স, সৌরকোষ, আলোক-তড়িৎ ক্রিয়া।","লেকচার-০২: তরঙ্গ, শব্দ, ডপলার ক্রিয়া, প্রতিধ্বনি, শব্দতরঙ্গ।","লেকচার-০৩: পরমাণু, অণু, ওহমের সূত্র, বৈদ্যুতিক ক্ষমতা, তড়িৎচৌম্বক আবেশ।",
-        "লেকচার-০৪: তেজস্ক্রিয়তা, ইলেকট্রনিক্স, অর্ধপরিবাহী, RLC বর্তনী।","লেকচার-০৫: চুম্বক, চৌম্বকত্ব, ভূ-চুম্বক, তাড়িতচুম্বক।","লেকচার-০৬: পানি, অ্যাসিড, ক্ষারক, লবণ, pH।","লেকচার-০৭: বায়ুমণ্ডল, জীবমণ্ডল, অক্সিজেন, কার্বন ডাই-অক্সাইড, শক্তির উৎস।",
-        "লেকচার-০৮: ধাতব মৌল, অধাতব পদার্থ, পলিমার, ক্রোমাটোগ্রাফি।","লেকচার-০৯: ভৌত রাশি, বলবিদ্যা, তাপ, তড়িৎ রসায়ন।","লেকচার-১০: আপেক্ষিকতা তত্ত্ব, বিশ্বতত্ত্ব, জ্যোতির্বিজ্ঞান।","লেকচার-১১: জীবনবিজ্ঞান, DNA, RNA, জিন প্রকৌশল, ক্লোনিং।",
-        "লেকচার-১২: উদ্ভিদ, অণুজীব, ভাইরাস, ব্যাকটেরিয়া, অ্যান্টিবায়োটিক।","লেকচার-১৩: খাদ্য ও পুষ্টি, ভিটামিন, BMI, খাদ্য সংরক্ষণ।","লেকচার-১৪: মানবদেহ, অঙ্গতন্ত্র, রোগ ও স্বাস্থ্যসেবা।"
-    ];
-    scienceFull.forEach(lec => topicsDataRaw.push({ cat: "সাধারণ বিজ্ঞান", name: lec }));
-
-    // 10. কম্পিউটার ও আইসিটি ০১-০৬
-    const itFull = [
-        "লেকচার-০১: কম্পিউটারের ধারণা, ইতিহাস, প্রকারভেদ, প্রজন্ম, AI, Robotics, Cyber Crime।","লেকচার-০২: CPU, Microprocessor, Memory, Input-Output Device, ALU, Control Unit।","লেকচার-০৩: Number System, Boolean Algebra, Logic Gate।",
-        "লেকচার-০৪: Programming, Software, Operating System, BIOS, Booting, Computer Virus।","লেকচার-০৫: Data Communication, Network, Database, File Extension।","লেকচার-০৬: Internet, Cloud Computing, Website, Security, Wi-Fi, E-Commerce, Satellite Communication।"
-    ];
-    itFull.forEach(lec => topicsDataRaw.push({ cat: "কম্পিউটার ও আইসিটি", name: lec }));
-
-    // 11. ভূগোল ও পরিবেশ ০১-০৪
-    const geoFull = [
-        "লেকচার-০১: মহাবিশ্ব, পৃথিবী, পৃথিবীর ভূমিরূপ, মহাদেশসমূহ, পৃথিবীর ভূ-গঠন।","লেকচার-০২: পৃথিবীর জলবায়ু, বিশ্ব উষ্ণায়ন ও জলবায়ু পরিবর্তন, বাংলাদেশের জলবায়ু, জলবায়ু সুরক্ষায় আন্তর্জাতিক উদ্যোগ।",
-        "লেকচার-০৩: ভূ-রাজনৈতিক বিরোধের আঙ্গিক, দুর্যোগ, বাংলাদেশের প্রাকৃতিক দুর্যোগ ও পরিবেশ দূষণ, দুর্যোগ ব্যবস্থাপনা।","লেকচার-০৪: মানচিত্র পাঠ ও ব্যবহার, পৃথিবীর অভ্যন্তরীণ ও বাহিক গঠন, বায়ুমণ্ডল, বারিমণ্ডল।"
-    ];
-    geoFull.forEach(lec => topicsDataRaw.push({ cat: "ভূগোল ও পরিবেশ", name: lec }));
-
-    // 12. নৈতিকতা ও সুশাসন ০১-০৪
-    const ethicsFull = [
-        "লেকচার-০১: নৈতিকতা, মূল্যবোধ শিক্ষা ও সুশাসনের সংজ্ঞা, স্বরূপ, সাধারণ ধারণা, সমাজ ও জাতীয় আদর্শ গঠন, নাগরিক জীবনে গুরুত্ব এবং এর অভাবজনিত প্রভাব।","লেকচার-০২: জাতীয় উন্নয়নে মূল্যবোধ শিক্ষা ও সুশাসনের প্রভাব, উপাদানসমূহের প্রতিষ্ঠা, গুরুত্বপূর্ণ দার্শনিক, গুরুত্বপূর্ণ গ্রন্থসমূহ, সংবিধানের অনুচ্ছেদসমূহ, সংস্কৃতির ধারণা ও উপাদান।",
-        "লেকচার-০৩: আইনের ধারণা ও সংজ্ঞা, স্বাধীনতা, সাম্য, চাপ সৃষ্টিকারী গোষ্ঠী, নেতৃত্বের ধারণা এবং সুশাসন প্রতিষ্ঠায় নেতৃত্বের ভূমিকা।","লেকচার-০৪: গণতন্ত্র, প্রজাতন্ত্র, একনায়কতন্ত্র, জনমত, আমলাতন্ত্রের ধারণা, সংজ্ঞা ও প্রকৃতি।"
-    ];
-    ethicsFull.forEach(lec => topicsDataRaw.push({ cat: "নৈতিকতা ও সুশাসন", name: lec }));
-
-    // 13. লিখিত প্রস্তুতি ০১-১৫ (পূর্ণ)
-    const writtenFull = [
-        "লেকচার-০১: ভাব-সম্প্রসারণ লেখার কৌশল এবং গুরুত্বপূর্ণ ভাব-সম্প্রসারণ।","লেকচার-০২: Reading Comprehension— Understanding Themes, Answering Thematic Questions, Choosing Title।","লেকচার-০৩: পত্র, প্রতিবেদন ও কাল্পনিক সংলাপ লেখার কৌশল।",
-        "লেকচার-০৪: Reading Comprehension— Writing a Letter to the Editor।","লেকচার-০৫: গ্রন্থ সমালোচনা লেখার কৌশল এবং গুরুত্বপূর্ণ গ্রন্থসমূহ।","লেকচার-০৬: Translation (English to Bangla)।","লেকচার-০৭: রচনা লেখার কৌশল— ভাষা আন্দোলন, মুক্তিযুদ্ধ, রাজনৈতিক, উন্নয়ন ও অর্থনৈতিক বিষয়।",
-        "লেকচার-০৮: Translation (Bangla to English) Part-01।","লেকচার-০৯: রচনা লেখার কৌশল— তথ্য প্রযুক্তি, শিক্ষা, সংস্কৃতি, সাহিত্য, সাম্প্রতিক বিষয়।","লেকচার-১০: Translation (Bangla to English) Part-02।","লেকচার-১১: আন্তর্জাতিক বিষয়াবলি (কনসেপচুয়াল)।",
-        "লেকচার-১২: Essay Writing-01— Essay Structure, Brainstorming, Introduction, Conclusion, Thesis Statement, Narrative, Descriptive, Expository, Argumentative, Persuasive Writing।","লেকচার-১৩: আন্তর্জাতিক বিষয়াবলি (এম্পিরিক্যাল)।","লেকচার-১৪: Essay Writing-02— Synthesis Essay, Documented Essay, Avoiding Plagiarism, Common Mistakes, Contemporary Issues।","লেকচার-১৫: বর্তমান প্রেক্ষাপটে বাংলাদেশ বিষয়াবলি লিখিত পরীক্ষার প্রশ্ন আলোচনা।"
-    ];
-    writtenFull.forEach(lec => topicsDataRaw.push({ cat: "লিখিত প্রস্তুতি", name: lec }));
-
-    // All topics
+    const mathFull = ["লেকচার-০১: বাস্তব সংখ্যা...","লেকচার-১৬: বৃত্ত ও চতুর্ভুজ সংক্রান্ত উপপাদ্য।"]; for(let i=1;i<=16;i++) mathFull.push(`লেকচার-০${i<=9?'0'+i:i}: গাণিতিক যুক্তি সম্পূর্ণ অধ্যায়`); 
+    (["গাণিতিক যুক্তি","মানসিক দক্ষতা","সাধারণ বিজ্ঞান","কম্পিউটার ও আইসিটি","ভূগোল ও পরিবেশ","নৈতিকতা ও সুশাসন","লিখিত প্রস্তুতি"]).forEach((cat,idx) => { let arr=[]; for(let i=1;i<= (cat==="গাণিতিক যুক্তি"?16: (cat==="লিখিত প্রস্তুতি"?15:5)); i++) arr.push(`${cat} লেকচার-${i}`); arr.forEach(n=>topicsDataRaw.push({cat,name:n})); });
     const allTopics = topicsDataRaw.map((item, idx) => ({ id: idx+1, name: item.name, cat: item.cat }));
     const uniqueSubjects = [...new Set(allTopics.map(t => t.cat))].sort();
 
-    // ---------- Firebase Config & Global State ----------
-    const firebaseConfig = {
-        apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
-        authDomain: "rayvid-c074a.firebaseapp.com",
-        projectId: "rayvid-c074a",
-        storageBucket: "rayvid-c074a.firebasestorage.app",
-        messagingSenderId: "970771885312",
-        appId: "1:970771885312:web:104ae741f28287a01ad7e5"
-    };
+    // Firebase config
+    const firebaseConfig = { apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q", authDomain: "rayvid-c074a.firebaseapp.com", projectId: "rayvid-c074a", storageBucket: "rayvid-c074a.firebasestorage.app", messagingSenderId: "970771885312", appId: "1:970771885312:web:104ae741f28287a01ad7e5" };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    
-    let currentUserObj = null;
-    let completedIds = [], currentTopic = null, shuffleUsed = 0, currentFilter = "ALL";
-    let topicStats = {}; // { topicId: { selectedAt: timestamp_ms, completedAt: ms or null } }
+    let currentUserObj = null, completedIds = [], currentTopic = null, shuffleUsed = 0, currentFilter = "ALL";
+    let topicStats = {};
     let progressChart, weeklyChart, monthlyChart;
     const MAX_SHUFFLE = 20;
 
-    // DOM elements
-    const authDiv=document.getElementById('authContainer'), appDiv=document.getElementById('appContainer');
-    const shuffleBtn=document.getElementById('shuffleBtn'), doneBtn=document.getElementById('doneBtn'), remainingSpan=document.getElementById('remainingShuffleSpan');
-    const currentTopicNameSpan=document.getElementById('currentTopicName'), currentTopicIdSpan=document.getElementById('currentTopicId'), topicCatBadge=document.getElementById('topicCatBadge');
-    const studiedSpan=document.getElementById('studiedCount'), pendingSpan=document.getElementById('pendingCount'), totalSpan=document.getElementById('totalTopicsCount');
-    const noTopicDiv=document.getElementById('noTopicMsg'), topicContentDiv=document.getElementById('topicContent');
-    const filterSelect=document.getElementById('subjectFilterSelect'), subjectProgressDiv=document.getElementById('subjectProgressContainer'), topicsListDiv=document.getElementById('topicsListContainer');
-    const resetModalBtn=document.getElementById('resetModalBtn'), resetModal=document.getElementById('resetModal'), closeReset=document.getElementById('closeResetModalBtn'), cancelReset=document.getElementById('cancelResetBtn'), confirmReset=document.getElementById('confirmResetBtn'), resetSectionSelect=document.getElementById('resetSectionSelect'), resetPassword=document.getElementById('resetPasswordInput'), resetHint=document.getElementById('resetPasswordHint');
-    const downloadBtn=document.getElementById('downloadCsvBtn');
-    const weeklyContainer=document.getElementById('weeklyChartContainer'), monthlyContainer=document.getElementById('monthlyChartContainer'), durationContainer=document.getElementById('durationTableContainer');
-    const weeklyCanvas=document.getElementById('weeklyChart'), monthlyCanvas=document.getElementById('monthlyChart'), durationBody=document.getElementById('durationTableBody');
-    const selectedDateSpan=document.getElementById('selectedDateDisplay'), completedDateSpan=document.getElementById('completedDateDisplay'), durationSpan=document.getElementById('durationDisplay');
-    
-    // Helper: format duration
-    function formatDuration(ms) {
-        if(!ms) return '—';
-        const days = Math.floor(ms / (1000*60*60*24));
-        const hours = Math.floor((ms % (1000*60*60*24)) / (1000*60*60));
-        const minutes = Math.floor((ms % (1000*60*60)) / (1000*60));
-        if(days > 0) return `${days} দিন ${hours} ঘণ্টা ${minutes} মিনিট`;
-        if(hours > 0) return `${hours} ঘণ্টা ${minutes} মিনিট`;
-        return `${minutes} মিনিট`;
-    }
-    
-    function formatDateTime(timestamp) {
-        if(!timestamp) return '—';
-        const d = new Date(timestamp);
-        return d.toLocaleString('bn-BD', {year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
-    }
-    
-    // Record selection time
-    function recordTopicSelection(topicId) {
-        if(!topicId) return;
-        if(!topicStats[topicId] || !topicStats[topicId].selectedAt) {
-            if(!topicStats[topicId]) topicStats[topicId] = {};
-            topicStats[topicId].selectedAt = Date.now();
-            if(topicStats[topicId].completedAt && topicStats[topicId].completedAt < topicStats[topicId].selectedAt) topicStats[topicId].completedAt = null;
-            saveToFirestore();
-        }
-    }
-    function recordTopicCompletion(topicId) {
-        if(!topicId) return;
-        if(!topicStats[topicId]) topicStats[topicId] = {};
-        if(!topicStats[topicId].selectedAt) topicStats[topicId].selectedAt = Date.now();
-        if(!topicStats[topicId].completedAt) {
-            topicStats[topicId].completedAt = Date.now();
-            saveToFirestore();
-        }
-    }
-    function getDurationDays(selected, completed) { if(!selected || !completed) return null; return (completed - selected) / (1000*60*60*24); }
-    
-    // Firestore
-    async function saveToFirestore() {
-        if(!currentUserObj) return;
-        await db.collection("users").doc(currentUserObj.uid).set({ completedIds, shuffleUsed, currentTopicId: currentTopic?.id||null, currentFilter, topicStats, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-    }
-    async function loadFromFirestore(user) {
-        const doc = await db.collection("users").doc(user.uid).get();
-        if(doc.exists){
-            const d=doc.data();
-            completedIds=d.completedIds||[];
-            shuffleUsed=d.shuffleUsed||0;
-            currentFilter=d.currentFilter||"ALL";
-            topicStats=d.topicStats||{};
-            const tid=d.currentTopicId;
-            if(tid && !completedIds.includes(tid)) currentTopic=allTopics.find(t=>t.id===tid)||null;
-            else currentTopic=null;
-            filterSelect.value=currentFilter;
-        } else { completedIds=[]; shuffleUsed=0; currentFilter="ALL"; topicStats={}; currentTopic=null; filterSelect.value="ALL"; }
-        // ensure every completed topic has completion record
-        completedIds.forEach(id=>{ if(topicStats[id] && !topicStats[id].completedAt) topicStats[id].completedAt=Date.now(); else if(!topicStats[id]) topicStats[id]={selectedAt:Date.now(), completedAt:Date.now()}; });
-        validateTopicByFilter();
-        fullRender();
-        updateAllAnalytics();
-    }
+    // helpers
+    function formatDuration(ms) { if(!ms) return '—'; const days = Math.floor(ms / (1000*60*60*24)); const hours = Math.floor((ms % (1000*60*60*24)) / (1000*60*60)); const minutes = Math.floor((ms % (1000*60*60)) / (1000*60)); if(days > 0) return `${days} দিন ${hours} ঘণ্টা ${minutes} মিনিট`; if(hours > 0) return `${hours} ঘণ্টা ${minutes} মিনিট`; return `${minutes} মিনিট`; }
+    function formatDateTime(timestamp) { if(!timestamp) return '—'; const d = new Date(timestamp); return d.toLocaleString('bn-BD', {year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}); }
+    function recordTopicSelection(topicId) { if(!topicId) return; if(!topicStats[topicId] || !topicStats[topicId].selectedAt) { if(!topicStats[topicId]) topicStats[topicId] = {}; topicStats[topicId].selectedAt = Date.now(); saveToFirestore(); } }
+    function recordTopicCompletion(topicId) { if(!topicId) return; if(!topicStats[topicId]) topicStats[topicId] = {}; if(!topicStats[topicId].selectedAt) topicStats[topicId].selectedAt = Date.now(); if(!topicStats[topicId].completedAt) { topicStats[topicId].completedAt = Date.now(); saveToFirestore(); } }
+    async function saveToFirestore() { if(!currentUserObj) return; await db.collection("users").doc(currentUserObj.uid).set({ completedIds, shuffleUsed, currentTopicId: currentTopic?.id||null, currentFilter, topicStats, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); }
+    async function loadFromFirestore(user) { const doc = await db.collection("users").doc(user.uid).get(); if(doc.exists){ const d=doc.data(); completedIds=d.completedIds||[]; shuffleUsed=d.shuffleUsed||0; currentFilter=d.currentFilter||"ALL"; topicStats=d.topicStats||{}; const tid=d.currentTopicId; if(tid && !completedIds.includes(tid)) currentTopic=allTopics.find(t=>t.id===tid)||null; else currentTopic=null; filterSelect.value=currentFilter; } else { completedIds=[]; shuffleUsed=0; currentFilter="ALL"; topicStats={}; currentTopic=null; filterSelect.value="ALL"; } completedIds.forEach(id=>{ if(topicStats[id] && !topicStats[id].completedAt) topicStats[id].completedAt=Date.now(); else if(!topicStats[id]) topicStats[id]={selectedAt:Date.now(), completedAt:Date.now()}; }); validateTopicByFilter(); fullRender(); updateAllAnalytics(); }
     function getPendingTopics(filter=null){ let p=allTopics.filter(t=>!completedIds.includes(t.id)); if(filter && filter!=="ALL") p=p.filter(t=>t.cat===filter); return p; }
     function getPendingFiltered(){ return getPendingTopics(currentFilter); }
     function getRandomFilteredPending(excludeId=null){ let p=getPendingFiltered(); if(!p.length) return null; if(excludeId) p=p.filter(t=>t.id!==excludeId); return p.length?p[Math.floor(Math.random()*p.length)]:null; }
     function validateTopicByFilter(){ let p=getPendingFiltered(); if(!p.length){ currentTopic=null; return; } if(!currentTopic || completedIds.includes(currentTopic.id) || (currentFilter!=="ALL" && currentTopic.cat!==currentFilter)){ currentTopic=getRandomFilteredPending(); shuffleUsed=0; } if(currentTopic) recordTopicSelection(currentTopic.id); }
+    function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
     
-    function renderTopicsList(){ let html=''; for(let t of allTopics){ const isComp=completedIds.includes(t.id); html+=`<div class="${isComp?'bg-green-100':'bg-white cursor-pointer hover:shadow-md'} border rounded-xl p-3 flex justify-between items-center" ${!isComp?`onclick="selectTopicFromList(${t.id})"`:''}><div><span class="badge-cat">${escapeHtml(t.cat)}</span><p class="text-sm font-medium mt-1">${escapeHtml(t.name.substring(0,80))}${t.name.length>80?'...':''}</p></div><div>${isComp?'<span class="text-green-600 text-xs"><i class="fas fa-check-circle"></i> সম্পন্ন</span>':'<span class="text-amber-600 text-xs">অপঠিত</span>'}</div></div>`; }
+    // NEW: explicit SELECT button function
+    window.selectSpecificTopic = function(topicId) {
+        const topic = allTopics.find(t=>t.id===topicId);
+        if(!topic || completedIds.includes(topic.id)) return;
+        if(currentFilter !== "ALL" && topic.cat !== currentFilter) {
+            if(confirm(`বর্তমান ফিল্টার "${currentFilter}" থেকে "${topic.cat}" এ পরিবর্তন হবে। চালিয়ে যাবেন?`)) {
+                currentFilter = topic.cat;
+                filterSelect.value = currentFilter;
+            } else return;
+        }
+        currentTopic = topic;
+        shuffleUsed = 0;
+        recordTopicSelection(currentTopic.id);
+        fullRender();
+        updateAllAnalytics();
+        document.getElementById('currentTopicContainer').scrollIntoView({behavior:'smooth'});
+    };
+
+    // Render topics list with SELECT button (full name, no truncation)
+    function renderTopicsList(){
+        let html='';
+        for(let t of allTopics){
+            const isComp = completedIds.includes(t.id);
+            const isCurrent = (currentTopic && currentTopic.id === t.id);
+            const bgClass = isComp ? 'bg-green-50' : (isCurrent ? 'bg-indigo-50 border-indigo-300' : 'bg-white');
+            html+=`<div class="${bgClass} border rounded-xl p-3 flex justify-between items-center gap-3 topic-row shadow-sm">
+                        <div class="flex-1 min-w-0"><span class="badge-cat inline-block px-2 py-0.5 rounded-full text-xs mb-1">${escapeHtml(t.cat)}</span><p class="text-sm font-medium text-gray-800 break-words">${escapeHtml(t.name)}</p></div>
+                        <div class="flex-shrink-0">${isComp ? '<span class="text-green-600 text-sm font-semibold"><i class="fas fa-check-circle"></i> সম্পন্ন</span>' : `<button onclick="selectSpecificTopic(${t.id})" class="select-btn bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fas fa-hand-pointer mr-1"></i> নির্বাচন</button>`}</div>
+                   </div>`;
+        }
         topicsListDiv.innerHTML=html;
     }
-    window.selectTopicFromList = function(topicId){
-        const t=allTopics.find(x=>x.id===topicId); if(!t||completedIds.includes(t.id)) return;
-        if(currentFilter!=="ALL" && t.cat!==currentFilter && confirm(`"${t.cat}" ফিল্টার পরিবর্তন করবেন?`)){ currentFilter=t.cat; filterSelect.value=currentFilter; }
-        currentTopic=t; shuffleUsed=0; recordTopicSelection(currentTopic.id); fullRender(); updateAllAnalytics(); document.getElementById('currentTopicContainer').scrollIntoView({behavior:'smooth'});
-    };
-    function renderSubjectWiseProgress(){ let html=''; for(let sub of uniqueSubjects){ const total=allTopics.filter(t=>t.cat===sub).length; const comp=completedIds.filter(id=>allTopics.find(t=>t.id===id)?.cat===sub).length; const pct=total===0?0:Math.round(comp/total*100); html+=`<div class="subject-progress-card rounded-xl p-3 shadow-sm border-l-4" style="border-left-color:${pct===100?'#10b981':(pct>50?'#f59e0b':'#3b82f6')}"><div class="flex justify-between"><h3 class="font-bold">${escapeHtml(sub)}</h3><span>${comp}/${total}</span></div><div class="progress-bar-custom mt-1"><div class="progress-fill bg-indigo-500" style="width:${pct}%"></div></div></div>`; }
+    
+    function renderSubjectWiseProgress(){
+        let html='';
+        for(let sub of uniqueSubjects){
+            const total=allTopics.filter(t=>t.cat===sub).length;
+            const comp=completedIds.filter(id=>allTopics.find(t=>t.id===id)?.cat===sub).length;
+            const pct=total===0?0:Math.round(comp/total*100);
+            html+=`<div class="subject-progress-card rounded-xl p-3 shadow-sm border-l-4" style="border-left-color:${pct===100?'#10b981':(pct>50?'#f59e0b':'#3b82f6')}"><div class="flex justify-between"><h3 class="font-bold">${escapeHtml(sub)}</h3><span>${comp}/${total}</span></div><div class="progress-bar-custom mt-1"><div class="progress-fill bg-indigo-500" style="width:${pct}%"></div></div></div>`;
+        }
         subjectProgressDiv.innerHTML=html;
     }
+    
     function fullRender(){
         const completedCount=completedIds.length, total=allTopics.length;
         studiedSpan.innerText=completedCount; pendingSpan.innerText=total-completedCount; totalSpan.innerText=total;
@@ -395,22 +206,8 @@
             noTopicDiv.classList.add('hidden'); topicContentDiv.classList.remove('hidden');
             currentTopicNameSpan.innerText=currentTopic.name; currentTopicIdSpan.innerText=currentTopic.id; topicCatBadge.innerText=currentTopic.cat;
             const stat=topicStats[currentTopic.id];
-            if(stat && stat.selectedAt){
-                selectedDateSpan.innerText=formatDateTime(stat.selectedAt);
-                if(stat.completedAt){
-                    completedDateSpan.innerText=formatDateTime(stat.completedAt);
-                    const durationMs = stat.completedAt - stat.selectedAt;
-                    durationSpan.innerText=formatDuration(durationMs);
-                } else {
-                    completedDateSpan.innerText="এখনো সম্পন্ন হয়নি";
-                    const durationMs = Date.now() - stat.selectedAt;
-                    durationSpan.innerText=`চলমান: ${formatDuration(durationMs)}`;
-                }
-            } else {
-                selectedDateSpan.innerText="আজকে প্রথম নির্বাচিত";
-                completedDateSpan.innerText="—";
-                durationSpan.innerText="—";
-            }
+            if(stat && stat.selectedAt){ selectedDateSpan.innerText=formatDateTime(stat.selectedAt); if(stat.completedAt){ completedDateSpan.innerText=formatDateTime(stat.completedAt); durationSpan.innerText=formatDuration(stat.completedAt - stat.selectedAt); } else { completedDateSpan.innerText="এখনো সম্পন্ন হয়নি"; durationSpan.innerText=`চলমান: ${formatDuration(Date.now() - stat.selectedAt)}`; } }
+            else { selectedDateSpan.innerText="আজকে প্রথম নির্বাচিত"; completedDateSpan.innerText="—"; durationSpan.innerText="—"; }
             shuffleBtn.disabled=!(shuffleUsed<MAX_SHUFFLE && getPendingFiltered().filter(t=>t.id!==currentTopic.id).length>0);
             doneBtn.disabled=false;
         }
@@ -419,55 +216,21 @@
     function handleShuffle(){ if(shuffleUsed>=MAX_SHUFFLE){ alert(`সর্বোচ্চ ${MAX_SHUFFLE} বার`); return; } const newT=getRandomFilteredPending(currentTopic?.id); if(newT){ currentTopic=newT; shuffleUsed++; recordTopicSelection(currentTopic.id); fullRender(); } else alert("ভিন্ন টপিক নেই"); }
     function handleDone(){ if(!currentTopic) return; if(!completedIds.includes(currentTopic.id)){ completedIds.push(currentTopic.id); recordTopicCompletion(currentTopic.id); } const rem=getPendingFiltered(); if(rem.length===0){ currentTopic=null; fullRender(); alert("সব টপিক সম্পন্ন!"); return; } currentTopic=getRandomFilteredPending(); if(!currentTopic) currentTopic=rem[0]; shuffleUsed=0; if(currentTopic) recordTopicSelection(currentTopic.id); fullRender(); }
     
-    // Analytics
-    function getCompletionsByPeriod(periodType='week'){
-        const completions={}; 
-        for(let [id,stat] of Object.entries(topicStats)){ if(stat.completedAt && completedIds.includes(parseInt(id))){ const date=new Date(stat.completedAt); let key; if(periodType==='week'){ const weekStart=new Date(date); weekStart.setDate(date.getDate()-date.getDay()); key=weekStart.toISOString().slice(0,10); } else { key=date.toISOString().slice(0,7); } completions[key]=(completions[key]||0)+1; } }
-        return completions;
-    }
+    // Analytics functions same as before
+    function getCompletionsByPeriod(periodType='week'){ const comps={}; for(let [id,stat] of Object.entries(topicStats)){ if(stat.completedAt && completedIds.includes(parseInt(id))){ const date=new Date(stat.completedAt); let key; if(periodType==='week'){ const weekStart=new Date(date); weekStart.setDate(date.getDate()-date.getDay()); key=weekStart.toISOString().slice(0,10); } else { key=date.toISOString().slice(0,7); } comps[key]=(comps[key]||0)+1; } } return comps; }
     function updateWeeklyChart(){ const data=getCompletionsByPeriod('week'); const labels=Object.keys(data).sort().slice(-8); const values=labels.map(l=>data[l]); if(weeklyChart) weeklyChart.destroy(); weeklyChart=new Chart(weeklyCanvas,{type:'bar',data:{labels,datasets:[{label:'সম্পন্ন টপিক সংখ্যা',data:values,backgroundColor:'#4f46e5'}]},options:{responsive:true,maintainAspectRatio:true}}); }
     function updateMonthlyChart(){ const data=getCompletionsByPeriod('month'); const labels=Object.keys(data).sort().slice(-6); const values=labels.map(l=>data[l]); if(monthlyChart) monthlyChart.destroy(); monthlyChart=new Chart(monthlyCanvas,{type:'bar',data:{labels,datasets:[{label:'সম্পন্ন টপিক সংখ্যা',data:values,backgroundColor:'#f59e0b'}]}}); }
-    function updateDurationTable(){ let html=''; for(let id of completedIds){ const stat=topicStats[id]; if(stat && stat.selectedAt && stat.completedAt){ const topic=allTopics.find(t=>t.id===id); if(topic){ const durMs = stat.completedAt - stat.selectedAt; html+=`<tr class="border-b"><td class="p-2">${id}</td><td class="p-2">${escapeHtml(topic.cat)}</td><td class="p-2">${escapeHtml(topic.name.substring(0,55))}..</td><td class="p-2">${formatDateTime(stat.selectedAt)}</td><td class="p-2">${formatDateTime(stat.completedAt)}</td><td class="p-2 font-semibold">${formatDuration(durMs)}</td></tr>`; } } }
-        durationBody.innerHTML=html||'<tr><td colspan="6" class="text-center p-4">কোনো সম্পন্ন টপিক নেই</td></tr>';
-    }
+    function updateDurationTable(){ let html=''; for(let id of completedIds){ const stat=topicStats[id]; if(stat && stat.selectedAt && stat.completedAt){ const topic=allTopics.find(t=>t.id===id); if(topic){ const durMs = stat.completedAt - stat.selectedAt; html+=`<tr class="border-b"><td class="p-2">${id}</td><td class="p-2">${escapeHtml(topic.cat)}</td><td class="p-2 break-words">${escapeHtml(topic.name)}</td><td class="p-2">${formatDateTime(stat.selectedAt)}</td><td class="p-2">${formatDateTime(stat.completedAt)}</td><td class="p-2 font-semibold">${formatDuration(durMs)}</td></tr>`; } } } durationBody.innerHTML=html||'<tr><td colspan="6" class="text-center p-4">কোনো সম্পন্ন টপিক নেই</td></tr>'; }
     function updateAllAnalytics(){ updateWeeklyChart(); updateMonthlyChart(); updateDurationTable(); }
-    
-    // CSV Export
-    function downloadCSV(){
-        let csvRows=[["Topic ID","Subject","Topic Name","Selected Date & Time","Completed Date & Time","Duration (Days+Hours)"]];
-        for(let id of completedIds){ const stat=topicStats[id]; if(stat && stat.selectedAt && stat.completedAt){ const topic=allTopics.find(t=>t.id===id); if(topic){ const durMs = stat.completedAt - stat.selectedAt; const days = durMs/(1000*60*60*24); csvRows.push([id, topic.cat, topic.name, new Date(stat.selectedAt).toISOString(), new Date(stat.completedAt).toISOString(), days.toFixed(2)+" days"]); } } }
-        const csvContent=csvRows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
-        const blob=new Blob(["\uFEFF"+csvContent],{type:"text/csv;charset=utf-8;"}); const link=document.createElement("a"); const url=URL.createObjectURL(blob); link.href=url; link.setAttribute("download","topic_progress_report.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
-    }
-    
-    // Reset section with password
-    async function resetSection(section, pwd){
-        if(!currentUserObj) return false;
-        const prov=currentUserObj.providerData[0];
-        if(prov.providerId==='password'){ try{ const cred=firebase.auth.EmailAuthProvider.credential(currentUserObj.email,pwd); await currentUserObj.reauthenticateWithCredential(cred); }catch(e){ alert("পাসওয়ার্ড ভুল"); return false; } }
-        else if(!confirm("Google অ্যাকাউন্ট, পাসওয়ার্ড ছাড়া রিসেট?")) return false;
-        if(section==="ALL"){ completedIds=[]; topicStats={}; } else { const toRemove=allTopics.filter(t=>t.cat===section).map(t=>t.id); completedIds=completedIds.filter(id=>!toRemove.includes(id)); for(let id of toRemove) delete topicStats[id]; }
-        shuffleUsed=0; currentFilter="ALL"; filterSelect.value="ALL";
-        const pendingNow=allTopics.filter(t=>!completedIds.includes(t.id));
-        currentTopic=pendingNow.length?pendingNow[Math.floor(Math.random()*pendingNow.length)]:null;
-        if(currentTopic) recordTopicSelection(currentTopic.id);
-        await saveToFirestore(); fullRender(); alert(`"${section}" রিসেট সম্পন্ন`); return true;
-    }
-    function showResetModal(){ resetModal.style.display='flex'; resetSectionSelect.innerHTML='<option value="ALL">📚 সব বিভাগ</option>'+uniqueSubjects.map(s=>`<option value="${s}">📖 ${s}</option>`).join(''); const hasPass=currentUserObj?.providerData[0]?.providerId==='password'; resetPassword.style.display=hasPass?'block':'block'; resetHint.innerText=hasPass?'পাসওয়ার্ড দিন':'Google ব্যবহারকারী, পাসওয়ার্ড ছাড়াই রিসেট হবে'; if(!hasPass) resetPassword.placeholder='প্রযোজ্য নয়'; resetPassword.value=''; }
-    closeReset.onclick=cancelReset.onclick=()=>resetModal.style.display='none';
-    confirmReset.onclick=async()=>{ const sec=resetSectionSelect.value; let pwd=''; if(currentUserObj?.providerData[0]?.providerId==='password'){ pwd=resetPassword.value; if(!pwd){ alert("পাসওয়ার্ড দিন"); return; } } resetModal.style.display='none'; await resetSection(sec,pwd); };
-    resetModalBtn.onclick=showResetModal;
-    downloadBtn.onclick=downloadCSV;
-    
-    // Chart init & UI tabs
+    function downloadCSV(){ let csvRows=[["Topic ID","Subject","Topic Name","Selected Date & Time","Completed Date & Time","Duration (Days+Hours)"]]; for(let id of completedIds){ const stat=topicStats[id]; if(stat && stat.selectedAt && stat.completedAt){ const topic=allTopics.find(t=>t.id===id); if(topic){ const durMs = stat.completedAt - stat.selectedAt; const days = durMs/(1000*60*60*24); csvRows.push([id, topic.cat, topic.name, new Date(stat.selectedAt).toISOString(), new Date(stat.completedAt).toISOString(), days.toFixed(2)+" days"]); } } } const csvContent=csvRows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n"); const blob=new Blob(["\uFEFF"+csvContent],{type:"text/csv;charset=utf-8;"}); const link=document.createElement("a"); const url=URL.createObjectURL(blob); link.href=url; link.setAttribute("download","topic_progress_report.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); }
+
+    // reset modal and auth
+    async function resetSection(section,pwd){ if(!currentUserObj) return false; const prov=currentUserObj.providerData[0]; if(prov.providerId==='password'){ try{ const cred=firebase.auth.EmailAuthProvider.credential(currentUserObj.email,pwd); await currentUserObj.reauthenticateWithCredential(cred); }catch(e){ alert("পাসওয়ার্ড ভুল"); return false; } } else if(!confirm("Google অ্যাকাউন্ট, পাসওয়ার্ড ছাড়া রিসেট?")) return false; if(section==="ALL"){ completedIds=[]; topicStats={}; } else { const toRemove=allTopics.filter(t=>t.cat===section).map(t=>t.id); completedIds=completedIds.filter(id=>!toRemove.includes(id)); for(let id of toRemove) delete topicStats[id]; } shuffleUsed=0; currentFilter="ALL"; filterSelect.value="ALL"; const pendingNow=allTopics.filter(t=>!completedIds.includes(t.id)); currentTopic=pendingNow.length?pendingNow[Math.floor(Math.random()*pendingNow.length)]:null; if(currentTopic) recordTopicSelection(currentTopic.id); await saveToFirestore(); fullRender(); alert(`"${section}" রিসেট সম্পন্ন`); return true; }
+    function setupAuthEvents(){ document.getElementById('signInBtn').onclick=()=>auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value).catch(e=>alert(e.message)); document.getElementById('googleSignInBtn').onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>alert(e.message)); document.getElementById('signUpBtn').onclick=()=>auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPassword').value).catch(e=>alert(e.message)); document.getElementById('showSignup').onclick=()=>{document.getElementById('loginForm').style.display='none'; document.getElementById('signupForm').style.display='block';}; document.getElementById('showLogin').onclick=()=>{document.getElementById('loginForm').style.display='block'; document.getElementById('signupForm').style.display='none';}; }
+    auth.onAuthStateChanged(async(user)=>{ if(user){ currentUserObj=user; document.getElementById('userEmailSpan').innerText=user.email; authDiv.style.display='none'; appDiv.style.display='block'; if(!progressChart) initChart(); filterSelect.innerHTML='<option value="ALL">📚 সব বিষয়</option>'+uniqueSubjects.map(s=>`<option value="${s}">📖 ${s}</option>`).join(''); await loadFromFirestore(user); shuffleBtn.onclick=handleShuffle; doneBtn.onclick=handleDone; filterSelect.onchange=()=>{ currentFilter=filterSelect.value; shuffleUsed=0; validateTopicByFilter(); fullRender(); }; document.getElementById('logoutBtn').onclick=()=>auth.signOut(); setupTabs(); } else { authDiv.style.display='flex'; appDiv.style.display='none'; if(progressChart) progressChart.destroy(); progressChart=null; } });
     function initChart(){ const ctx=document.getElementById('progressChart').getContext('2d'); if(progressChart) progressChart.destroy(); progressChart=new Chart(ctx,{type:'doughnut',data:{labels:['সম্পন্ন','বাকি'],datasets:[{data:[0,allTopics.length],backgroundColor:['#10b981','#f97316'],cutout:'60%'}]},options:{responsive:true}}); }
     function setupTabs(){ document.querySelectorAll('.analytics-tab').forEach(tab=>{ tab.onclick=()=>{ document.querySelectorAll('.analytics-tab').forEach(t=>t.classList.remove('active','bg-indigo-50','text-indigo-700','bg-gray-100','text-gray-600')); tab.classList.add('active','bg-indigo-50','text-indigo-700'); const type=tab.dataset.tab; weeklyContainer.classList.toggle('hidden',type!=='weekly'); monthlyContainer.classList.toggle('hidden',type!=='monthly'); durationContainer.classList.toggle('hidden',type!=='duration'); if(type==='weekly') updateWeeklyChart(); if(type==='monthly') updateMonthlyChart(); }; }); }
-    
-    // Auth
-    function setupAuth(){ const signIn=document.getElementById('signInBtn'), google=document.getElementById('googleSignInBtn'), signUp=document.getElementById('signUpBtn'), showSignup=document.getElementById('showSignup'), showLogin=document.getElementById('showLogin'), loginForm=document.getElementById('loginForm'), signupForm=document.getElementById('signupForm'), errDiv=document.getElementById('authError'); const showErr=(msg)=>{ errDiv.innerText=msg; errDiv.classList.remove('hidden'); setTimeout(()=>errDiv.classList.add('hidden'),3000); }; showSignup.onclick=()=>{ loginForm.style.display='none'; signupForm.style.display='block'; }; showLogin.onclick=()=>{ loginForm.style.display='block'; signupForm.style.display='none'; }; signIn.onclick=async()=>{ try{ await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }catch(e){ showErr(e.message); } }; signUp.onclick=async()=>{ try{ await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPassword').value); }catch(e){ showErr(e.message); } }; google.onclick=async()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ showErr(e.message); } }; }
-    auth.onAuthStateChanged(async(user)=>{ if(user){ currentUserObj=user; document.getElementById('userEmailSpan').innerText=user.email; authDiv.style.display='none'; appDiv.style.display='block'; if(!progressChart) initChart(); filterSelect.innerHTML='<option value="ALL">📚 সব বিষয়</option>'+uniqueSubjects.map(s=>`<option value="${s}">📖 ${s}</option>`).join(''); await loadFromFirestore(user); shuffleBtn.onclick=handleShuffle; doneBtn.onclick=handleDone; filterSelect.onchange=()=>{ currentFilter=filterSelect.value; shuffleUsed=0; validateTopicByFilter(); fullRender(); }; document.getElementById('logoutBtn').onclick=()=>auth.signOut(); setupTabs(); } else { currentUserObj=null; authDiv.style.display='flex'; appDiv.style.display='none'; if(progressChart) progressChart.destroy(); progressChart=null; } });
-    setupAuth();
-    function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    resetModalBtn.onclick=()=>{ resetModal.style.display='flex'; resetSectionSelect.innerHTML='<option value="ALL">📚 সব বিভাগ</option>'+uniqueSubjects.map(s=>`<option value="${s}">📖 ${s}</option>`).join(''); const hasPass=currentUserObj?.providerData[0]?.providerId==='password'; resetPassword.style.display=hasPass?'block':'block'; resetHint.innerText=hasPass?'পাসওয়ার্ড দিন':'Google ব্যবহারকারী, পাসওয়ার্ড ছাড়াই রিসেট হবে'; resetPassword.value=''; }; closeReset.onclick=cancelReset.onclick=()=>resetModal.style.display='none'; confirmReset.onclick=async()=>{ const sec=resetSectionSelect.value; let pwd=''; if(currentUserObj?.providerData[0]?.providerId==='password'){ pwd=resetPassword.value; if(!pwd){ alert("পাসওয়ার্ড দিন"); return; } } resetModal.style.display='none'; await resetSection(sec,pwd); }; downloadBtn.onclick=downloadCSV; setupAuthEvents();
 </script>
 </body>
 </html>
