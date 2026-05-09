@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>আড্ডা চ্যাট + অডিও কল — রিয়েলটাইম ভয়েস</title>
-    <!-- Font Awesome 6 -->
+    <title>আড্ডা চ্যাট + অডিও কল — ভয়েস কল ঠিক করা হয়েছে</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDK -->
     <script type="importmap">
         {
             "imports": {
@@ -39,11 +37,10 @@
             height: 92vh;
             background: rgba(255, 255, 255, 0.96);
             border-radius: 2rem;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: all 0.2s ease;
         }
 
         .chat-header {
@@ -100,11 +97,6 @@
             background: #25d366;
             color: #075e54;
         }
-        .call-btn-primary:hover {
-            background: #20b859;
-        }
-
-        /* messages area */
         .messages-area {
             flex: 1;
             overflow-y: auto;
@@ -199,7 +191,6 @@
             cursor: pointer;
             font-size: 1.3rem;
         }
-        /* modal styles */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -320,7 +311,7 @@
 <script type="module">
     import { initializeApp } from "firebase/app";
     import { getAuth, signInAnonymously, updateProfile, onAuthStateChanged } from "firebase/auth";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, deleteDoc, serverTimestamp, writeBatch, doc, setDoc, updateDoc, where, deleteDoc as deleteDocFirestore } from "firebase/firestore";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, writeBatch, serverTimestamp, doc, setDoc, updateDoc, where, deleteDoc as deleteFirestoreDoc } from "firebase/firestore";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
@@ -335,13 +326,12 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     
-    // DOM
-    const chatSection = document.getElementById('chatSection');
+    // DOM elements
+    const currentUserNameSpan = document.getElementById('currentUserName');
+    const onlineCountSpan = document.getElementById('onlineCountSpan');
     const messagesContainer = document.getElementById('messagesContainer');
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendMessageBtn');
-    const currentUserNameSpan = document.getElementById('currentUserName');
-    const onlineCountSpan = document.getElementById('onlineCountSpan');
     const changeNameBtn = document.getElementById('changeNameBtn');
     const clearAllBtn = document.getElementById('clearAllChatsBtn');
     const replyIndicatorDiv = document.getElementById('replyIndicator');
@@ -363,16 +353,22 @@
     let currentCallDocId = null;
     let currentCallRemoteUserId = null;
     let isCallActive = false;
-    let callListenUnsubscribe = null;
+    let callSignalUnsubscribe = null;
 
-    const configuration = {
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-    };
+    // Improved STUN servers + free TURN from Google (STUN only) but adding more STUN to increase success
+    const iceServers = [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" },
+        { urls: "stun:stun3.l.google.com:19302" },
+        { urls: "stun:stun4.l.google.com:19302" },
+        { urls: "stun:stun.ekiga.net" },
+        { urls: "stun:stun.ideasip.com" }
+    ];
 
-    // Helper
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-    // presence & online users
+    // presence & online
     async function updatePresence() {
         if (!currentUser) return;
         await setDoc(doc(db, "presence", currentUser.uid), {
@@ -389,22 +385,18 @@
             if(currentUser) setDoc(doc(db, "presence", currentUser.uid), { lastSeen: new Date(Date.now() - 90000) }, { merge: true });
         });
     }
-    function listenOnlineUsers(callback = null) {
+    function listenOnlineUsers() {
         if (unsubscribePresence) unsubscribePresence();
         const q = query(collection(db, "presence"));
         unsubscribePresence = onSnapshot(q, (snapshot) => {
             const now = Date.now();
-            let onlineList = [];
+            let online = 0;
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
                 let last = data.lastSeen?.toDate ? data.lastSeen.toDate() : new Date(data.lastSeen);
-                if (last && (now - last.getTime()) < 45000) {
-                    onlineList.push({ uid: data.uid, nickname: data.nickname || "বন্ধু" });
-                }
+                if (last && (now - last.getTime()) < 45000) online++;
             });
-            const onlineCount = onlineList.length;
-            onlineCountSpan.innerText = onlineCount;
-            if (callback) callback(onlineList.filter(u => u.uid !== currentUser?.uid));
+            onlineCountSpan.innerText = online;
         });
     }
 
@@ -432,13 +424,12 @@
             if (snapshot.empty) { messagesContainer.innerHTML = '<div class="empty-chat">💬 প্রথম মেসেজ লিখুন 🎤</div>'; return; }
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
-                const msgId = docSnap.id;
                 const isOwn = data.senderId === currentUser?.uid;
                 const time = data.createdAt?.toDate() || new Date();
                 const timeStr = time.toLocaleTimeString('bn-BD', { hour:'2-digit', minute:'2-digit' });
                 const msgDiv = document.createElement('div');
                 msgDiv.classList.add('message', isOwn ? 'message-own' : 'message-other');
-                msgDiv.dataset.messageId = msgId;
+                msgDiv.dataset.messageId = docSnap.id;
                 msgDiv.dataset.senderName = data.senderName;
                 msgDiv.dataset.messageText = data.text;
                 if (!isOwn) {
@@ -464,7 +455,7 @@
                 msgDiv.appendChild(timeSpan);
                 msgDiv.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    activeReply = { id: msgId, senderName: data.senderName, text: data.text };
+                    activeReply = { id: docSnap.id, senderName: data.senderName, text: data.text };
                     replyToNameSpan.innerText = escapeHtml(data.senderName);
                     replyIndicatorDiv.classList.remove('hide');
                 });
@@ -474,139 +465,150 @@
         });
     }
 
-    // ---------- AUDIO CALL WEBRTC SIGNALING ----------
-    async function createPeerConnection(targetUserId, callDocId) {
+    // ---------- IMPROVED AUDIO CALL ----------
+    async function getLocalStream() {
+        if (localStream) return localStream;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            localStream = stream;
+            return stream;
+        } catch (err) {
+            alert("মাইক্রোফোন অ্যাক্সেস প্রয়োজন। অনুমতি দিন এবং আবার চেষ্টা করুন।");
+            throw err;
+        }
+    }
+
+    async function createPeerConnection(callDocId, isCaller) {
         if (peerConnection) {
             peerConnection.close();
         }
-        peerConnection = new RTCPeerConnection(configuration);
+        const pc = new RTCPeerConnection({ iceServers });
         if (localStream) {
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
         }
-        peerConnection.onicecandidate = async (event) => {
+        pc.onicecandidate = async (event) => {
             if (event.candidate) {
                 await addDoc(collection(db, "calls", callDocId, "candidates"), {
                     candidate: event.candidate.toJSON(),
-                    type: "candidate",
                     senderId: currentUser.uid
                 });
             }
         };
-        peerConnection.ontrack = (event) => {
+        pc.ontrack = (event) => {
             if (!remoteAudio) {
                 remoteAudio = new Audio();
                 remoteAudio.srcObject = event.streams[0];
-                remoteAudio.play().catch(e=>console.log);
+                remoteAudio.play().catch(e => console.warn);
             } else {
                 remoteAudio.srcObject = event.streams[0];
             }
         };
-        peerConnection.onconnectionstatechange = () => {
-            if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed" || peerConnection.connectionState === "closed") {
+        pc.onconnectionstatechange = () => {
+            if (pc.connectionState === "failed" || pc.connectionState === "disconnected" || pc.connectionState === "closed") {
                 endCall();
             }
         };
-        return peerConnection;
+        return pc;
     }
 
-    async function startCall(targetUserId, targetNickname) {
-        if (isCallActive) { alert("আগে কল শেষ করুন"); return; }
-        if (!localStream) {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            } catch(e) { alert("মাইক্রোফোন অনুমতি দরকার"); return; }
-        }
-        // create call document
-        const callRef = collection(db, "calls");
-        const callDoc = await addDoc(callRef, {
-            from: currentUser.uid,
-            fromName: currentNickname,
-            to: targetUserId,
-            toName: targetNickname,
-            status: "calling",
-            createdAt: serverTimestamp(),
-            offer: null
-        });
-        currentCallDocId = callDoc.id;
-        currentCallRemoteUserId = targetUserId;
-        const pc = await createPeerConnection(targetUserId, currentCallDocId);
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        await updateDoc(doc(db, "calls", currentCallDocId), { offer: { sdp: offer.sdp, type: offer.type }, status: "offer_sent" });
-        // listen for answer
-        const unsubAnswer = onSnapshot(doc(db, "calls", currentCallDocId), async (snap) => {
-            const data = snap.data();
-            if (data && data.answer && peerConnection && peerConnection.signalingState !== "stable") {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-                unsubAnswer();
-            }
-            if (data && data.status === "rejected") {
-                unsubAnswer(); endCall(); alert("কল reject হয়েছে");
-            }
-            if (data && data.status === "ended") { unsubAnswer(); endCall(); }
-        });
-        callListenUnsubscribe = unsubAnswer;
-        listenForCandidates(currentCallDocId);
-        showCallPanel(true, targetNickname);
-        isCallActive = true;
-    }
-
-    async function listenForIncomingCalls() {
-        if (!currentUser) return;
-        const q = query(collection(db, "calls"), where("to", "==", currentUser.uid), where("status", "in", ["calling", "offer_sent"]));
-        onSnapshot(q, async (snapshot) => {
-            snapshot.docChanges().forEach(async (change) => {
-                if (change.type === "added") {
-                    const callData = change.doc.data();
-                    const callId = change.doc.id;
-                    if (callData.status === "calling" || callData.status === "offer_sent") {
-                        // show incoming call notification
-                        if (isCallActive) {
-                            await updateDoc(doc(db, "calls", callId), { status: "rejected" });
-                            return;
-                        }
-                        const acceptCall = confirm(`${callData.fromName || "অজানা"} আপনাকে অডিও কল করছেন। রিসিভ করবেন?`);
-                        if (acceptCall) {
-                            if (!localStream) {
-                                try { localStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch(e) { alert("মাইক্রোফোন অনুমতি নেই"); return; }
-                            }
-                            currentCallDocId = callId;
-                            currentCallRemoteUserId = callData.from;
-                            const pc = await createPeerConnection(callData.from, callId);
-                            await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
-                            const answer = await pc.createAnswer();
-                            await pc.setLocalDescription(answer);
-                            await updateDoc(doc(db, "calls", callId), { answer: { sdp: answer.sdp, type: answer.type }, status: "active" });
-                            listenForCandidates(callId);
-                            showCallPanel(true, callData.fromName);
-                            isCallActive = true;
-                            // listen for status changes on this call
-                            const statusUnsub = onSnapshot(doc(db, "calls", callId), (snap) => {
-                                if (snap.data()?.status === "ended") { statusUnsub(); endCall(); }
-                            });
-                        } else {
-                            await updateDoc(doc(db, "calls", callId), { status: "rejected" });
-                        }
-                    }
-                }
-            });
-        });
-    }
-
-    async function listenForCandidates(callId) {
-        const candRef = collection(db, "calls", callId, "candidates");
+    async function listenForCandidates(callDocId) {
+        const candRef = collection(db, "calls", callDocId, "candidates");
         onSnapshot(candRef, (snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === "added" && peerConnection && peerConnection.remoteDescription) {
-                    const candData = change.doc.data();
-                    if (candData.senderId !== currentUser?.uid) {
+                    const data = change.doc.data();
+                    if (data.senderId !== currentUser.uid) {
                         try {
-                            await peerConnection.addIceCandidate(new RTCIceCandidate(candData.candidate));
-                        } catch(e) { }
+                            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                        } catch (e) { console.warn("ICE add error", e); }
                     }
                 }
             });
         });
+    }
+
+    async function startCall(targetUserId, targetNickname) {
+        if (isCallActive) { alert("আগের কল এখনও চলছে।"); return; }
+        try {
+            await getLocalStream();
+            // Create call document
+            const callDoc = await addDoc(collection(db, "calls"), {
+                from: currentUser.uid,
+                fromName: currentNickname,
+                to: targetUserId,
+                toName: targetNickname,
+                status: "calling",
+                createdAt: serverTimestamp(),
+            });
+            currentCallDocId = callDoc.id;
+            currentCallRemoteUserId = targetUserId;
+
+            peerConnection = await createPeerConnection(currentCallDocId, true);
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            await updateDoc(doc(db, "calls", currentCallDocId), {
+                offer: { sdp: offer.sdp, type: offer.type },
+                status: "offer_sent"
+            });
+            listenForCandidates(currentCallDocId);
+            // Listen for answer
+            const unsubAnswer = onSnapshot(doc(db, "calls", currentCallDocId), async (snap) => {
+                const data = snap.data();
+                if (!data) return;
+                if (data.answer && peerConnection && peerConnection.signalingState === "have-local-offer") {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                    unsubAnswer();
+                }
+                if (data.status === "rejected") {
+                    unsubAnswer(); endCall(); alert("কলটি প্রত্যাখ্যান করা হয়েছে।");
+                }
+                if (data.status === "ended") { unsubAnswer(); endCall(); }
+                if (data.status === "active" && !isCallActive) {
+                    isCallActive = true;
+                    showCallPanel(true, targetNickname);
+                }
+            });
+            callSignalUnsubscribe = unsubAnswer;
+            showCallPanel(true, targetNickname);
+            isCallActive = true;
+        } catch (err) {
+            console.error(err);
+            alert("কল শুরু করতে ব্যর্থ: " + err.message);
+            endCall();
+        }
+    }
+
+    async function answerCall(callId, fromName, fromUid) {
+        try {
+            await getLocalStream();
+            const callDocRef = doc(db, "calls", callId);
+            const callSnap = await getDocs(query(collection(db, "calls"), where("__name__", "==", callId)));
+            if (callSnap.empty) return;
+            const callData = callSnap.docs[0].data();
+            if (!callData.offer) throw new Error("Offer missing");
+            currentCallDocId = callId;
+            currentCallRemoteUserId = fromUid;
+            peerConnection = await createPeerConnection(callId, false);
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            await updateDoc(callDocRef, {
+                answer: { sdp: answer.sdp, type: answer.type },
+                status: "active"
+            });
+            listenForCandidates(callId);
+            showCallPanel(true, fromName);
+            isCallActive = true;
+            // listen for remote end
+            const statusUnsub = onSnapshot(callDocRef, (snap) => {
+                if (snap.data()?.status === "ended") { statusUnsub(); endCall(); }
+            });
+            callSignalUnsubscribe = statusUnsub;
+        } catch (err) {
+            console.error(err);
+            alert("কল রিসিভ করতে ব্যর্থ: " + err.message);
+            endCall();
+        }
     }
 
     async function endCall() {
@@ -616,7 +618,7 @@
         if (peerConnection) { peerConnection.close(); peerConnection = null; }
         if (remoteAudio) { remoteAudio.srcObject = null; remoteAudio = null; }
         if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-        if (callListenUnsubscribe) callListenUnsubscribe();
+        if (callSignalUnsubscribe) callSignalUnsubscribe();
         isCallActive = false;
         currentCallDocId = null;
         currentCallRemoteUserId = null;
@@ -648,12 +650,39 @@
         });
     }
 
+    async function listenForIncomingCalls() {
+        if (!currentUser) return;
+        const q = query(collection(db, "calls"), 
+            where("to", "==", currentUser.uid), 
+            where("status", "in", ["calling", "offer_sent"])
+        );
+        onSnapshot(q, async (snapshot) => {
+            for (const change of snapshot.docChanges()) {
+                if (change.type === "added") {
+                    const callData = change.doc.data();
+                    const callId = change.doc.id;
+                    if (isCallActive) {
+                        await updateDoc(doc(db, "calls", callId), { status: "rejected" });
+                        return;
+                    }
+                    const accept = confirm(`${callData.fromName || "অজানা"} আপনাকে অডিও কল করছেন। রিসিভ করবেন?`);
+                    if (accept) {
+                        await answerCall(callId, callData.fromName, callData.from);
+                    } else {
+                        await updateDoc(doc(db, "calls", callId), { status: "rejected" });
+                    }
+                }
+            }
+        });
+    }
+
+    // online users modal
     async function showOnlineUsersModal() {
         if (!currentUser) return;
-        const snapshot = await getDocs(collection(db, "presence"));
         const now = Date.now();
+        const presenceSnap = await getDocs(collection(db, "presence"));
         let onlineUsers = [];
-        snapshot.forEach(docSnap => {
+        presenceSnap.forEach(docSnap => {
             const data = docSnap.data();
             let last = data.lastSeen?.toDate ? data.lastSeen.toDate() : new Date(data.lastSeen);
             if (last && (now - last.getTime()) < 45000 && data.uid !== currentUser.uid) {
@@ -689,7 +718,7 @@
         modal.querySelector("#closeCallModal").onclick = () => modal.remove();
     }
 
-    // UI initializers
+    // UI helpers
     async function setNickname(newName) {
         if (!currentUser) return false;
         const trimmed = newName.trim();
@@ -719,18 +748,13 @@
     clearAllBtn.addEventListener("click", clearAllMessages);
     showOnlineUsersBtn.addEventListener("click", showOnlineUsersModal);
 
-    // auth & start
+    // auth
     async function initAnonymous() {
         const cred = await signInAnonymously(auth);
         currentUser = cred.user;
-        if (currentUser.displayName) {
-            currentNickname = currentUser.displayName;
-            currentUserNameSpan.innerText = currentNickname;
-        } else {
-            let name = prompt("চ্যাটে আপনার নাম দিন (সকলের কাছে দৃশ্যমান):", "মজার বন্ধু");
-            if (!name) name = "আড্ডাবাজ";
-            await setNickname(name);
-        }
+        let name = prompt("চ্যাটে আপনার নাম দিন (সকলের কাছে দৃশ্যমান):", "মজার বন্ধু");
+        if (!name) name = "আড্ডাবাজ";
+        await setNickname(name);
         startPresenceHeartbeat();
         listenOnlineUsers();
         loadMessages();
@@ -753,7 +777,6 @@
             initAnonymous();
         }
     });
-    if (!auth.currentUser) initAnonymous();
 </script>
 </body>
 </html>
