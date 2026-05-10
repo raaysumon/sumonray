@@ -1,9 +1,11 @@
+Here is an HTML document that creates a WhatsApp-like chat and video call application with account creation, sign-in, phone number search, private messaging, and audio/video calling features.
+```html
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>আড্ডা চ্যাট + ভিডিও কল (বিশ্বব্যাপী)</title>
+    <title>আড্ডা চ্যাট + ভিডিও কল (ওয়াটসঅ্যাপ স্টাইল)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script type="importmap">
         {
@@ -33,7 +35,7 @@
 
         .app-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 1200px;
             height: 92vh;
             background: rgba(255, 255, 255, 0.96);
             border-radius: 2rem;
@@ -43,63 +45,175 @@
             flex-direction: column;
         }
 
-        .chat-header {
-            background: linear-gradient(120deg, #075e54, #128c7e);
+        /* Auth screens */
+        .auth-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #075e54;
+            padding: 20px;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 32px;
+            padding: 30px 24px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .auth-card h2 {
+            color: #075e54;
+            margin-bottom: 20px;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 12px 0;
+            border: 1px solid #ddd;
+            border-radius: 40px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .auth-btn {
+            background: #25d366;
+            color: #075e54;
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .auth-switch {
+            margin-top: 20px;
+            color: #128c7e;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+        .hide {
+            display: none !important;
+        }
+
+        /* Main app layout (WhatsApp style) */
+        .main-app {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        .contacts-panel {
+            width: 35%;
+            background: #f0f2f5;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #e5ddd5;
+            background-image: radial-gradient(circle at 25% 40%, rgba(200, 220, 210, 0.4) 1.5%, transparent 1.8%);
+        }
+        @media (max-width: 700px) {
+            .contacts-panel { width: 100%; position: absolute; z-index: 10; height: 100%; transition: transform 0.2s; }
+            .chat-panel { width: 100%; }
+            .contacts-panel.hide-mobile { transform: translateX(-100%); }
+        }
+        .profile-header {
+            background: #075e54;
             color: white;
-            padding: 12px 20px;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
         }
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .search-box {
+            padding: 10px;
+            background: #f0f2f5;
         }
-        .user-name {
-            font-weight: 700;
-            font-size: 1.1rem;
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 30px;
+            border: none;
+            background: white;
+            outline: none;
+        }
+        .contact-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-        .user-status {
-            font-size: 0.7rem;
-            background: #dcf8c5;
-            color: #075e54;
-            padding: 2px 8px;
-            border-radius: 30px;
-            width: fit-content;
-            font-weight: 600;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .icon-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
+            gap: 12px;
+            padding: 12px 16px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: background 0.1s;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .contact-item:hover, .contact-item.active {
+            background: #e9ecef;
+        }
+        .contact-avatar {
+            width: 48px;
+            height: 48px;
+            background: #128c7e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
             font-size: 1.2rem;
         }
-        .icon-btn:hover {
-            background: rgba(255,255,255,0.4);
-            transform: scale(1.05);
+        .contact-info {
+            flex: 1;
         }
-        .call-btn-primary {
+        .contact-name {
+            font-weight: 600;
+        }
+        .contact-phone {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        .online-dot {
+            width: 10px;
+            height: 10px;
             background: #25d366;
-            color: #075e54;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
         }
-        .video-call-btn {
-            background: #e67e22;
+        .chat-header {
+            background: #075e54;
             color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        @media (max-width: 700px) {
+            .back-btn { display: block; }
+        }
+        .chat-name {
+            font-weight: 700;
+            flex: 1;
         }
         .messages-area {
             flex: 1;
@@ -107,145 +221,64 @@
             padding: 18px 14px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            background-image: radial-gradient(circle at 25% 40%, rgba(200, 220, 210, 0.3) 1.5%, transparent 1.8%);
+            gap: 12px;
         }
-        .messages-area::-webkit-scrollbar { width: 5px; }
-        .messages-area::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-        .messages-area::-webkit-scrollbar-thumb { background: #075e54; border-radius: 10px; }
-
         .message {
             display: flex;
             flex-direction: column;
-            max-width: 82%;
+            max-width: 80%;
             animation: popIn 0.2s ease;
-            cursor: pointer;
         }
         .message-own { align-self: flex-end; }
         .message-other { align-self: flex-start; }
         .bubble {
             padding: 10px 14px;
-            border-radius: 22px;
+            border-radius: 18px;
             word-wrap: break-word;
-            font-size: 0.95rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: white;
         }
-        .bubble-own { background: #dcf8c5; border-bottom-right-radius: 5px; }
-        .bubble-other { background: white; border-bottom-left-radius: 5px; border: 1px solid #efefef; }
-        .reply-quote {
-            font-size: 0.75rem;
-            background: rgba(0,0,0,0.05);
-            padding: 5px 8px;
-            border-radius: 14px;
-            margin-bottom: 6px;
-            border-left: 3px solid #075e54;
-        }
-        .sender-name {
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-            margin-left: 8px;
-            color: #0b5e4e;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .bubble-own { background: #dcf8c5; border-bottom-right-radius: 4px; }
+        .bubble-other { background: white; border-bottom-left-radius: 4px; }
         .message-time {
             font-size: 0.6rem;
             color: #6c757d;
             margin-top: 4px;
             margin-left: 10px;
-            margin-right: 8px;
-            display: flex;
-            justify-content: flex-end;
-        }
-        .reply-indicator {
-            background: #e9f5e9;
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            margin: 0 16px 6px 16px;
-            border-left: 4px solid #075e54;
         }
         .input-area {
-            background: #ffffffec;
+            background: #f0f2f5;
             padding: 12px 16px;
             display: flex;
             gap: 12px;
-            border-top: 1px solid #e9ecef;
         }
         .message-input {
             flex: 1;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
+            border: none;
+            background: white;
             padding: 12px 18px;
-            border-radius: 40px;
-            font-size: 0.95rem;
+            border-radius: 30px;
             outline: none;
         }
         .send-btn {
-            background: linear-gradient(135deg, #075e54, #0b8f7a);
+            background: #25d366;
             border: none;
             color: white;
             width: 48px;
             height: 48px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.3rem;
         }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(6px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1100;
-        }
-        .modal-card {
-            background: white;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 48px;
-            padding: 24px 20px;
-            text-align: center;
-            animation: fadeUp 0.2s ease;
-        }
-        .modal-card h3 { margin-bottom: 12px; color: #075e54; }
-        .online-user-list {
-            max-height: 250px;
-            overflow-y: auto;
-            margin: 16px 0;
-            text-align: left;
-        }
-        .online-user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            border-bottom: 1px solid #eee;
-        }
-        .call-user-btn, .video-call-user-btn {
+        .call-btn-sm {
+            background: rgba(255,255,255,0.2);
             border: none;
-            padding: 6px 12px;
-            border-radius: 30px;
             color: white;
-            font-weight: bold;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
             cursor: pointer;
             margin-left: 6px;
         }
-        .call-user-btn { background: #25d366; }
-        .video-call-user-btn { background: #e67e22; }
-        .hide { display: none; }
-        @keyframes popIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(20px);} to { opacity:1; transform:translateY(0);} }
-        
+        /* Call panel same as before */
         .call-panel {
             position: fixed;
             bottom: 0;
@@ -255,111 +288,79 @@
             z-index: 1050;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
             border-top-left-radius: 24px;
             border-top-right-radius: 24px;
             padding: 16px;
         }
-        .video-container {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-        .video-box {
-            background: #000;
-            border-radius: 16px;
-            overflow: hidden;
-            position: relative;
-            width: 45%;
-            min-width: 160px;
-            aspect-ratio: 4/3;
-        }
-        .video-box video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #2c3e2f;
-        }
-        .video-label {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-        }
-        .call-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 8px;
-        }
-        .call-end-btn, .call-mute-btn, .call-video-toggle {
-            background: #e74c3c;
-            border: none;
-            border-radius: 50%;
-            width: 52px;
-            height: 52px;
-            font-size: 1.5rem;
-            color: white;
-            cursor: pointer;
-        }
-        .call-mute-btn, .call-video-toggle { background: #34495e; }
-        .empty-chat { text-align: center; color: #5f7f6e; padding: 20px; font-style: italic; }
-        .toast-error {
-            position: fixed;
-            bottom: 100px;
-            left: 20px;
-            right: 20px;
-            background: #e74c3c;
-            color: white;
-            padding: 10px;
-            border-radius: 30px;
-            text-align: center;
-            z-index: 2000;
-            font-size: 0.8rem;
-        }
+        .video-container { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .video-box { background: #000; border-radius: 16px; overflow: hidden; width: 45%; aspect-ratio: 4/3; }
+        .video-box video { width: 100%; height: 100%; object-fit: cover; }
+        .call-controls { display: flex; justify-content: center; gap: 20px; margin-top: 12px; }
+        .call-end-btn, .call-mute-btn, .call-video-toggle { background: #e74c3c; border: none; border-radius: 50%; width: 52px; height: 52px; font-size: 1.5rem; color: white; cursor: pointer; }
+        .toast-error { position: fixed; bottom: 100px; left: 20px; right: 20px; background: #e74c3c; color: white; padding: 10px; border-radius: 30px; text-align: center; z-index: 2000; }
+        @keyframes popIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
     </style>
 </head>
 <body>
 <div class="app-container" id="appRoot">
-    <div id="chatSection" style="display: flex; flex-direction: column; height: 100%;">
-        <div class="chat-header">
-            <div class="user-info">
-                <div class="user-name"><i class="fas fa-video"></i> <span id="currentUserName">বন্ধু</span></div>
-                <div class="user-status"><i class="fas fa-circle" style="font-size: 8px; color: #25d366;"></i> <span id="onlineCountSpan">০ জন</span> অনলাইন</div>
+    <!-- Auth Container -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-card">
+            <h2><i class="fab fa-whatsapp"></i> আড্ডা চ্যাট</h2>
+            <div id="loginForm">
+                <input type="email" id="loginEmail" class="auth-input" placeholder="ইমেল">
+                <input type="password" id="loginPassword" class="auth-input" placeholder="পাসওয়ার্ড">
+                <button id="doLoginBtn" class="auth-btn">সাইন ইন করুন</button>
+                <div class="auth-switch" id="showSignupBtn">অ্যাকাউন্ট নেই? সাইন আপ করুন</div>
             </div>
-            <div class="action-buttons">
-                <button class="icon-btn call-btn-primary" id="showAudioCallModalBtn" title="অডিও কল"><i class="fas fa-phone-alt"></i></button>
-                <button class="icon-btn video-call-btn" id="showVideoCallModalBtn" title="ভিডিও কল"><i class="fas fa-video"></i></button>
-                <button class="icon-btn" id="changeNameBtn"><i class="fas fa-user-edit"></i></button>
-                <button class="icon-btn" id="clearAllChatsBtn"><i class="fas fa-trash-alt"></i></button>
+            <div id="signupForm" class="hide">
+                <input type="text" id="signupName" class="auth-input" placeholder="আপনার নাম">
+                <input type="tel" id="signupPhone" class="auth-input" placeholder="মোবাইল নম্বর (যেমন: +8801xxxxxxxx)">
+                <input type="email" id="signupEmail" class="auth-input" placeholder="ইমেল">
+                <input type="password" id="signupPassword" class="auth-input" placeholder="পাসওয়ার্ড">
+                <button id="doSignupBtn" class="auth-btn">সাইন আপ করুন</button>
+                <div class="auth-switch" id="showLoginBtn">ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন</div>
+            </div>
+            <div id="authError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- Main WhatsApp Style App (hidden until login) -->
+    <div id="mainApp" class="main-app hide">
+        <div id="contactsPanel" class="contacts-panel">
+            <div class="profile-header">
+                <span><i class="fab fa-whatsapp"></i> চ্যাটসমূহ</span>
+                <button id="logoutBtn" class="call-btn-sm" style="background: transparent; border:1px solid white;"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchPhoneInput" placeholder="🔍 ফোন নম্বর দিয়ে খুঁজুন...">
+            </div>
+            <div id="contactsList" style="flex:1; overflow-y: auto;">
+                <div style="padding:20px; text-align:center;">লোড হচ্ছে...</div>
             </div>
         </div>
-
-        <div id="replyIndicator" class="reply-indicator hide">
-            <span><i class="fas fa-reply-all"></i> <span id="replyToName"></span> এর জবাব দিচ্ছেন</span>
-            <button id="cancelReplyBtn" class="cancel-reply"><i class="fas fa-times-circle"></i></button>
-        </div>
-
-        <div class="messages-area" id="messagesContainer">
-            <div class="empty-chat">🎥 ভিডিও কল ফিচার সহ আড্ডা! কাউকে কল করতে উপরের বাটনে ক্লিক করুন 📞</div>
-        </div>
-        <div class="input-area">
-            <input type="text" id="messageInput" class="message-input" placeholder="✍️ বাংলায় মেসেজ লিখুন...">
-            <button class="send-btn" id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+        <div id="chatPanel" class="chat-panel">
+            <div class="chat-header">
+                <button id="mobileBackBtn" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                <div class="chat-name" id="chatContactName">কাউকে সিলেক্ট করুন</div>
+                <button id="audioCallBtn" class="call-btn-sm"><i class="fas fa-phone-alt"></i></button>
+                <button id="videoCallBtn" class="call-btn-sm"><i class="fas fa-video"></i></button>
+            </div>
+            <div id="messagesArea" class="messages-area">
+                <div style="text-align:center; color:#888;">বাম থেকে একজন পরিচিতি নির্বাচন করুন</div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="chatMessageInput" class="message-input" placeholder="মেসেজ লিখুন...">
+                <button id="sendMsgBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "firebase/app";
-    import { getAuth, signInAnonymously, updateProfile, onAuthStateChanged } from "firebase/auth";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, writeBatch, serverTimestamp, doc, setDoc, updateDoc, where } from "firebase/firestore";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "firebase/auth";
+    import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, writeBatch, deleteDoc } from "firebase/firestore";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
@@ -373,67 +374,50 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    
+
     // DOM elements
-    const currentUserNameSpan = document.getElementById('currentUserName');
-    const onlineCountSpan = document.getElementById('onlineCountSpan');
-    const messagesContainer = document.getElementById('messagesContainer');
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendMessageBtn');
-    const changeNameBtn = document.getElementById('changeNameBtn');
-    const clearAllBtn = document.getElementById('clearAllChatsBtn');
-    const replyIndicatorDiv = document.getElementById('replyIndicator');
-    const replyToNameSpan = document.getElementById('replyToName');
-    const cancelReplyBtn = document.getElementById('cancelReplyBtn');
-    const showAudioCallModalBtn = document.getElementById('showAudioCallModalBtn');
-    const showVideoCallModalBtn = document.getElementById('showVideoCallModalBtn');
+    const authContainer = document.getElementById('authContainer');
+    const mainAppDiv = document.getElementById('mainApp');
+    const loginFormDiv = document.getElementById('loginForm');
+    const signupFormDiv = document.getElementById('signupForm');
+    const authErrorSpan = document.getElementById('authError');
+    const contactsListDiv = document.getElementById('contactsList');
+    const searchInput = document.getElementById('searchPhoneInput');
+    const chatContactNameSpan = document.getElementById('chatContactName');
+    const messagesArea = document.getElementById('messagesArea');
+    const chatMessageInput = document.getElementById('chatMessageInput');
+    const sendMsgBtn = document.getElementById('sendMsgBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const audioCallBtn = document.getElementById('audioCallBtn');
+    const videoCallBtn = document.getElementById('videoCallBtn');
+    const mobileBackBtn = document.getElementById('mobileBackBtn');
+    const contactsPanel = document.getElementById('contactsPanel');
 
     let currentUser = null;
-    let currentNickname = "";
+    let currentUserDoc = null; // store phone, name
+    let selectedContact = null; // { uid, name, phone }
     let unsubscribeMessages = null;
-    let unsubscribePresence = null;
-    let activeReply = null;
-    let presenceInterval = null;
+    let unsubscribeContacts = null;
+    let allUsers = []; // for contacts
 
-    // WebRTC globals
+    // WebRTC call globals
     let peerConnection = null;
     let localStream = null;
     let remoteAudio = null;
-    let pendingRemoteStream = null;
     let remoteVideo = null;
-    let localVideo = null;
     let currentCallDocId = null;
-    let currentCallRemoteUserId = null;
     let isCallActive = false;
     let callSignalUnsubscribe = null;
-    let isVideoCall = false;
     let callPanelDiv = null;
+    let isVideoCall = false;
 
-    // TURN + STUN servers for worldwide connectivity
     const iceServers = [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" },
-        { urls: "stun:stun3.l.google.com:19302" },
-        { urls: "stun:stun4.l.google.com:19302" },
-        {
-            urls: "turn:openrelay.metered.ca:80",
-            username: "openrelayproject",
-            credential: "openrelayproject"
-        },
-        {
-            urls: "turn:openrelay.metered.ca:443",
-            username: "openrelayproject",
-            credential: "openrelayproject"
-        },
-        {
-            urls: "turn:openrelay.metered.ca:443?transport=tcp",
-            username: "openrelayproject",
-            credential: "openrelayproject"
-        }
+        { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
+        { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" }
     ];
 
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
     function showToast(msg) {
         let toast = document.querySelector('.toast-error');
         if(toast) toast.remove();
@@ -444,345 +428,311 @@
         setTimeout(() => toast.remove(), 4000);
     }
 
-    // presence
-    async function updatePresence() {
-        if (!currentUser) return;
-        await setDoc(doc(db, "presence", currentUser.uid), {
-            uid: currentUser.uid,
-            nickname: currentNickname,
-            lastSeen: serverTimestamp(),
-        }, { merge: true });
-    }
-    function startPresenceHeartbeat() {
-        if (presenceInterval) clearInterval(presenceInterval);
-        updatePresence();
-        presenceInterval = setInterval(() => { if(currentUser) updatePresence(); }, 20000);
-        window.addEventListener('beforeunload', () => {
-            if(currentUser) setDoc(doc(db, "presence", currentUser.uid), { lastSeen: new Date(Date.now() - 90000) }, { merge: true });
-        });
-    }
-    function listenOnlineUsers() {
-        if (unsubscribePresence) unsubscribePresence();
-        const q = query(collection(db, "presence"));
-        unsubscribePresence = onSnapshot(q, (snapshot) => {
-            const now = Date.now();
-            let online = 0;
-            snapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                let last = data.lastSeen?.toDate ? data.lastSeen.toDate() : new Date(data.lastSeen);
-                if (last && (now - last.getTime()) < 45000) online++;
-            });
-            onlineCountSpan.innerText = online;
+    //  Auth UI
+    document.getElementById('showSignupBtn').addEventListener('click', () => {
+        loginFormDiv.classList.add('hide');
+        signupFormDiv.classList.remove('hide');
+        authErrorSpan.innerText = '';
+    });
+    document.getElementById('showLoginBtn').addEventListener('click', () => {
+        signupFormDiv.classList.add('hide');
+        loginFormDiv.classList.remove('hide');
+        authErrorSpan.innerText = '';
+    });
+
+    async function createUserProfile(uid, name, phone, email) {
+        await setDoc(doc(db, "users", uid), {
+            name: name,
+            phone: phone,
+            email: email,
+            uid: uid,
+            createdAt: serverTimestamp()
         });
     }
 
-    // Text chat
-    async function sendMessage() {
-        if (!currentUser || !currentNickname) return;
-        const text = messageInput.value.trim();
-        if (!text) return;
-        let replyData = activeReply ? { replyToSender: activeReply.senderName, replyToText: activeReply.text.slice(0,65) } : null;
+    document.getElementById('doSignupBtn').addEventListener('click', async () => {
+        const name = document.getElementById('signupName').value.trim();
+        const phone = document.getElementById('signupPhone').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        if (!name || !phone || !email || !password) {
+            authErrorSpan.innerText = 'সব ফিল্ড পূরণ করুন';
+            return;
+        }
         try {
-            await addDoc(collection(db, "messages"), {
-                text, senderId: currentUser.uid, senderName: currentNickname,
-                createdAt: serverTimestamp(), reply: replyData || null
-            });
-            messageInput.value = "";
-            if (activeReply) { activeReply = null; replyIndicatorDiv.classList.add('hide'); }
-        } catch(e) { showToast("পাঠাতে ব্যর্থ"); }
+            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCred.user, { displayName: name });
+            await createUserProfile(userCred.user.uid, name, phone, email);
+            authErrorSpan.innerText = '';
+        } catch(e) {
+            authErrorSpan.innerText = e.message;
+        }
+    });
+    document.getElementById('doLoginBtn').addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) { authErrorSpan.innerText = 'ইমেল ও পাসওয়ার্ড দিন'; return; }
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch(e) { authErrorSpan.innerText = e.message; }
+    });
+    logoutBtn.addEventListener('click', async () => { await signOut(auth); });
+
+    // after login setup
+    async function loadCurrentUserProfile(uid) {
+        const docSnap = await getDoc(doc(db, "users", uid));
+        if (docSnap.exists()) {
+            currentUserDoc = docSnap.data();
+        } else {
+            // fallback: create from auth displayName
+            let name = auth.currentUser?.displayName || "User";
+            await setDoc(doc(db, "users", uid), { name, phone: "", uid, createdAt: serverTimestamp() });
+            currentUserDoc = { name, phone: "" };
+        }
     }
 
-    function loadMessages() {
-        if (unsubscribeMessages) unsubscribeMessages();
-        const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
-        unsubscribeMessages = onSnapshot(q, (snapshot) => {
-            messagesContainer.innerHTML = '';
-            if (snapshot.empty) { messagesContainer.innerHTML = '<div class="empty-chat">💬 প্রথম মেসেজ লিখুন 🎤</div>'; return; }
+    // fetch all users except self
+    function listenContacts() {
+        if (unsubscribeContacts) unsubscribeContacts();
+        const q = query(collection(db, "users"));
+        unsubscribeContacts = onSnapshot(q, (snapshot) => {
+            allUsers = [];
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
-                const isOwn = data.senderId === currentUser?.uid;
+                if (data.uid !== currentUser?.uid) {
+                    allUsers.push({ uid: data.uid, name: data.name || "বন্ধু", phone: data.phone || "নম্বর নাই" });
+                }
+            });
+            renderContactsList(allUsers);
+        });
+    }
+
+    function renderContactsList(usersArray) {
+        if (!contactsListDiv) return;
+        const searchTerm = searchInput.value.trim();
+        let filtered = usersArray;
+        if (searchTerm) {
+            filtered = usersArray.filter(u => u.phone && u.phone.includes(searchTerm));
+        }
+        if (filtered.length === 0) {
+            contactsListDiv.innerHTML = '<div style="padding:20px; text-align:center;">কোনো ব্যবহারকারী পাওয়া যায়নি</div>';
+            return;
+        }
+        contactsListDiv.innerHTML = '';
+        filtered.forEach(user => {
+            const div = document.createElement('div');
+            div.className = 'contact-item';
+            if (selectedContact && selectedContact.uid === user.uid) div.classList.add('active');
+            div.innerHTML = `
+                <div class="contact-avatar">${user.name.charAt(0).toUpperCase()}</div>
+                <div class="contact-info">
+                    <div class="contact-name">${escapeHtml(user.name)}</div>
+                    <div class="contact-phone">${escapeHtml(user.phone)}</div>
+                </div>
+            `;
+            div.addEventListener('click', () => {
+                selectContact(user);
+                if (window.innerWidth <= 700) contactsPanel.classList.add('hide-mobile');
+            });
+            contactsListDiv.appendChild(div);
+        });
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    async function selectContact(contact) {
+        if (unsubscribeMessages) unsubscribeMessages();
+        selectedContact = contact;
+        chatContactNameSpan.innerText = `${contact.name} ${contact.phone ? '('+contact.phone+')' : ''}`;
+        messagesArea.innerHTML = '<div style="text-align:center;">মেসেজ লোড হচ্ছে...</div>';
+        // load private messages
+        const conversationId = getConversationId(currentUser.uid, contact.uid);
+        const q = query(collection(db, "messages"), where("conversationId", "==", conversationId), orderBy("createdAt", "asc"));
+        unsubscribeMessages = onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) { messagesArea.innerHTML = '<div style="text-align:center; color:gray;">একটি মেসেজ লিখুন 📝</div>'; return; }
+            messagesArea.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                const isOwn = data.senderId === currentUser.uid;
                 const time = data.createdAt?.toDate() || new Date();
                 const timeStr = time.toLocaleTimeString('bn-BD', { hour:'2-digit', minute:'2-digit' });
                 const msgDiv = document.createElement('div');
-                msgDiv.classList.add('message', isOwn ? 'message-own' : 'message-other');
-                if (!isOwn) {
-                    const nameSpan = document.createElement('div'); nameSpan.classList.add('sender-name');
-                    nameSpan.innerHTML = `<i class="fas fa-user-circle"></i> ${escapeHtml(data.senderName)}`;
-                    msgDiv.appendChild(nameSpan);
-                } else {
-                    const nameSpan = document.createElement('div'); nameSpan.classList.add('sender-name');
-                    nameSpan.style.justifyContent = "flex-end";
-                    nameSpan.innerHTML = `<i class="fas fa-user-check"></i> আপনি (${escapeHtml(data.senderName)})`;
-                    msgDiv.appendChild(nameSpan);
-                }
-                if (data.reply) {
-                    const quote = document.createElement('div'); quote.classList.add('reply-quote');
-                    quote.innerHTML = `<span><i class="fas fa-reply"></i> ${escapeHtml(data.reply.replyToSender)}:</span> “${escapeHtml(data.reply.replyToText)}”`;
-                    msgDiv.appendChild(quote);
-                }
-                const bubble = document.createElement('div'); bubble.classList.add('bubble', isOwn ? 'bubble-own' : 'bubble-other');
+                msgDiv.className = `message ${isOwn ? 'message-own' : 'message-other'}`;
+                const bubble = document.createElement('div');
+                bubble.className = `bubble ${isOwn ? 'bubble-own' : 'bubble-other'}`;
                 bubble.innerText = data.text;
                 msgDiv.appendChild(bubble);
-                const timeSpan = document.createElement('div'); timeSpan.classList.add('message-time');
-                timeSpan.innerHTML = `<i class="far fa-clock"></i> ${timeStr}`;
+                const timeSpan = document.createElement('div'); timeSpan.className = 'message-time';
+                timeSpan.innerText = timeStr;
                 msgDiv.appendChild(timeSpan);
-                msgDiv.addEventListener('click', () => {
-                    activeReply = { id: docSnap.id, senderName: data.senderName, text: data.text };
-                    replyToNameSpan.innerText = escapeHtml(data.senderName);
-                    replyIndicatorDiv.classList.remove('hide');
-                });
-                messagesContainer.appendChild(msgDiv);
+                messagesArea.appendChild(msgDiv);
             });
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            messagesArea.scrollTop = messagesArea.scrollHeight;
         });
     }
 
-    // ---------- WebRTC with proper video handling ----------
+    function getConversationId(uid1, uid2) {
+        return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+    }
+
+    async function sendPrivateMessage() {
+        if (!selectedContact) { showToast("একজন ব্যবহারকারী নির্বাচন করুন"); return; }
+        const text = chatMessageInput.value.trim();
+        if (!text) return;
+        const conversationId = getConversationId(currentUser.uid, selectedContact.uid);
+        try {
+            await addDoc(collection(db, "messages"), {
+                text: text,
+                senderId: currentUser.uid,
+                senderName: currentUserDoc?.name || currentUser.displayName,
+                receiverId: selectedContact.uid,
+                conversationId: conversationId,
+                createdAt: serverTimestamp()
+            });
+            chatMessageInput.value = "";
+        } catch(e) { showToast("পাঠাতে ব্যর্থ"); }
+    }
+
+    // ---------- WebRTC Call (private) ----------
     async function getMediaStream(videoEnabled) {
-        if (localStream) {
-            localStream.getTracks().forEach(t => t.stop());
-            localStream = null;
-        }
+        if (localStream) localStream.getTracks().forEach(t => t.stop());
         const constraints = { audio: true, video: videoEnabled };
         try {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             localStream = stream;
             return stream;
-        } catch(err) {
-            showToast(videoEnabled ? "ক্যামেরা/মাইক্রোফোন অনুমতি প্রয়োজন" : "মাইক্রোফোন অনুমতি প্রয়োজন");
-            throw err;
-        }
+        } catch(err) { showToast("মাইক্রোফোন/ক্যামেরা অনুমতি প্রয়োজন"); throw err; }
     }
 
     async function createPeerConnection(callDocId) {
         if (peerConnection) peerConnection.close();
         const pc = new RTCPeerConnection({ iceServers });
-        
-        if (localStream) {
-            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-        }
-        
+        if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
         pc.onicecandidate = async (event) => {
-            if (event.candidate) {
-                await addDoc(collection(db, "calls", callDocId, "candidates"), {
-                    candidate: event.candidate.toJSON(),
-                    senderId: currentUser.uid
-                });
-            }
+            if (event.candidate) await addDoc(collection(db, "calls", callDocId, "candidates"), { candidate: event.candidate.toJSON(), senderId: currentUser.uid });
         };
-        
         pc.ontrack = (event) => {
-            console.log("ontrack fired, kind:", event.track.kind);
             if (event.track.kind === "audio") {
-                if (!remoteAudio) {
-                    remoteAudio = new Audio();
-                    remoteAudio.srcObject = event.streams[0];
-                    remoteAudio.play().catch(e=>console.log);
-                } else {
-                    remoteAudio.srcObject = event.streams[0];
-                }
+                if (!remoteAudio) { remoteAudio = new Audio(); remoteAudio.srcObject = event.streams[0]; remoteAudio.play(); }
+                else remoteAudio.srcObject = event.streams[0];
             } else if (event.track.kind === "video") {
-                pendingRemoteStream = event.streams[0];
-                if (remoteVideo && remoteVideo.srcObject !== pendingRemoteStream) {
-                    remoteVideo.srcObject = pendingRemoteStream;
-                }
+                if (remoteVideo && event.streams[0]) remoteVideo.srcObject = event.streams[0];
             }
         };
-        
-        pc.onconnectionstatechange = () => {
-            console.log("Connection state:", pc.connectionState);
-            if (pc.connectionState === "failed") {
-                showToast("সংযোগ ব্যর্থ হয়েছে (TURN প্রয়োজন হতে পারে)");
-                endCall();
-            }
-            if (pc.connectionState === "disconnected" || pc.connectionState === "closed") endCall();
-        };
-        pc.oniceconnectionstatechange = () => {
-            console.log("ICE state:", pc.iceConnectionState);
-        };
+        pc.onconnectionstatechange = () => { if (pc.connectionState === "failed") { endCall(); showToast("কল সংযোগ ব্যর্থ"); } };
         return pc;
     }
 
-    async function listenForCandidates(callDocId) {
-        const candRef = collection(db, "calls", callDocId, "candidates");
-        onSnapshot(candRef, (snapshot) => {
-            snapshot.docChanges().forEach(async (change) => {
-                if (change.type === "added" && peerConnection && peerConnection.remoteDescription) {
-                    const data = change.doc.data();
-                    if (data.senderId !== currentUser.uid) {
-                        try {
-                            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-                        } catch(e) { console.warn(e); }
-                    }
-                }
-            });
-        });
-    }
-
-    async function startCall(targetUserId, targetNickname, videoEnabled) {
-        if (isCallActive) { showToast("কল চলছে, আগে কল শেষ করুন।"); return; }
+    async function startCall(targetUser, videoEnabled) {
+        if (isCallActive) { showToast("কল চলছে"); return; }
+        if (!targetUser) { showToast("কাউকে সিলেক্ট করুন"); return; }
         try {
             isVideoCall = videoEnabled;
             await getMediaStream(videoEnabled);
             const callDoc = await addDoc(collection(db, "calls"), {
-                from: currentUser.uid, fromName: currentNickname,
-                to: targetUserId, toName: targetNickname,
+                from: currentUser.uid, fromName: currentUserDoc?.name,
+                to: targetUser.uid, toName: targetUser.name,
                 status: "calling", type: videoEnabled ? "video" : "audio",
                 createdAt: serverTimestamp()
             });
             currentCallDocId = callDoc.id;
-            currentCallRemoteUserId = targetUserId;
             peerConnection = await createPeerConnection(currentCallDocId);
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
-            await updateDoc(doc(db, "calls", currentCallDocId), {
-                offer: { sdp: offer.sdp, type: offer.type },
-                status: "offer_sent"
-            });
+            await updateDoc(doc(db, "calls", currentCallDocId), { offer: { sdp: offer.sdp, type: offer.type }, status: "offer_sent" });
             listenForCandidates(currentCallDocId);
-            
             const unsubAnswer = onSnapshot(doc(db, "calls", currentCallDocId), async (snap) => {
                 const data = snap.data();
-                if (!data) return;
-                if (data.answer && peerConnection && peerConnection.signalingState === "have-local-offer") {
+                if (data?.answer && peerConnection && peerConnection.signalingState === "have-local-offer") {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                     unsubAnswer();
                 }
-                if (data.status === "rejected") { unsubAnswer(); endCall(); showToast("কল প্রত্যাখ্যান করা হয়েছে।"); }
-                if (data.status === "ended") { unsubAnswer(); endCall(); }
-                if (data.status === "active" && !isCallActive) {
-                    isCallActive = true;
-                    showCallPanel(true, targetNickname, videoEnabled);
-                }
+                if (data?.status === "rejected") { unsubAnswer(); endCall(); showToast("কল প্রত্যাখ্যান"); }
+                if (data?.status === "ended") { unsubAnswer(); endCall(); }
+                if (data?.status === "active" && !isCallActive) { isCallActive = true; showCallPanelUI(targetUser.name, videoEnabled); }
             });
             callSignalUnsubscribe = unsubAnswer;
-            showCallPanel(true, targetNickname, videoEnabled);
+            showCallPanelUI(targetUser.name, videoEnabled);
             isCallActive = true;
-        } catch(err) { console.error(err); showToast("কল শুরু ব্যর্থ"); endCall(); }
+        } catch(e) { showToast("কল শুরু ব্যর্থ"); endCall(); }
     }
 
-    async function answerCall(callId, fromName, fromUid, videoRequired) {
+    async function answerCall(callId, fromUserObj, videoRequired) {
         try {
             isVideoCall = videoRequired;
             await getMediaStream(videoRequired);
             const callDocRef = doc(db, "calls", callId);
-            const callSnap = await getDocs(query(collection(db, "calls"), where("__name__", "==", callId)));
-            if (callSnap.empty) return;
-            const callData = callSnap.docs[0].data();
-            if (!callData.offer) throw new Error("Offer missing");
+            const callSnap = await getDoc(callDocRef);
+            if (!callSnap.exists()) throw new Error("no call");
+            const callData = callSnap.data();
+            if (!callData.offer) throw new Error();
             currentCallDocId = callId;
-            currentCallRemoteUserId = fromUid;
             peerConnection = await createPeerConnection(callId);
             await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
             const answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
             await updateDoc(callDocRef, { answer: { sdp: answer.sdp, type: answer.type }, status: "active" });
             listenForCandidates(callId);
-            showCallPanel(true, fromName, videoRequired);
+            showCallPanelUI(fromUserObj.name, videoRequired);
             isCallActive = true;
-            const statusUnsub = onSnapshot(callDocRef, (snap) => {
-                if (snap.data()?.status === "ended") { statusUnsub(); endCall(); }
+            const unsubStatus = onSnapshot(callDocRef, (snap) => { if (snap.data()?.status === "ended") { unsubStatus(); endCall(); } });
+            callSignalUnsubscribe = unsubStatus;
+        } catch(e) { showToast("কল গ্রহণ ব্যর্থ"); endCall(); }
+    }
+
+    async function listenForCandidates(callDocId) {
+        onSnapshot(collection(db, "calls", callDocId, "candidates"), (snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added" && peerConnection && peerConnection.remoteDescription) {
+                    const data = change.doc.data();
+                    if (data.senderId !== currentUser.uid) {
+                        try { await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch(e) {}
+                    }
+                }
             });
-            callSignalUnsubscribe = statusUnsub;
-        } catch(err) { console.error(err); showToast("কল রিসিভ করতে ব্যর্থ"); endCall(); }
+        });
     }
 
     async function endCall() {
-        if (currentCallDocId) {
-            await updateDoc(doc(db, "calls", currentCallDocId), { status: "ended" }).catch(()=>{});
-        }
+        if (currentCallDocId) await updateDoc(doc(db, "calls", currentCallDocId), { status: "ended" }).catch(()=>{});
         if (peerConnection) { peerConnection.close(); peerConnection = null; }
         if (remoteAudio) { remoteAudio.srcObject = null; remoteAudio = null; }
         if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
         if (callSignalUnsubscribe) callSignalUnsubscribe();
-        isCallActive = false;
-        currentCallDocId = null;
-        pendingRemoteStream = null;
+        isCallActive = false; currentCallDocId = null;
         if (callPanelDiv) callPanelDiv.remove();
-        callPanelDiv = null;
-        remoteVideo = null;
-        localVideo = null;
+        callPanelDiv = null; remoteVideo = null;
     }
 
-    function showCallPanel(show, remoteName, isVideo) {
+    function showCallPanelUI(remoteName, isVideo) {
         if (callPanelDiv) callPanelDiv.remove();
-        if (!show) return;
-        
-        callPanelDiv = document.createElement("div");
-        callPanelDiv.className = "call-panel";
+        callPanelDiv = document.createElement("div"); callPanelDiv.className = "call-panel";
         let videoHtml = '';
         if (isVideo) {
-            videoHtml = `
-                <div class="video-container">
-                    <div class="video-box"><video id="localVideo" autoplay muted playsinline></video><div class="video-label">আপনি</div></div>
-                    <div class="video-box"><video id="remoteVideo" autoplay playsinline></video><div class="video-label">${escapeHtml(remoteName)}</div></div>
-                </div>
-            `;
+            videoHtml = `<div class="video-container"><div class="video-box"><video id="localVideo" autoplay muted playsinline></video><div class="video-label">আপনি</div></div><div class="video-box"><video id="remoteVideo" autoplay playsinline></video><div class="video-label">${escapeHtml(remoteName)}</div></div></div>`;
         }
-        callPanelDiv.innerHTML = `
-            ${videoHtml}
-            <div class="call-controls">
-                <button class="call-mute-btn" id="muteCallBtn"><i class="fas fa-microphone"></i></button>
-                ${isVideo ? '<button class="call-video-toggle" id="toggleVideoBtn"><i class="fas fa-video"></i></button>' : ''}
-                <button class="call-end-btn" id="hangupCallBtn"><i class="fas fa-phone-slash"></i></button>
-            </div>
-        `;
+        callPanelDiv.innerHTML = `${videoHtml}<div class="call-controls"><button class="call-mute-btn" id="muteCallBtn"><i class="fas fa-microphone"></i></button>${isVideo ? '<button class="call-video-toggle" id="toggleVideoBtn"><i class="fas fa-video"></i></button>' : ''}<button class="call-end-btn" id="hangupCallBtn"><i class="fas fa-phone-slash"></i></button></div>`;
         document.body.appendChild(callPanelDiv);
-        
         if (isVideo && localStream) {
-            localVideo = document.getElementById('localVideo');
-            if (localVideo) localVideo.srcObject = localStream;
+            const localVid = document.getElementById('localVideo'); if(localVid) localVid.srcObject = localStream;
             remoteVideo = document.getElementById('remoteVideo');
-            if (remoteVideo && pendingRemoteStream) {
-                remoteVideo.srcObject = pendingRemoteStream;
-            }
         }
-        
+        document.getElementById("hangupCallBtn")?.addEventListener("click", () => endCall());
         const muteBtn = document.getElementById("muteCallBtn");
         let muted = false;
-        muteBtn?.addEventListener("click", () => {
-            if (localStream) {
-                muted = !muted;
-                localStream.getAudioTracks()[0].enabled = !muted;
-                muteBtn.innerHTML = muted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
-            }
-        });
-        
+        muteBtn?.addEventListener("click", () => { if(localStream) { muted = !muted; localStream.getAudioTracks()[0].enabled = !muted; muteBtn.innerHTML = muted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>'; } });
         if (isVideo) {
-            const videoToggle = document.getElementById("toggleVideoBtn");
-            let videoOff = false;
-            videoToggle?.addEventListener("click", () => {
-                if (localStream && localStream.getVideoTracks().length) {
-                    videoOff = !videoOff;
-                    localStream.getVideoTracks()[0].enabled = !videoOff;
-                    videoToggle.innerHTML = videoOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>';
-                }
-            });
+            const vidToggle = document.getElementById("toggleVideoBtn");
+            let vidOff = false;
+            vidToggle?.addEventListener("click", () => { if(localStream?.getVideoTracks().length) { vidOff = !vidOff; localStream.getVideoTracks()[0].enabled = !vidOff; vidToggle.innerHTML = vidOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>'; } });
         }
-        
-        document.getElementById("hangupCallBtn")?.addEventListener("click", () => { endCall(); });
-        
         if (peerConnection && isVideo && remoteVideo) {
-            const originalOntrack = peerConnection.ontrack;
-            peerConnection.ontrack = (event) => {
-                if (event.track.kind === 'video' && remoteVideo) {
-                    if (event.streams[0]) remoteVideo.srcObject = event.streams[0];
-                }
-                if (event.track.kind === 'audio') {
-                    if (!remoteAudio) {
-                        remoteAudio = new Audio();
-                        remoteAudio.srcObject = event.streams[0];
-                        remoteAudio.play();
-                    } else {
-                        remoteAudio.srcObject = event.streams[0];
-                    }
-                }
-                if (originalOntrack) originalOntrack(event);
-            };
+            const original = peerConnection.ontrack;
+            peerConnection.ontrack = (e) => { if(e.track.kind === 'video' && remoteVideo && e.streams[0]) remoteVideo.srcObject = e.streams[0]; if(e.track.kind === 'audio') { if(!remoteAudio){ remoteAudio = new Audio(); remoteAudio.srcObject = e.streams[0]; remoteAudio.play(); } else remoteAudio.srcObject = e.streams[0]; } if(original) original(e); };
         }
     }
 
-    async function listenForIncomingCalls() {
+    function listenIncomingCalls() {
         if (!currentUser) return;
         const q = query(collection(db, "calls"), where("to", "==", currentUser.uid), where("status", "in", ["calling", "offer_sent"]));
         onSnapshot(q, async (snapshot) => {
@@ -790,14 +740,12 @@
                 if (change.type === "added") {
                     const callData = change.doc.data();
                     const callId = change.doc.id;
-                    if (isCallActive) {
-                        await updateDoc(doc(db, "calls", callId), { status: "rejected" });
-                        return;
-                    }
-                    const callType = callData.type === "video" ? "ভিডিও কল" : "অডিও কল";
-                    const accept = confirm(`${callData.fromName || "অজানা"} ${callType} করছেন। রিসিভ করবেন?`);
+                    if (isCallActive) { await updateDoc(doc(db, "calls", callId), { status: "rejected" }); return; }
+                    const typeText = callData.type === "video" ? "ভিডিও কল" : "অডিও কল";
+                    const accept = confirm(`${callData.fromName || "অজানা"} ${typeText} করছেন। রিসিভ করবেন?`);
                     if (accept) {
-                        await answerCall(callId, callData.fromName, callData.from, callData.type === "video");
+                        const fromUser = { uid: callData.from, name: callData.fromName };
+                        await answerCall(callId, fromUser, callData.type === "video");
                     } else {
                         await updateDoc(doc(db, "calls", callId), { status: "rejected" });
                     }
@@ -806,105 +754,42 @@
         });
     }
 
-    async function showCallModal(videoType) {
+    // Presence & online handling
+    async function updatePresence() {
         if (!currentUser) return;
-        const now = Date.now();
-        const presenceSnap = await getDocs(collection(db, "presence"));
-        let onlineUsers = [];
-        presenceSnap.forEach(docSnap => {
-            const data = docSnap.data();
-            let last = data.lastSeen?.toDate ? data.lastSeen.toDate() : new Date(data.lastSeen);
-            if (last && (now - last.getTime()) < 45000 && data.uid !== currentUser.uid) {
-                onlineUsers.push({ uid: data.uid, nickname: data.nickname || "বন্ধু" });
-            }
-        });
-        const modal = document.createElement("div"); modal.className = "modal-overlay";
-        modal.innerHTML = `
-            <div class="modal-card">
-                <i class="fas ${videoType ? 'fa-video' : 'fa-phone-alt'}"></i>
-                <h3>${videoType ? "ভিডিও কলের জন্য" : "অডিও কলের জন্য"} অনলাইন সদস্য</h3>
-                <div class="online-user-list" id="onlineUserList"></div>
-                <button id="closeCallModal" style="background:#ccc; margin-top:10px; padding:8px 16px; border-radius:40px;">বন্ধ করুন</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        const listDiv = modal.querySelector("#onlineUserList");
-        if (onlineUsers.length === 0) listDiv.innerHTML = "<div style='text-align:center'>কেউ অনলাইনে নেই</div>";
-        onlineUsers.forEach(u => {
-            const item = document.createElement("div"); item.className = "online-user-item";
-            item.innerHTML = `<span><i class="fas fa-circle" style="color:#25d366;"></i> ${escapeHtml(u.nickname)}</span>
-                              <button class="call-user-btn" data-uid="${u.uid}" data-name="${escapeHtml(u.nickname)}">${videoType ? 'ভিডিও কল' : 'অডিও কল'}</button>`;
-            listDiv.appendChild(item);
-        });
-        document.querySelectorAll(".call-user-btn").forEach(btn => {
-            btn.addEventListener("click", async () => {
-                const targetUid = btn.dataset.uid;
-                const targetName = btn.dataset.name;
-                modal.remove();
-                await startCall(targetUid, targetName, videoType);
-            });
-        });
-        modal.querySelector("#closeCallModal").onclick = () => modal.remove();
+        await setDoc(doc(db, "presence", currentUser.uid), { uid: currentUser.uid, nickname: currentUserDoc?.name, lastSeen: serverTimestamp() }, { merge: true });
     }
-
-    async function setNickname(newName) {
-        if (!currentUser) return false;
-        const trimmed = newName.trim();
-        if (!trimmed) return false;
-        await updateProfile(currentUser, { displayName: trimmed });
-        currentNickname = trimmed;
-        currentUserNameSpan.innerText = trimmed;
-        await updatePresence();
-        return true;
-    }
-    function changeNicknameUI() {
-        const newName = prompt("নতুন নাম লিখুন:", currentNickname);
-        if (newName && newName.trim() !== "" && newName.trim() !== currentNickname) setNickname(newName.trim());
-    }
-    async function clearAllMessages() {
-        if (!confirm("সব চ্যাট মুছে ফেলবেন?")) return;
-        const snap = await getDocs(collection(db, "messages"));
-        const batch = writeBatch(db);
-        snap.forEach(d => batch.delete(d.ref));
-        await batch.commit();
-    }
-
-    cancelReplyBtn.addEventListener("click", () => { activeReply = null; replyIndicatorDiv.classList.add('hide'); });
-    sendBtn.addEventListener("click", sendMessage);
-    messageInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
-    changeNameBtn.addEventListener("click", changeNicknameUI);
-    clearAllBtn.addEventListener("click", clearAllMessages);
-    showAudioCallModalBtn.addEventListener("click", () => showCallModal(false));
-    showVideoCallModalBtn.addEventListener("click", () => showCallModal(true));
-
-    async function initAnonymous() {
-        const cred = await signInAnonymously(auth);
-        currentUser = cred.user;
-        let name = prompt("চ্যাটে আপনার নাম দিন (সকলের কাছে দৃশ্যমান):", "মজার বন্ধু");
-        if (!name) name = "আড্ডাবাজ";
-        await setNickname(name);
-        startPresenceHeartbeat();
-        listenOnlineUsers();
-        loadMessages();
-        listenForIncomingCalls();
-    }
-    onAuthStateChanged(auth, (user) => {
+    setInterval(() => updatePresence(), 20000);
+    
+    // final auth observer
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
-            if (user.displayName) {
-                currentNickname = user.displayName;
-                currentUserNameSpan.innerText = currentNickname;
-                startPresenceHeartbeat();
-                listenOnlineUsers();
-                loadMessages();
-                listenForIncomingCalls();
-            } else {
-                initAnonymous().catch(console.error);
-            }
+            await loadCurrentUserProfile(user.uid);
+            authContainer.classList.add('hide');
+            mainAppDiv.classList.remove('hide');
+            if (window.innerWidth <= 700) contactsPanel.classList.remove('hide-mobile');
+            listenContacts();
+            updatePresence();
+            listenIncomingCalls();
+            // search event
+            searchInput.addEventListener('input', () => renderContactsList(allUsers));
+            sendMsgBtn.addEventListener('click', sendPrivateMessage);
+            chatMessageInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendPrivateMessage(); });
+            audioCallBtn.addEventListener('click', () => { if(selectedContact) startCall(selectedContact, false); else showToast("একটি কন্টাক্ট সিলেক্ট করুন"); });
+            videoCallBtn.addEventListener('click', () => { if(selectedContact) startCall(selectedContact, true); else showToast("একটি কন্টাক্ট সিলেক্ট করুন"); });
+            mobileBackBtn.addEventListener('click', () => { contactsPanel.classList.remove('hide-mobile'); });
         } else {
-            initAnonymous();
+            if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeContacts) unsubscribeContacts();
+            if (peerConnection) peerConnection.close();
+            endCall();
+            authContainer.classList.remove('hide');
+            mainAppDiv.classList.add('hide');
+            selectedContact = null;
         }
     });
 </script>
 </body>
 </html>
+```
