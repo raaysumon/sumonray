@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ivyity | smart education & IoT — direct purchase</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter + Noto Sans Bengali -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F5F7FA;
+            font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
+            color: #111827;
+            line-height: 1.5;
+        }
+
+        /* BLACK / WHITE / RED PROFESSIONAL THEME */
+        .navbar {
+            background: #000000;
+            border-bottom: 3px solid #DC2626;
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* leaf logo */
+        .logo-icon {
+            background: #DC2626;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(220,38,38,0.25);
+        }
+
+        .logo-icon i {
+            font-size: 1.7rem;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #FFFFFF;
+            line-height: 1.2;
+        }
+
+        .logo-text span {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #D1D5DB;
+            display: block;
+            margin-top: 2px;
+            letter-spacing: 0.3px;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 0.5rem;
+            background: #1F2937;
+            padding: 0.3rem;
+            border-radius: 60px;
+        }
+
+        .lang-btn {
+            border: none;
+            background: transparent;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-family: inherit;
+            color: #E5E7EB;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #DC2626;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .view-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111827;
+            border-left: 5px solid #DC2626;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* product cards */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .product-card {
+            background: #FFFFFF;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.15);
+            border-color: #DC2626;
+        }
+
+        .product-icon {
+            background: #FEF2F2;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 2.5rem;
+            color: #DC2626;
+            border-bottom: 1px solid #FEE2E2;
+        }
+
+        .product-info {
+            padding: 1.25rem;
+        }
+
+        .product-category {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: #F3F4F6;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            margin-bottom: 0.7rem;
+            color: #DC2626;
+            letter-spacing: 0.3px;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+
+        .product-price {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #111827;
+            margin: 0.6rem 0;
+        }
+
+        .buy-now-btn {
+            background: #DC2626;
+            border: none;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+        }
+
+        .buy-now-btn:hover {
+            background: #B91C1C;
+            transform: translateY(-2px);
+        }
+
+        /* modal (bkash) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .bkash-modal {
+            background: white;
+            max-width: 450px;
+            width: 90%;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            text-align: center;
+            border-top: 6px solid #DC2626;
+        }
+        .bkash-logo {
+            background: #DC2626;
+            width: 65px;
+            height: 65px;
+            border-radius: 65px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 2rem;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.6rem 0;
+            border: 1px solid #D1D5DB;
+            border-radius: 2rem;
+            font-size: 0.95rem;
+        }
+        .pay-confirm {
+            background: #DC2626;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .close-modal {
+            background: #F3F4F6;
+            margin-top: 0.7rem;
+            width: 100%;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #111827;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            z-index: 1100;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .toast-msg.show { opacity: 1; }
+        footer {
+            text-align: center;
+            margin: 3rem 0 1.5rem;
+            color: #6B7280;
+            font-size: 0.8rem;
+            border-top: 1px solid #E5E7EB;
+            padding-top: 1.5rem;
+        }
+        @media (max-width: 640px) {
+            .navbar { padding: 0.8rem 1rem; }
+            .logo-text h1 { font-size: 1.3rem; }
+            .logo-icon { width: 36px; height: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-container">
+        <div class="logo-wrapper">
+            <div class="logo-icon"><i class="fas fa-leaf"></i></div>   <!-- leaf logo -->
+            <div class="logo-text">
+                <h1>Ivyity</h1>
+                <span data-i18n="tagline">smart · edtech · iot</span>
+            </div>
+        </div>
+        <div class="lang-switch">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="bn">বাংলা</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="view-header">
+        <h2><i class="fas fa-microchip"></i> <span data-i18n="productsHeading">Education & IoT Collection</span></h2>
+    </div>
+    <div id="productsGrid" class="products-grid"></div>
+</div>
+
+<footer>
+    <p>© 2025 Ivyity — <span data-i18n="footer">smart learning & IoT solutions | bKash direct payment</span></p>
+</footer>
+
+<!-- bKash Modal -->
+<div id="bkashModal" class="modal-overlay">
+    <div class="bkash-modal">
+        <div class="bkash-logo"><i class="fas fa-mobile-alt"></i></div>
+        <h3 data-i18n="bkashTitle">bKash Payment</h3>
+        <p><span data-i18n="purchaseItem">Item:</span> <strong id="modalProductName"></strong></p>
+        <p><strong id="modalProductPrice">0</strong> BDT</p>
+        <input type="text" id="bkashNumber" class="modal-input" placeholder="01XXXXXXXXX">
+        <input type="password" id="bkashOtp" class="modal-input" placeholder="123456 (demo OTP)">
+        <small data-i18n="demoNote">🔐 Mock payment: any valid number & 6-digit OTP works</small>
+        <button id="confirmPaymentBtn" class="pay-confirm">Confirm & Pay</button>
+        <button id="closeModalBtn" class="close-modal">Cancel</button>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✨</div>
+
+<script>
+    // PRODUCTS (bilingual) — direct purchase, no cart
+    const PRODUCTS_EN = [
+        { id: 1, name: "Intro to IoT & Embedded Systems", price: 4500, category: "Education Course", icon: "fas fa-microchip", type: "course" },
+        { id: 2, name: "Advanced Python for IoT", price: 5500, category: "Education Course", icon: "fab fa-python", type: "course" },
+        { id: 3, name: "AI & Edge Machine Learning", price: 7500, category: "Education Course", icon: "fas fa-brain", type: "course" },
+        { id: 4, name: "Smart Agriculture Monitoring Kit", price: 18500, category: "IoT Project", icon: "fas fa-tractor", type: "iot" },
+        { id: 5, name: "IoT Home Security System", price: 22500, category: "IoT Project", icon: "fas fa-shield-alt", type: "iot" },
+        { id: 6, name: "Wearable Health Tracker", price: 19500, category: "IoT Project", icon: "fas fa-heartbeat", type: "iot" }
+    ];
+
+    const PRODUCTS_BN = [
+        { id: 1, name: "IoT ও এম্বেডেড সিস্টেম পরিচিতি", price: 4500, category: "শিক্ষা কোর্স", icon: "fas fa-microchip", type: "course" },
+        { id: 2, name: "IoT-এর জন্য অ্যাডভান্সড পাইথন", price: 5500, category: "শিক্ষা কোর্স", icon: "fab fa-python", type: "course" },
+        { id: 3, name: "AI ও এজ মেশিন লার্নিং", price: 7500, category: "শিক্ষা কোর্স", icon: "fas fa-brain", type: "course" },
+        { id: 4, name: "স্মার্ট কৃষি মনিটরিং কিট", price: 18500, category: "IoT প্রকল্প", icon: "fas fa-tractor", type: "iot" },
+        { id: 5, name: "IoT হোম সিকিউরিটি সিস্টেম", price: 22500, category: "IoT প্রকল্প", icon: "fas fa-shield-alt", type: "iot" },
+        { id: 6, name: "ওয়্যারেবল হেলথ ট্র্যাকার", price: 19500, category: "IoT প্রকল্প", icon: "fas fa-heartbeat", type: "iot" }
+    ];
+
+    let currentLang = "en";
+    let pendingProduct = null;   // store product for direct payment
+
+    const translations = {
+        en: {
+            tagline: "smart · edtech · iot",
+            productsHeading: "Education & IoT Collection",
+            footer: "smart learning & IoT solutions | bKash direct payment",
+            bkashTitle: "bKash Payment",
+            purchaseItem: "Item:",
+            demoNote: "🔐 Mock payment: any valid number & 6-digit OTP works",
+            buyNow: "Buy Now",
+            successMsg: "Payment Successful! Thank you for purchasing",
+            invalidNumber: "Invalid bKash number! Use 01XXXXXXXXX",
+            invalidOtp: "OTP must be 6 digits",
+            course: "Course",
+            iotProject: "IoT Project"
+        },
+        bn: {
+            tagline: "স্মার্ট · শিক্ষা · আইওটি",
+            productsHeading: "শিক্ষা ও IoT সংগ্রহ",
+            footer: "স্মার্ট লার্নিং ও IoT সমাধান | bKash সরাসরি পেমেন্ট",
+            bkashTitle: "bKash পেমেন্ট",
+            purchaseItem: "পণ্য:",
+            demoNote: "🔐 মক পেমেন্ট: যেকোনো বৈধ নম্বর ও ৬ সংখ্যার OTP কাজ করে",
+            buyNow: "এখনই কিনুন",
+            successMsg: "পেমেন্ট সফল! কেনার জন্য ধন্যবাদ",
+            invalidNumber: "ভুল bKash নম্বর! 01XXXXXXXXX ব্যবহার করুন",
+            invalidOtp: "OTP অবশ্যই ৬ সংখ্যার হতে হবে",
+            course: "কোর্স",
+            iotProject: "IoT প্রকল্প"
+        }
+    };
+
+    function t(key) { return translations[currentLang][key] || key; }
+
+    function updateUIStrings() {
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+        });
+        const taglineSpan = document.querySelector(".logo-text span");
+        if(taglineSpan) taglineSpan.innerText = t("tagline");
+        // refresh product buttons text
+        document.querySelectorAll(".buy-now-btn").forEach(btn => {
+            const span = btn.querySelector(".btn-text");
+            if(span) span.innerText = t("buyNow");
+        });
+    }
+
+    function getCurrentProducts() { return currentLang === "en" ? [...PRODUCTS_EN] : [...PRODUCTS_BN]; }
+
+    function showToast(msg, bg = "#111827") {
+        const toast = document.getElementById("toastMsg");
+        toast.style.backgroundColor = bg;
+        toast.innerText = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+
+    // Direct purchase: open modal for product
+    function initiatePurchase(product) {
+        pendingProduct = product;
+        document.getElementById("modalProductName").innerText = product.name;
+        document.getElementById("modalProductPrice").innerText = product.price.toLocaleString();
+        document.getElementById("bkashNumber").value = "";
+        document.getElementById("bkashOtp").value = "";
+        document.getElementById("bkashModal").classList.add("active");
+    }
+
+    function closeModal() {
+        document.getElementById("bkashModal").classList.remove("active");
+        pendingProduct = null;
+    }
+
+    function processBkashPayment() {
+        if (!pendingProduct) {
+            showToast("No product selected", "#DC2626");
+            closeModal();
+            return;
+        }
+        const phone = document.getElementById("bkashNumber").value.trim();
+        const otp = document.getElementById("bkashOtp").value.trim();
+        const phoneRegex = /^01[0-9]{9}$/;
+        const otpRegex = /^[0-9]{6}$/;
+        if (!phoneRegex.test(phone)) {
+            showToast(t("invalidNumber"), "#DC2626");
+            return;
+        }
+        if (!otpRegex.test(otp)) {
+            showToast(t("invalidOtp"), "#DC2626");
+            return;
+        }
+        const confirmBtn = document.getElementById("confirmPaymentBtn");
+        confirmBtn.disabled = true;
+        confirmBtn.innerText = "Processing...";
+        // simulate payment API
+        setTimeout(() => {
+            const transactionId = "BKASH" + Math.floor(Math.random() * 10000000000);
+            showToast(`✅ ${t("successMsg")} (${pendingProduct.name}) | Txn: ${transactionId}`, "#10b981");
+            closeModal();
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = "Confirm & Pay";
+            pendingProduct = null;
+        }, 1400);
+    }
+
+    function renderProducts() {
+        const grid = document.getElementById("productsGrid");
+        if (!grid) return;
+        const products = getCurrentProducts();
+        grid.innerHTML = "";
+        products.forEach(prod => {
+            const categoryText = (prod.type === "course") ? t("course") : t("iotProject");
+            const displayCategory = currentLang === "en" ? prod.category : (prod.type === "course" ? "শিক্ষা কোর্স" : "IoT প্রকল্প");
+            const card = document.createElement("div");
+            card.className = "product-card";
+            card.innerHTML = `
+                <div class="product-icon"><i class="${prod.icon}" style="font-size: 2.6rem;"></i></div>
+                <div class="product-info">
+                    <span class="product-category">${displayCategory}</span>
+                    <div class="product-title">${prod.name}</div>
+                    <div class="product-price">৳ ${prod.price.toLocaleString()}<span class="price-bdt"> BDT</span></div>
+                    <button class="buy-now-btn" data-id="${prod.id}"><i class="fas fa-bolt"></i> <span class="btn-text">${t("buyNow")}</span></button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        // attach buy now events
+        document.querySelectorAll(".buy-now-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const id = parseInt(btn.getAttribute("data-id"));
+                const productsList = getCurrentProducts();
+                const product = productsList.find(p => p.id === id);
+                if (product) initiatePurchase(product);
+            });
+        });
+    }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        updateUIStrings();
+        renderProducts();  // re-render with new language
+        document.querySelectorAll(".lang-btn").forEach(btn => {
+            if (btn.getAttribute("data-lang") === lang) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+    }
+
+    // initial load and event binding
+    document.addEventListener("DOMContentLoaded", () => {
+        renderProducts();
+        // language switcher
+        document.querySelectorAll(".lang-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const lang = btn.getAttribute("data-lang");
+                setLanguage(lang);
+            });
+        });
+        // modal controls
+        const modal = document.getElementById("bkashModal");
+        document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+        document.getElementById("confirmPaymentBtn").addEventListener("click", processBkashPayment);
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeModal();
+        });
+        // set initial strings
+        setLanguage("en");
+    });
+</script>
+</body>
+</html>
