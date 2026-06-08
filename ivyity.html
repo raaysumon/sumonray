@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Ivyity | smart education & IoT — direct purchase</title>
+    <title>Ivyity | smart education & IoT — courses & projects</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts: Inter + Noto Sans Bengali -->
@@ -22,7 +22,7 @@
             line-height: 1.5;
         }
 
-        /* BLACK / WHITE / RED PROFESSIONAL THEME */
+        /* BLACK / RED / WHITE PROFESSIONAL THEME */
         .navbar {
             background: #000000;
             border-bottom: 3px solid #DC2626;
@@ -49,7 +49,6 @@
             gap: 12px;
         }
 
-        /* leaf logo */
         .logo-icon {
             background: #DC2626;
             width: 42px;
@@ -81,6 +80,31 @@
             display: block;
             margin-top: 2px;
             letter-spacing: 0.3px;
+        }
+
+        /* NAV LINKS (anchor tags) */
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: #E5E7EB;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.2px;
+        }
+        .nav-links a i {
+            font-size: 0.9rem;
+        }
+        .nav-links a:hover {
+            color: #DC2626;
         }
 
         .lang-switch {
@@ -116,21 +140,36 @@
             padding: 0 1.5rem;
         }
 
-        .view-header h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #111827;
-            border-left: 5px solid #DC2626;
-            padding-left: 1rem;
-            margin-bottom: 1.5rem;
+        /* section styling */
+        .product-section {
+            margin-bottom: 3.5rem;
+            scroll-margin-top: 90px; /* for fixed navbar offset */
         }
 
-        /* product cards */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #DC2626;
+            padding-left: 1rem;
+        }
+
+        .section-header i {
+            font-size: 1.7rem;
+            color: #DC2626;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 2rem;
-            margin-top: 0.5rem;
         }
 
         .product-card {
@@ -175,15 +214,16 @@
         }
 
         .product-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
             color: #111827;
+            line-height: 1.3;
         }
 
         .product-price {
             font-weight: 800;
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             color: #111827;
             margin: 0.6rem 0;
         }
@@ -203,6 +243,7 @@
             cursor: pointer;
             transition: 0.2s;
             box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+            font-family: inherit;
         }
 
         .buy-now-btn:hover {
@@ -259,6 +300,7 @@
             border: 1px solid #D1D5DB;
             border-radius: 2rem;
             font-size: 0.95rem;
+            font-family: inherit;
         }
         .pay-confirm {
             background: #DC2626;
@@ -270,6 +312,7 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 1rem;
+            transition: 0.2s;
         }
         .close-modal {
             background: #F3F4F6;
@@ -299,16 +342,21 @@
         .toast-msg.show { opacity: 1; }
         footer {
             text-align: center;
-            margin: 3rem 0 1.5rem;
+            margin: 2rem 0 1.5rem;
             color: #6B7280;
             font-size: 0.8rem;
             border-top: 1px solid #E5E7EB;
             padding-top: 1.5rem;
         }
-        @media (max-width: 640px) {
+        @media (max-width: 740px) {
             .navbar { padding: 0.8rem 1rem; }
-            .logo-text h1 { font-size: 1.3rem; }
-            .logo-icon { width: 36px; height: 36px; }
+            .nav-container { flex-direction: column; align-items: stretch; }
+            .nav-links { justify-content: center; margin: 0.5rem 0; }
+            .lang-switch { align-self: center; }
+            .logo-wrapper { justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -317,11 +365,17 @@
 <div class="navbar">
     <div class="nav-container">
         <div class="logo-wrapper">
-            <div class="logo-icon"><i class="fas fa-leaf"></i></div>   <!-- leaf logo -->
+            <div class="logo-icon"><i class="fas fa-leaf"></i></div>
             <div class="logo-text">
                 <h1>Ivyity</h1>
                 <span data-i18n="tagline">smart · edtech · iot</span>
             </div>
+        </div>
+        <!-- Nav links section with anchor tags (a thake) -->
+        <div class="nav-links">
+            <a href="#coursesSection" class="nav-link" data-i18n-nav="coursesNav"><i class="fas fa-graduation-cap"></i> <span>Courses</span></a>
+            <a href="#projectsSection" class="nav-link" data-i18n-nav="projectsNav"><i class="fas fa-microchip"></i> <span>IoT Projects</span></a>
+            <a href="#" id="contactNavLink" class="nav-link" data-i18n-nav="contactNav"><i class="fas fa-envelope"></i> <span>Contact</span></a>
         </div>
         <div class="lang-switch">
             <button class="lang-btn active" data-lang="en">EN</button>
@@ -331,10 +385,22 @@
 </div>
 
 <div class="container">
-    <div class="view-header">
-        <h2><i class="fas fa-microchip"></i> <span data-i18n="productsHeading">Education & IoT Collection</span></h2>
+    <!-- Two distinct sections: Courses & IoT Projects (with ids for anchor links) -->
+    <div id="coursesSection" class="product-section">
+        <div class="section-header">
+            <i class="fas fa-graduation-cap"></i>
+            <h2 data-i18n="coursesTitle">📚 Education Courses</h2>
+        </div>
+        <div id="coursesGrid" class="products-grid"></div>
     </div>
-    <div id="productsGrid" class="products-grid"></div>
+
+    <div id="projectsSection" class="product-section">
+        <div class="section-header">
+            <i class="fas fa-microchip"></i>
+            <h2 data-i18n="projectsTitle">🔧 IoT Projects</h2>
+        </div>
+        <div id="projectsGrid" class="products-grid"></div>
+    </div>
 </div>
 
 <footer>
@@ -348,8 +414,8 @@
         <h3 data-i18n="bkashTitle">bKash Payment</h3>
         <p><span data-i18n="purchaseItem">Item:</span> <strong id="modalProductName"></strong></p>
         <p><strong id="modalProductPrice">0</strong> BDT</p>
-        <input type="text" id="bkashNumber" class="modal-input" placeholder="01XXXXXXXXX">
-        <input type="password" id="bkashOtp" class="modal-input" placeholder="123456 (demo OTP)">
+        <input type="text" id="bkashNumber" class="modal-input" placeholder="01XXXXXXXXX" autocomplete="off">
+        <input type="password" id="bkashOtp" class="modal-input" placeholder="123456 (demo OTP)" autocomplete="off">
         <small data-i18n="demoNote">🔐 Mock payment: any valid number & 6-digit OTP works</small>
         <button id="confirmPaymentBtn" class="pay-confirm">Confirm & Pay</button>
         <button id="closeModalBtn" class="close-modal">Cancel</button>
@@ -358,7 +424,7 @@
 <div id="toastMsg" class="toast-msg">✨</div>
 
 <script>
-    // PRODUCTS (bilingual) — direct purchase, no cart
+    // PRODUCTS (bilingual) — courses & IoT projects distinct
     const PRODUCTS_EN = [
         { id: 1, name: "Intro to IoT & Embedded Systems", price: 4500, category: "Education Course", icon: "fas fa-microchip", type: "course" },
         { id: 2, name: "Advanced Python for IoT", price: 5500, category: "Education Course", icon: "fab fa-python", type: "course" },
@@ -378,12 +444,13 @@
     ];
 
     let currentLang = "en";
-    let pendingProduct = null;   // store product for direct payment
+    let pendingProduct = null;
 
     const translations = {
         en: {
             tagline: "smart · edtech · iot",
-            productsHeading: "Education & IoT Collection",
+            coursesTitle: "📚 Education Courses",
+            projectsTitle: "🔧 IoT Projects",
             footer: "smart learning & IoT solutions | bKash direct payment",
             bkashTitle: "bKash Payment",
             purchaseItem: "Item:",
@@ -393,11 +460,16 @@
             invalidNumber: "Invalid bKash number! Use 01XXXXXXXXX",
             invalidOtp: "OTP must be 6 digits",
             course: "Course",
-            iotProject: "IoT Project"
+            iotProject: "IoT Project",
+            // nav texts
+            coursesNav: "Courses",
+            projectsNav: "IoT Projects",
+            contactNav: "Contact"
         },
         bn: {
             tagline: "স্মার্ট · শিক্ষা · আইওটি",
-            productsHeading: "শিক্ষা ও IoT সংগ্রহ",
+            coursesTitle: "📚 শিক্ষা কোর্স",
+            projectsTitle: "🔧 আইওটি প্রকল্প",
             footer: "স্মার্ট লার্নিং ও IoT সমাধান | bKash সরাসরি পেমেন্ট",
             bkashTitle: "bKash পেমেন্ট",
             purchaseItem: "পণ্য:",
@@ -407,24 +479,32 @@
             invalidNumber: "ভুল bKash নম্বর! 01XXXXXXXXX ব্যবহার করুন",
             invalidOtp: "OTP অবশ্যই ৬ সংখ্যার হতে হবে",
             course: "কোর্স",
-            iotProject: "IoT প্রকল্প"
+            iotProject: "IoT প্রকল্প",
+            coursesNav: "কোর্সসমূহ",
+            projectsNav: "আইওটি প্রকল্প",
+            contactNav: "যোগাযোগ"
         }
     };
 
     function t(key) { return translations[currentLang][key] || key; }
 
     function updateUIStrings() {
+        // update elements with data-i18n attribute
         document.querySelectorAll("[data-i18n]").forEach(el => {
             const key = el.getAttribute("data-i18n");
             if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
         });
+        // update nav links texts (data-i18n-nav)
+        document.querySelectorAll("[data-i18n-nav]").forEach(el => {
+            const key = el.getAttribute("data-i18n-nav");
+            if (translations[currentLang][key]) {
+                const span = el.querySelector("span");
+                if (span) span.innerText = translations[currentLang][key];
+                else el.innerText = translations[currentLang][key];
+            }
+        });
         const taglineSpan = document.querySelector(".logo-text span");
         if(taglineSpan) taglineSpan.innerText = t("tagline");
-        // refresh product buttons text
-        document.querySelectorAll(".buy-now-btn").forEach(btn => {
-            const span = btn.querySelector(".btn-text");
-            if(span) span.innerText = t("buyNow");
-        });
     }
 
     function getCurrentProducts() { return currentLang === "en" ? [...PRODUCTS_EN] : [...PRODUCTS_BN]; }
@@ -437,7 +517,6 @@
         setTimeout(() => toast.classList.remove("show"), 2800);
     }
 
-    // Direct purchase: open modal for product
     function initiatePurchase(product) {
         pendingProduct = product;
         document.getElementById("modalProductName").innerText = product.name;
@@ -473,7 +552,6 @@
         const confirmBtn = document.getElementById("confirmPaymentBtn");
         confirmBtn.disabled = true;
         confirmBtn.innerText = "Processing...";
-        // simulate payment API
         setTimeout(() => {
             const transactionId = "BKASH" + Math.floor(Math.random() * 10000000000);
             showToast(`✅ ${t("successMsg")} (${pendingProduct.name}) | Txn: ${transactionId}`, "#10b981");
@@ -485,33 +563,68 @@
     }
 
     function renderProducts() {
-        const grid = document.getElementById("productsGrid");
-        if (!grid) return;
-        const products = getCurrentProducts();
-        grid.innerHTML = "";
-        products.forEach(prod => {
-            const categoryText = (prod.type === "course") ? t("course") : t("iotProject");
-            const displayCategory = currentLang === "en" ? prod.category : (prod.type === "course" ? "শিক্ষা কোর্স" : "IoT প্রকল্প");
+        const allProducts = getCurrentProducts();
+        const courses = allProducts.filter(p => p.type === "course");
+        const projects = allProducts.filter(p => p.type === "iot");
+
+        const coursesGrid = document.getElementById("coursesGrid");
+        const projectsGrid = document.getElementById("projectsGrid");
+        if (!coursesGrid || !projectsGrid) return;
+
+        coursesGrid.innerHTML = "";
+        projectsGrid.innerHTML = "";
+
+        function createCardElement(product) {
+            const categoryKey = product.type === "course" ? "course" : "iotProject";
+            const displayCategory = t(categoryKey);
             const card = document.createElement("div");
             card.className = "product-card";
             card.innerHTML = `
-                <div class="product-icon"><i class="${prod.icon}" style="font-size: 2.6rem;"></i></div>
+                <div class="product-icon"><i class="${product.icon}" style="font-size: 2.6rem;"></i></div>
                 <div class="product-info">
                     <span class="product-category">${displayCategory}</span>
-                    <div class="product-title">${prod.name}</div>
-                    <div class="product-price">৳ ${prod.price.toLocaleString()}<span class="price-bdt"> BDT</span></div>
-                    <button class="buy-now-btn" data-id="${prod.id}"><i class="fas fa-bolt"></i> <span class="btn-text">${t("buyNow")}</span></button>
+                    <div class="product-title">${product.name}</div>
+                    <div class="product-price">৳ ${product.price.toLocaleString()}<span class="price-bdt"> BDT</span></div>
+                    <button class="buy-now-btn" data-id="${product.id}"><i class="fas fa-bolt"></i> <span class="btn-text">${t("buyNow")}</span></button>
                 </div>
             `;
-            grid.appendChild(card);
-        });
-        // attach buy now events
+            return card;
+        }
+
+        courses.forEach(course => coursesGrid.appendChild(createCardElement(course)));
+        projects.forEach(project => projectsGrid.appendChild(createCardElement(project)));
+
+        // attach buy handlers
         document.querySelectorAll(".buy-now-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                const id = parseInt(btn.getAttribute("data-id"));
-                const productsList = getCurrentProducts();
-                const product = productsList.find(p => p.id === id);
-                if (product) initiatePurchase(product);
+            btn.removeEventListener("click", buyHandler);
+            btn.addEventListener("click", buyHandler);
+        });
+    }
+
+    function buyHandler(e) {
+        const btn = e.currentTarget;
+        const id = parseInt(btn.getAttribute("data-id"));
+        const allProducts = getCurrentProducts();
+        const product = allProducts.find(p => p.id === id);
+        if (product) initiatePurchase(product);
+    }
+
+    // smooth scroll for anchor links
+    function initSmoothScroll() {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href && href !== '#') {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } else if (href === '#') {
+                    // contact link: show toast message (mock contact)
+                    e.preventDefault();
+                    showToast("📩 Contact us: hello@ivyity.com | +880 1234 567890", "#1E3A8A");
+                }
             });
         });
     }
@@ -526,24 +639,30 @@
         });
     }
 
-    // initial load and event binding
     document.addEventListener("DOMContentLoaded", () => {
         renderProducts();
+        initSmoothScroll();
+
         // language switcher
         document.querySelectorAll(".lang-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
+            btn.addEventListener("click", () => {
                 const lang = btn.getAttribute("data-lang");
                 setLanguage(lang);
             });
         });
+
         // modal controls
         const modal = document.getElementById("bkashModal");
-        document.getElementById("closeModalBtn").addEventListener("click", closeModal);
-        document.getElementById("confirmPaymentBtn").addEventListener("click", processBkashPayment);
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) closeModal();
-        });
-        // set initial strings
+        const closeModalBtn = document.getElementById("closeModalBtn");
+        const confirmBtn = document.getElementById("confirmPaymentBtn");
+        if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
+        if (confirmBtn) confirmBtn.addEventListener("click", processBkashPayment);
+        if (modal) {
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+        
         setLanguage("en");
     });
 </script>
