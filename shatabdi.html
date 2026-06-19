@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Applicant Data – Click to Copy</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ── Reset & base ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f7fc;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
+            padding: 2rem 2.2rem 2.8rem;
+            transition: all 0.2s;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eef3f8;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: #0b2a44;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .header h1 i {
+            color: #2a7de1;
+            font-size: 1.8rem;
+        }
+
+        .copy-all-btn {
+            background: #1a5fb4;
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(26, 95, 180, 0.25);
+        }
+
+        .copy-all-btn:hover {
+            background: #0f4a92;
+        }
+
+        .copy-all-btn:active {
+            transform: scale(0.96);
+        }
+
+        .copy-all-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* ── Section titles ── */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a3b5d;
+            margin: 2rem 0 1.2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-title i {
+            color: #2a7de1;
+            font-size: 1.3rem;
+            width: 1.8rem;
+            text-align: center;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        /* ── Data grid ── */
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem 2rem;
+        }
+
+        .data-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 12px;
+            background: #f9fafc;
+            transition: background 0.15s;
+            border: 1px solid transparent;
+            cursor: default;
+        }
+
+        .data-item:hover {
+            background: #f0f4fe;
+            border-color: #d6e4ff;
+        }
+
+        .data-item .label {
+            font-weight: 500;
+            color: #3b5a7a;
+            font-size: 0.9rem;
+            min-width: 130px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .data-item .label i {
+            color: #6a8bb0;
+            font-size: 0.8rem;
+            width: 1.2rem;
+        }
+
+        .data-item .value {
+            font-size: 0.95rem;
+            color: #0b1e30;
+            font-weight: 500;
+            word-break: break-word;
+            flex: 1;
+        }
+
+        .data-item .value.bengali {
+            font-weight: 400;
+            color: #1f3b56;
+            font-size: 0.95rem;
+        }
+
+        .data-item .copy-btn {
+            background: transparent;
+            border: none;
+            color: #6a8bb0;
+            font-size: 0.95rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .data-item .copy-btn:hover {
+            background: #d6e4ff;
+            color: #1a5fb4;
+        }
+
+        .data-item .copy-btn.copied {
+            color: #0f9d58;
+            background: #e2f3e6;
+        }
+
+        /* ── Full-width items ── */
+        .data-item.full {
+            grid-column: 1 / -1;
+        }
+
+        /* ── Address block ── */
+        .address-group {
+            background: #f9fafc;
+            border-radius: 16px;
+            padding: 0.8rem 1rem 0.2rem 1rem;
+            margin-top: 0.2rem;
+            border: 1px solid #eef3f8;
+        }
+
+        .address-group .data-item {
+            background: transparent;
+            border-radius: 0;
+            padding: 0.4rem 0;
+            border: none;
+        }
+
+        .address-group .data-item:hover {
+            background: transparent;
+        }
+
+        .address-group .data-item .label {
+            min-width: 120px;
+        }
+
+        /* ── Educational table ── */
+        .edu-table-wrap {
+            overflow-x: auto;
+            margin: 0.5rem 0 0.5rem 0;
+            border-radius: 14px;
+            border: 1px solid #eef3f8;
+        }
+
+        .edu-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+            min-width: 600px;
+        }
+
+        .edu-table th {
+            background: #eef4fa;
+            color: #1a3b5d;
+            font-weight: 600;
+            padding: 0.9rem 1rem;
+            text-align: left;
+            border-bottom: 2px solid #dce6f0;
+        }
+
+        .edu-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #eef3f8;
+            color: #0b1e30;
+            vertical-align: middle;
+            transition: background 0.15s;
+        }
+
+        .edu-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .edu-table tr:hover td {
+            background: #f5f9ff;
+        }
+
+        /* each cell copy icon */
+        .edu-table td .cell-copy-icon {
+            font-size: 0.6rem;
+            opacity: 0.2;
+            margin-left: 6px;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .edu-table td:hover .cell-copy-icon {
+            opacity: 0.8;
+            color: #1a5fb4;
+        }
+
+        .edu-table .copy-cell {
+            text-align: center;
+            width: 50px;
+        }
+
+        .edu-table .copy-cell .copy-btn {
+            background: transparent;
+            border: none;
+            color: #6a8bb0;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            transition: 0.15s;
+        }
+
+        .edu-table .copy-cell .copy-btn:hover {
+            background: #d6e4ff;
+            color: #1a5fb4;
+        }
+
+        .edu-table .copy-cell .copy-btn.copied {
+            color: #0f9d58;
+            background: #e2f3e6;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1a2f44;
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            z-index: 999;
+            max-width: 90vw;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: #7bcb8a;
+            font-size: 1.1rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 800px) {
+            .container {
+                padding: 1.5rem 1.2rem;
+            }
+            .data-grid {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+            }
+            .data-item .label {
+                min-width: 100px;
+                font-size: 0.82rem;
+            }
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            .copy-all-btn {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            .address-group .data-item .label {
+                min-width: 90px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.6rem;
+            }
+            .container {
+                padding: 1rem 0.8rem;
+                border-radius: 18px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.6rem;
+            }
+            .copy-all-btn {
+                justify-content: center;
+            }
+            .data-item {
+                flex-wrap: wrap;
+                gap: 0.2rem;
+            }
+            .data-item .label {
+                min-width: 100%;
+                font-size: 0.78rem;
+                color: #3b5a7a;
+            }
+            .data-item .value {
+                font-size: 0.88rem;
+                padding-left: 0.2rem;
+            }
+            .data-item .copy-btn {
+                align-self: flex-start;
+                margin-top: 0.1rem;
+            }
+            .section-title {
+                font-size: 1rem;
+                margin: 1.5rem 0 0.8rem 0;
+            }
+            .edu-table {
+                font-size: 0.8rem;
+                min-width: 400px;
+            }
+            .edu-table th,
+            .edu-table td {
+                padding: 0.5rem 0.6rem;
+            }
+            .toast {
+                font-size: 0.8rem;
+                padding: 0.6rem 1.2rem;
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="appContainer">
+
+        <!-- ─── HEADER ─── -->
+        <div class="header">
+            <h1><i class="fas fa-id-card"></i> Applicant Data</h1>
+            <button class="copy-all-btn" id="copyAllBtn">
+                <i class="fas fa-copy"></i> Copy All
+            </button>
+        </div>
+
+        <!-- ─── BASIC INFO ─── -->
+        <div class="section-title"><i class="fas fa-user-circle"></i> Basic Information</div>
+        <div class="data-grid" id="basicInfoGrid">
+            <!-- Name EN -->
+            <div class="data-item" data-copy="SHATABDI ROY">
+                <span class="label"><i class="fas fa-user"></i> Name (EN)</span>
+                <span class="value" id="val_name_en">SHATABDI ROY</span>
+                <button class="copy-btn" data-target="val_name_en" data-label="Name (EN)"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Name BN -->
+            <div class="data-item" data-copy="শতাব্দী রায়">
+                <span class="label"><i class="fas fa-user"></i> Name (BN)</span>
+                <span class="value bengali" id="val_name_bn">শতাব্দী রায়</span>
+                <button class="copy-btn" data-target="val_name_bn" data-label="Name (BN)"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Father EN -->
+            <div class="data-item" data-copy="GOUTOM KUMAR ROY">
+                <span class="label"><i class="fas fa-user-friends"></i> Father (EN)</span>
+                <span class="value" id="val_father_en">GOUTOM KUMAR ROY</span>
+                <button class="copy-btn" data-target="val_father_en" data-label="Father (EN)"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Father BN -->
+            <div class="data-item" data-copy="গৌতম কুমার রায়">
+                <span class="label"><i class="fas fa-user-friends"></i> Father (BN)</span>
+                <span class="value bengali" id="val_father_bn">গৌতম কুমার রায়</span>
+                <button class="copy-btn" data-target="val_father_bn" data-label="Father (BN)"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Mother EN -->
+            <div class="data-item" data-copy="HENA MONDAL">
+                <span class="label"><i class="fas fa-user-friends"></i> Mother (EN)</span>
+                <span class="value" id="val_mother_en">HENA MONDAL</span>
+                <button class="copy-btn" data-target="val_mother_en" data-label="Mother (EN)"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Mother BN -->
+            <div class="data-item" data-copy="হেনা মন্ডল">
+                <span class="label"><i class="fas fa-user-friends"></i> Mother (BN)</span>
+                <span class="value bengali" id="val_mother_bn">হেনা মন্ডল</span>
+                <button class="copy-btn" data-target="val_mother_bn" data-label="Mother (BN)"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- DOB -->
+            <div class="data-item" data-copy="02-Mar-2002 [24 Years 3 Months 3 Days (Till: 01-Jun-2026)]">
+                <span class="label"><i class="fas fa-calendar-alt"></i> Date of Birth</span>
+                <span class="value" id="val_dob">02-Mar-2002 [24 Years 3 Months 3 Days (Till: 01-Jun-2026)]</span>
+                <button class="copy-btn" data-target="val_dob" data-label="DOB"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Nationality -->
+            <div class="data-item" data-copy="Bangladeshi">
+                <span class="label"><i class="fas fa-flag"></i> Nationality</span>
+                <span class="value" id="val_nationality">Bangladeshi</span>
+                <button class="copy-btn" data-target="val_nationality" data-label="Nationality"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Religion -->
+            <div class="data-item" data-copy="Hinduism">
+                <span class="label"><i class="fas fa-pray"></i> Religion</span>
+                <span class="value" id="val_religion">Hinduism</span>
+                <button class="copy-btn" data-target="val_religion" data-label="Religion"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Gender -->
+            <div class="data-item" data-copy="Female">
+                <span class="label"><i class="fas fa-venus-mars"></i> Gender</span>
+                <span class="value" id="val_gender">Female</span>
+                <button class="copy-btn" data-target="val_gender" data-label="Gender"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- NID -->
+            <div class="data-item" data-copy="6474090831">
+                <span class="label"><i class="fas fa-id-card"></i> National ID</span>
+                <span class="value" id="val_nid">6474090831</span>
+                <button class="copy-btn" data-target="val_nid" data-label="NID"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Birth Reg -->
+            <div class="data-item" data-copy="20024711784017531">
+                <span class="label"><i class="fas fa-birthday-cake"></i> Birth Registration</span>
+                <span class="value" id="val_birthreg">20024711784017531</span>
+                <button class="copy-btn" data-target="val_birthreg" data-label="Birth Reg."><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Passport -->
+            <div class="data-item" data-copy="A08669516">
+                <span class="label"><i class="fas fa-passport"></i> Passport ID</span>
+                <span class="value" id="val_passport">A08669516</span>
+                <button class="copy-btn" data-target="val_passport" data-label="Passport"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Marital -->
+            <div class="data-item" data-copy="Single">
+                <span class="label"><i class="fas fa-ring"></i> Marital Status</span>
+                <span class="value" id="val_marital">Single</span>
+                <button class="copy-btn" data-target="val_marital" data-label="Marital"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Mobile -->
+            <div class="data-item" data-copy="01748063932">
+                <span class="label"><i class="fas fa-phone-alt"></i> Mobile</span>
+                <span class="value" id="val_mobile">01748063932</span>
+                <button class="copy-btn" data-target="val_mobile" data-label="Mobile"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Email -->
+            <div class="data-item" data-copy="ray.royys@gmail.com">
+                <span class="label"><i class="fas fa-envelope"></i> Email</span>
+                <span class="value" id="val_email">ray.royys@gmail.com</span>
+                <button class="copy-btn" data-target="val_email" data-label="Email"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Quota -->
+            <div class="data-item" data-copy="Not Applicable">
+                <span class="label"><i class="fas fa-tag"></i> Quota</span>
+                <span class="value" id="val_quota">Not Applicable</span>
+                <button class="copy-btn" data-target="val_quota" data-label="Quota"><i class="fas fa-copy"></i></button>
+            </div>
+            <!-- Dept Status -->
+            <div class="data-item" data-copy="Not Applicable">
+                <span class="label"><i class="fas fa-building"></i> Dept. Status</span>
+                <span class="value" id="val_dept">Not Applicable</span>
+                <button class="copy-btn" data-target="val_dept" data-label="Dept. Status"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+
+        <!-- ─── ADDRESSES ─── -->
+        <div class="section-title" style="margin-top:2.4rem;"><i class="fas fa-map-pin"></i> Addresses</div>
+
+        <!-- Present Address -->
+        <div style="font-weight:600; color:#1a3b5d; margin:0.6rem 0 0.4rem 0.2rem; font-size:1rem;">
+            <i class="fas fa-home" style="color:#2a7de1; width:1.8rem;"></i> Present Address
+        </div>
+        <div class="address-group" id="presentAddress">
+            <div class="data-item" data-copy="GOUTOM KUMAR ROY">
+                <span class="label"><i class="fas fa-user"></i> Care Of</span>
+                <span class="value" id="val_present_care">GOUTOM KUMAR ROY</span>
+                <button class="copy-btn" data-target="val_present_care" data-label="Present Care Of"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="RAYBARHI, PACHIM PARA TILDANGA, BATBUNIYA-9270, DACOPE, KHULNA">
+                <span class="label"><i class="fas fa-location-dot"></i> Village / Road</span>
+                <span class="value" id="val_present_village">RAYBARHI, PACHIM PARA TILDANGA, BATBUNIYA-9270, DACOPE, KHULNA</span>
+                <button class="copy-btn" data-target="val_present_village" data-label="Present Village"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="Khulna">
+                <span class="label"><i class="fas fa-city"></i> District</span>
+                <span class="value" id="val_present_district">Khulna</span>
+                <button class="copy-btn" data-target="val_present_district" data-label="Present District"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="Dacope">
+                <span class="label"><i class="fas fa-map"></i> Upazila / P.S.</span>
+                <span class="value" id="val_present_upazila">Dacope</span>
+                <button class="copy-btn" data-target="val_present_upazila" data-label="Present Upazila"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="BATBUNIYA">
+                <span class="label"><i class="fas fa-mailbox"></i> Post Office</span>
+                <span class="value" id="val_present_post">BATBUNIYA</span>
+                <button class="copy-btn" data-target="val_present_post" data-label="Present Post Office"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="9270">
+                <span class="label"><i class="fas fa-hashtag"></i> Post Code</span>
+                <span class="value" id="val_present_postcode">9270</span>
+                <button class="copy-btn" data-target="val_present_postcode" data-label="Present Post Code"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+
+        <!-- Permanent Address -->
+        <div style="font-weight:600; color:#1a3b5d; margin:1.4rem 0 0.4rem 0.2rem; font-size:1rem;">
+            <i class="fas fa-address-card" style="color:#2a7de1; width:1.8rem;"></i> Permanent Address
+        </div>
+        <div class="address-group" id="permanentAddress">
+            <div class="data-item" data-copy="GOUTOM KUMAR ROY">
+                <span class="label"><i class="fas fa-user"></i> Care Of</span>
+                <span class="value" id="val_permanent_care">GOUTOM KUMAR ROY</span>
+                <button class="copy-btn" data-target="val_permanent_care" data-label="Permanent Care Of"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="RAYBARHI, PACHIM PARA TILDANGA, BATBUNIYA-9270, DACOPE, KHULNA">
+                <span class="label"><i class="fas fa-location-dot"></i> Village / Road</span>
+                <span class="value" id="val_permanent_village">RAYBARHI, PACHIM PARA TILDANGA, BATBUNIYA-9270, DACOPE, KHULNA</span>
+                <button class="copy-btn" data-target="val_permanent_village" data-label="Permanent Village"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="Khulna">
+                <span class="label"><i class="fas fa-city"></i> District</span>
+                <span class="value" id="val_permanent_district">Khulna</span>
+                <button class="copy-btn" data-target="val_permanent_district" data-label="Permanent District"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="Dacope">
+                <span class="label"><i class="fas fa-map"></i> Upazila / P.S.</span>
+                <span class="value" id="val_permanent_upazila">Dacope</span>
+                <button class="copy-btn" data-target="val_permanent_upazila" data-label="Permanent Upazila"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="BATBUNIYA">
+                <span class="label"><i class="fas fa-mailbox"></i> Post Office</span>
+                <span class="value" id="val_permanent_post">BATBUNIYA</span>
+                <button class="copy-btn" data-target="val_permanent_post" data-label="Permanent Post Office"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="data-item" data-copy="9270">
+                <span class="label"><i class="fas fa-hashtag"></i> Post Code</span>
+                <span class="value" id="val_permanent_postcode">9270</span>
+                <button class="copy-btn" data-target="val_permanent_postcode" data-label="Permanent Post Code"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+
+        <!-- ─── EDUCATION ─── -->
+        <div class="section-title" style="margin-top:2.4rem;"><i class="fas fa-graduation-cap"></i> Educational Info</div>
+        <p style="color:#4a6a8a; font-size:0.9rem; margin:-0.5rem 0 0.8rem 0.2rem;">
+            <i class="fas fa-mouse-pointer" style="margin-right:0.4rem;"></i> Click <strong>any cell</strong> to copy its content individually. Use the <i class="fas fa-copy"></i> on the right to copy the whole row.
+        </p>
+
+        <div class="edu-table-wrap">
+            <table class="edu-table" id="eduTable">
+                <thead>
+                    <tr>
+                        <th>Examination</th>
+                        <th>Board/University</th>
+                        <th>Roll</th>
+                        <th>Result</th>
+                        <th>Group/Subject</th>
+                        <th>Year</th>
+                        <th>Duration</th>
+                        <th style="width:50px; text-align:center;"><i class="fas fa-copy"></i></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- SSC -->
+                    <tr>
+                        <td>S.S.C</td>
+                        <td>Jashore</td>
+                        <td>101126</td>
+                        <td>GPA 4.61 (Out of 5)</td>
+                        <td>Science</td>
+                        <td>2019</td>
+                        <td>N/A</td>
+                        <td class="copy-cell">
+                            <button class="copy-btn" data-row="ssc" data-label="SSC Row"><i class="fas fa-copy"></i></button>
+                        </td>
+                    </tr>
+                    <!-- HSC -->
+                    <tr>
+                        <td>H.S.C</td>
+                        <td>Jashore</td>
+                        <td>241508</td>
+                        <td>GPA 4.92 (Out of 5)</td>
+                        <td>Humanities</td>
+                        <td>2021</td>
+                        <td>N/A</td>
+                        <td class="copy-cell">
+                            <button class="copy-btn" data-row="hsc" data-label="HSC Row"><i class="fas fa-copy"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ─── FOOTER NOTE ─── -->
+        <div style="margin-top:2rem; font-size:0.85rem; color:#6a8bb0; text-align:center; border-top:1px solid #eef3f8; padding-top:1.2rem;">
+            <i class="fas fa-mouse-pointer" style="margin-right:0.4rem;"></i> Click any <i class="fas fa-copy"></i> button to copy that field &nbsp;·&nbsp; Use <strong>“Copy All”</strong> to copy everything as plain text.
+        </div>
+    </div>
+
+    <!-- ─── TOAST ─── -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Copied!</span>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ── DOM refs ──
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            let toastTimer = null;
+
+            // ── Toast helper ──
+            function showToast(msg) {
+                toastMsg.textContent = msg || 'Copied!';
+                toast.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 1800);
+            }
+
+            // ── Copy text to clipboard ──
+            function copyText(text, label) {
+                if (!text) return;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(label ? `✓ ${label} copied` : `✓ "${text}" copied`);
+                }).catch(() => {
+                    // fallback
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast(label ? `✓ ${label} copied` : `✓ "${text}" copied`);
+                    } catch (e) {
+                        showToast('Could not copy');
+                    }
+                    document.body.removeChild(ta);
+                });
+            }
+
+            // ── Get plain text content of a row (for row copy) ──
+            function getRowText(rowElement) {
+                const cells = rowElement.querySelectorAll('td:not(.copy-cell)');
+                const parts = [];
+                cells.forEach(cell => {
+                    // textContent excludes the icon because it's a <i> tag with ::before, but safe to trim
+                    const txt = cell.textContent.trim();
+                    if (txt) parts.push(txt);
+                });
+                return parts.join('  ');
+            }
+
+            // ── Copy All ──
+            function copyAll() {
+                const lines = [];
+
+                // Basic info – gather from data-grid items
+                const basicItems = document.querySelectorAll('#basicInfoGrid .data-item');
+                basicItems.forEach(item => {
+                    const labelEl = item.querySelector('.label');
+                    const valEl = item.querySelector('.value');
+                    if (labelEl && valEl) {
+                        const label = labelEl.textContent.trim().replace(/[^\w\s.()-]/g, '').trim();
+                        const val = valEl.textContent.trim();
+                        if (val) lines.push(`${label}: ${val}`);
+                    }
+                });
+
+                // Present Address
+                lines.push('');
+                lines.push('Present Address:');
+                const presItems = document.querySelectorAll('#presentAddress .data-item');
+                presItems.forEach(item => {
+                    const labelEl = item.querySelector('.label');
+                    const valEl = item.querySelector('.value');
+                    if (labelEl && valEl) {
+                        const label = labelEl.textContent.trim().replace(/[^\w\s.()-]/g, '').trim();
+                        const val = valEl.textContent.trim();
+                        if (val) lines.push(`  ${label}: ${val}`);
+                    }
+                });
+
+                // Permanent Address
+                lines.push('');
+                lines.push('Permanent Address:');
+                const permItems = document.querySelectorAll('#permanentAddress .data-item');
+                permItems.forEach(item => {
+                    const labelEl = item.querySelector('.label');
+                    const valEl = item.querySelector('.value');
+                    if (labelEl && valEl) {
+                        const label = labelEl.textContent.trim().replace(/[^\w\s.()-]/g, '').trim();
+                        const val = valEl.textContent.trim();
+                        if (val) lines.push(`  ${label}: ${val}`);
+                    }
+                });
+
+                // Education
+                lines.push('');
+                lines.push('Educational Info:');
+                const rows = document.querySelectorAll('#eduTable tbody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td:not(.copy-cell)');
+                    const rowParts = [];
+                    cells.forEach(cell => {
+                        const txt = cell.textContent.trim();
+                        if (txt) rowParts.push(txt);
+                    });
+                    if (rowParts.length) lines.push('  ' + rowParts.join('  '));
+                });
+
+                const fullText = lines.join('\n');
+                copyText(fullText, 'All Data');
+            }
+
+            // ── Attach copy buttons ──
+
+            // 1) Data-item copy buttons (basic + addresses)
+            document.querySelectorAll('.data-item .copy-btn[data-target]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const targetId = this.getAttribute('data-target');
+                    const label = this.getAttribute('data-label') || 'Field';
+                    const el = document.getElementById(targetId);
+                    if (el) {
+                        const text = el.textContent.trim();
+                        const parent = this.closest('.data-item');
+                        let copyVal = text;
+                        if (parent && parent.getAttribute('data-copy')) {
+                            copyVal = parent.getAttribute('data-copy');
+                        }
+                        copyText(copyVal, label);
+                        this.classList.add('copied');
+                        setTimeout(() => this.classList.remove('copied'), 1200);
+                    } else {
+                        showToast('Error: field not found');
+                    }
+                });
+            });
+
+            // 2) Table row copy buttons
+            document.querySelectorAll('#eduTable .copy-btn[data-row]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const rowKey = this.getAttribute('data-row');
+                    const label = this.getAttribute('data-label') || 'Row';
+                    const tr = this.closest('tr');
+                    if (tr) {
+                        const text = getRowText(tr);
+                        copyText(text, label);
+                        this.classList.add('copied');
+                        setTimeout(() => this.classList.remove('copied'), 1200);
+                    }
+                });
+            });
+
+            // 3) Make EVERY cell in the education table individually copyable (single cell copy)
+            document.querySelectorAll('#eduTable tbody td:not(.copy-cell)').forEach(cell => {
+                const originalText = cell.textContent.trim();
+                if (!originalText) return;
+
+                // Store the clean text
+                cell.setAttribute('data-copy-text', originalText);
+                cell.style.cursor = 'pointer';
+
+                // Add a small copy icon inside the cell
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-copy cell-copy-icon';
+                cell.appendChild(icon);
+
+                // Click handler to copy just this cell's text
+                cell.addEventListener('click', function(e) {
+                    // Prevent triggering row copy if any
+                    e.stopPropagation();
+                    const text = this.getAttribute('data-copy-text');
+                    if (text) {
+                        // show a brief highlight
+                        this.style.backgroundColor = '#d6e4ff';
+                        setTimeout(() => this.style.backgroundColor = '', 400);
+                        copyText(text, `"${text}"`);
+                    }
+                });
+
+                // Visual feedback on hover (already handled by CSS)
+            });
+
+            // 4) Copy All button
+            document.getElementById('copyAllBtn').addEventListener('click', function() {
+                copyAll();
+                this.classList.add('copied');
+                setTimeout(() => this.classList.remove('copied'), 1200);
+            });
+
+            // ── Also make value fields in data-item clickable (convenience) ──
+            document.querySelectorAll('.data-item .value').forEach(valEl => {
+                valEl.style.cursor = 'pointer';
+                valEl.addEventListener('click', function() {
+                    const parent = this.closest('.data-item');
+                    if (!parent) return;
+                    const btn = parent.querySelector('.copy-btn');
+                    if (btn) {
+                        btn.click();
+                    } else {
+                        const text = this.textContent.trim();
+                        const label = parent.querySelector('.label')?.textContent.trim() || 'Value';
+                        copyText(text, label);
+                    }
+                });
+            });
+
+            console.log('✅ Applicant data ready – every single cell in the education table is now individually copyable.');
+        })();
+    </script>
+
+</body>
+</html>
