@@ -9,7 +9,6 @@
         {
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
                 "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
             }
         }
@@ -23,7 +22,6 @@
         .auth-card h2 { color: #075e54; margin-bottom: 20px; }
         .auth-input { width: 100%; padding: 12px 16px; margin: 12px 0; border: 1px solid #ddd; border-radius: 40px; font-size: 1rem; outline: none; }
         .auth-btn { background: #25d366; color: #075e54; font-weight: bold; border: none; padding: 12px; width: 100%; border-radius: 40px; cursor: pointer; margin-top: 12px; }
-        .auth-switch { margin-top: 20px; color: #128c7e; cursor: pointer; font-size: 0.9rem; }
         .error-msg { color: #e74c3c; font-size: 0.8rem; margin-top: 6px; }
         .hide { display: none !important; }
         .main-app { display: flex; height: 100%; width: 100%; overflow: hidden; }
@@ -81,23 +79,13 @@
 </head>
 <body>
 <div class="app-container" id="appRoot">
+    <!-- শুধুমাত্র নাম দিয়ে ঢোকার জন্য সহজ ফর্ম -->
     <div id="authContainer" class="auth-container">
         <div class="auth-card">
             <h2><i class="fab fa-whatsapp"></i> Rayচ্যাট</h2>
-            <div id="loginForm">
-                <input type="email" id="loginEmail" class="auth-input" placeholder="ইমেল">
-                <input type="password" id="loginPassword" class="auth-input" placeholder="পাসওয়ার্ড">
-                <button id="doLoginBtn" class="auth-btn">সাইন ইন করুন</button>
-                <div class="auth-switch" id="showSignupBtn">অ্যাকাউন্ট নেই? সাইন আপ করুন</div>
-            </div>
-            <div id="signupForm" class="hide">
-                <input type="text" id="signupName" class="auth-input" placeholder="আপনার নাম">
-                <!-- নির্দিষ্ট নম্বর ডিফল্ট হিসেবে সেট করা এবং পরিবর্তন অযোগ্য করা হয়েছে -->
-                <input type="tel" id="signupPhone" class="auth-input" value="01567854902" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
-                <input type="email" id="signupEmail" class="auth-input" placeholder="ইমেল">
-                <input type="password" id="signupPassword" class="auth-input" placeholder="পাসওয়ার্ড">
-                <button id="doSignupBtn" class="auth-btn">সাইন আপ করুন</button>
-                <div class="auth-switch" id="showLoginBtn">ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন</div>
+            <div>
+                <input type="text" id="userNameInput" class="auth-input" placeholder="আপনার নাম লিখুন...">
+                <button id="enterAppBtn" class="auth-btn">প্রবেশ করুন</button>
             </div>
             <div id="authError" class="error-msg"></div>
         </div>
@@ -132,7 +120,6 @@
 
 <script type="module">
     import { initializeApp } from "firebase/app";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "firebase/auth";
     import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 
     const firebaseConfig = {
@@ -145,14 +132,13 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
 
     // DOM Elements
     const authContainer = document.getElementById('authContainer');
     const mainAppDiv = document.getElementById('mainApp');
-    const loginFormDiv = document.getElementById('loginForm');
-    const signupFormDiv = document.getElementById('signupForm');
+    const userNameInput = document.getElementById('userNameInput');
+    const enterAppBtn = document.getElementById('enterAppBtn');
     const authErrorSpan = document.getElementById('authError');
     const chatsListDiv = document.getElementById('chatsList');
     const chatContactNameSpan = document.getElementById('chatContactName');
@@ -167,12 +153,11 @@
     const newChatBtn = document.getElementById('newChatBtn');
 
     let currentUser = null;
-    let currentUserDoc = null;
     let selectedChat = null;
     let unsubscribeMessages = null;
     let unsubscribeChats = null;
 
-    // Fixed Global Phone Number Constant
+    // স্থায়ী নম্বর
     const FIXED_PHONE_NUMBER = "01567854902";
 
     // WebRTC Globals
@@ -192,7 +177,7 @@
     function getConversationId(uid1, uid2) { return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`; }
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-    // Load active conversation chats
+    // চ্যাট লিস্ট লোড করার ফাংশন
     function loadUserChats() {
         if (unsubscribeChats) unsubscribeChats();
         const convQuery = query(collection(db, "conversations"), where("participants", "array-contains", currentUser.uid));
@@ -273,14 +258,14 @@
         await addDoc(collection(db, "conversations", convId, "messages"), { 
             text, 
             senderId: currentUser.uid, 
-            senderName: currentUserDoc?.name || "ইউজার", 
+            senderName: currentUser.name, 
             receiverId: selectedChat.contactId, 
             timestamp: serverTimestamp() 
         });
         chatMessageInput.value = "";
     }
 
-    // Modal to view ALL Registered Users Worldwide
+    // সকল রেজিস্টার্ড ইউজার দেখার মোডাল
     async function openGlobalUsersModal() {
         const modal = document.createElement('div'); modal.className = 'modal-overlay';
         modal.innerHTML = `
@@ -333,7 +318,7 @@
             });
 
             if (userCount === 0) {
-                usersListContainer.innerHTML = '<p style="text-align:center; color:gray;">আপনি ছাড়া আর কোনো রেজিস্টার্ড ইউজার নেই</p>';
+                usersListContainer.innerHTML = '<p style="text-align:center; color:gray;">আপনি ছাড়া আর কোনো ইউজার নেই</p>';
             }
         } catch (e) {
             usersListContainer.innerHTML = '<p style="text-align:center; color:red;">ইউজার তালিকা লোড করতে সমস্যা হয়েছে</p>';
@@ -426,7 +411,7 @@
             isCallActive = true;
             await getMediaStream(isVideo);
             const callDoc = await addDoc(collection(db, "calls"), {
-                from: currentUser.uid, fromName: currentUserDoc?.name || "ইউজার", to: targetUser.contactId, toName: targetUser.name,
+                from: currentUser.uid, fromName: currentUser.name || "ইউজার", to: targetUser.contactId, toName: targetUser.name,
                 status: "calling", type: isVideo ? "video" : "audio", createdAt: serverTimestamp()
             });
             currentCallDocId = callDoc.id;
@@ -495,102 +480,69 @@
         });
     }
 
-    // ---------- AUTHENTICATION HANDLERS ----------
-
-    document.getElementById('showSignupBtn').onclick = () => {
-        loginFormDiv.classList.add('hide');
-        signupFormDiv.classList.remove('hide');
-        authErrorSpan.innerText = '';
-    };
-
-    document.getElementById('showLoginBtn').onclick = () => {
-        signupFormDiv.classList.add('hide');
-        loginFormDiv.classList.remove('hide');
-        authErrorSpan.innerText = '';
-    };
-
-    // Signup Logic Override (Strictly set phone to 01567854902)
-    document.getElementById('doSignupBtn').onclick = async () => {
-        const name = document.getElementById('signupName').value.trim();
-        const email = document.getElementById('signupEmail').value.trim();
-        const password = document.getElementById('signupPassword').value.trim();
-        const phone = FIXED_PHONE_NUMBER; // Forcefully assign ONLY this number
-
-        if (!name || !email || !password) {
-            authErrorSpan.innerText = 'দয়া করে সমস্ত ঘর সঠিকভাবে পূরণ করুন।';
+    // ---------- নাম দিয়ে প্রবেশের লজিক ----------
+    enterAppBtn.onclick = async () => {
+        const name = userNameInput.value.trim();
+        if (!name) {
+            authErrorSpan.innerText = "দয়া করে আপনার নাম লিখুন!";
             return;
         }
 
+        // নামের উপর ভিত্তি করে একটি ইউনিক ID তৈরি করা
+        const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const userId = "user_" + (cleanName || "anonymous") + "_" + Math.floor(1000 + Math.random() * 9000);
+
+        currentUser = {
+            uid: userId,
+            name: name,
+            phone: FIXED_PHONE_NUMBER
+        };
+
         try {
-            const res = await createUserWithEmailAndPassword(auth, email, password);
-            await updateProfile(res.user, { displayName: name });
-            await setDoc(doc(db, "users", res.user.uid), {
-                uid: res.user.uid,
+            // ফায়ারবেস ডেটাবেসে ইউজার সেভ করা
+            await setDoc(doc(db, "users", userId), {
+                uid: userId,
                 name: name,
-                email: email,
-                phone: phone, // Saved into Firestore DB as 01567854902
+                phone: FIXED_PHONE_NUMBER,
                 createdAt: serverTimestamp()
-            });
-            authErrorSpan.innerText = '';
-        } catch (err) {
-            authErrorSpan.innerText = 'সাইন আপ করতে সমস্যা হয়েছে: ' + err.message;
+            }, { merge: true });
+
+            // লোকাল স্টোরেজে তথ্য রাখা যাতে রিফ্রেশ দিলেও লগআউট না হয়ে যায়
+            localStorage.setItem('raychat_user', JSON.stringify(currentUser));
+
+            authContainer.classList.add('hide');
+            mainAppDiv.classList.remove('hide');
+
+            loadUserChats();
+            listenIncomingCalls();
+        } catch (e) {
+            authErrorSpan.innerText = "প্রবেশ করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।";
         }
     };
 
-    // Login Logic
-    document.getElementById('doLoginBtn').onclick = async () => {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-
-        if (!email || !password) {
-            authErrorSpan.innerText = 'ইমেল এবং পাসওয়ার্ড প্রদান করুন।';
-            return;
-        }
-
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            authErrorSpan.innerText = '';
-        } catch (err) {
-            authErrorSpan.innerText = 'লগইন ব্যর্থ হয়েছে। তথ্যগুলো সঠিক কিনা পরীক্ষা করুন।';
-        }
-    };
-
-    // Logout Logic
+    // লগআউট সিস্টেম
     logoutBtn.onclick = () => {
-        signOut(auth);
+        localStorage.removeItem('raychat_user');
+        location.reload();
     };
 
-    // UI & Action Listeners
+    // অটো-লগইন চেক (লোকাল স্টোরেজ থেকে)
+    const savedUser = localStorage.getItem('raychat_user');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        authContainer.classList.add('hide');
+        mainAppDiv.classList.remove('hide');
+        loadUserChats();
+        listenIncomingCalls();
+    }
+
+    // Event Listeners
     newChatBtn.onclick = () => openGlobalUsersModal();
     sendMsgBtn.onclick = () => sendPrivateMessage();
     chatMessageInput.onkeypress = (e) => { if (e.key === 'Enter') sendPrivateMessage(); };
     audioCallBtn.onclick = () => { if (selectedChat) startCall(selectedChat, false); };
     videoCallBtn.onclick = () => { if (selectedChat) startCall(selectedChat, true); };
     mobileBackBtn.onclick = () => chatsPanel.classList.remove('hide-mobile');
-
-    // Auth State Observer
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            const uDoc = await getDoc(doc(db, "users", user.uid));
-            currentUserDoc = uDoc.exists() ? uDoc.data() : { name: user.displayName || "ইউজার", phone: FIXED_PHONE_NUMBER };
-            
-            authContainer.classList.add('hide');
-            mainAppDiv.classList.remove('hide');
-            
-            loadUserChats();
-            listenIncomingCalls();
-        } else {
-            currentUser = null;
-            currentUserDoc = null;
-            selectedChat = null;
-            if (unsubscribeMessages) unsubscribeMessages();
-            if (unsubscribeChats) unsubscribeChats();
-            
-            authContainer.classList.remove('hide');
-            mainAppDiv.classList.add('hide');
-        }
-    });
 </script>
 </body>
 </html>
