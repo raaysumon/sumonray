@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -317,7 +316,7 @@
     }
 
     function renderChatsList(chats) {
-        if (chats.length === 0) { chatsListDiv.innerHTML = '<div style="padding:20px; text-align:center;">কোনো চ্যাট নেই। + বাটনে ক্লিক করুন</div>'; return; }
+        if (chats.length === 0) { chatsListDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">কোনো চ্যাট নেই। + বাটনে ক্লিক করুন</div>'; return; }
         chatsListDiv.innerHTML = '';
         chats.forEach(chat => {
             const div = document.createElement('div');
@@ -373,7 +372,7 @@
     // New chat modal
     function openNewChatModal() {
         const modal = document.createElement('div'); modal.className = 'modal-overlay';
-        modal.innerHTML = `<div class="modal-card"><i class="fas fa-search" style="font-size:2rem;color:#075e54;"></i><h3>ফোন নম্বর দিয়ে খুঁজুন</h3><input type="tel" id="searchPhoneInputModal" placeholder="যেমন: +8801xxxxxxxx"><div id="searchResult"></div><button id="modalCloseBtn">বন্ধ</button></div>`;
+        modal.innerHTML = `<div class="modal-card"><i class="fas fa-search" style="font-size:2rem;color:#075e54;"></i><h3>ফোন নম্বর দিয়ে খুঁজুন</h3><input type="tel" id="searchPhoneInputModal" placeholder="যেমন: +8801xxxxxxxx"><div id="searchResult"></div><button id="modalCloseBtn">বন্ধ</button></div>`;
         document.body.appendChild(modal);
         const searchInput = modal.querySelector('#searchPhoneInputModal');
         const resultDiv = modal.querySelector('#searchResult');
@@ -384,11 +383,11 @@
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("phone", "==", phone));
             const querySnap = await getDocs(q);
-            if (querySnap.empty) { resultDiv.innerHTML = '<p style="color:red;">ব্যবহারকারী পাওয়া যায়নি</p>'; return; }
+            if (querySnap.empty) { resultDiv.innerHTML = '<p style="color:red; margin-top:8px;">ব্যবহারকারী পাওয়া যায়নি</p>'; return; }
             let found = null;
             querySnap.forEach(docSnap => { const data = docSnap.data(); if (data.uid !== currentUser.uid) found = data; });
-            if (!found) { resultDiv.innerHTML = '<p style="color:red;">নিজের অথবা নম্বরটি নেই</p>'; return; }
-            resultDiv.innerHTML = `<div style="background:#f0f2f5; padding:12px; border-radius:20px;"><p><strong>${escapeHtml(found.name)}</strong></p><p>${escapeHtml(found.phone)}</p><button id="startChatBtn" style="background:#25d366;">চ্যাট শুরু করুন</button></div>`;
+            if (!found) { resultDiv.innerHTML = '<p style="color:red; margin-top:8px;">নিজের নম্বর অথবা ইউজার পাওয়া যায়নি</p>'; return; }
+            resultDiv.innerHTML = `<div style="background:#f0f2f5; padding:12px; border-radius:20px; margin-top:10px;"><p><strong>${escapeHtml(found.name)}</strong></p><p>${escapeHtml(found.phone)}</p><button id="startChatBtn" style="background:#25d366; color:white;">চ্যাট শুরু করুন</button></div>`;
             const startBtn = resultDiv.querySelector('#startChatBtn');
             startBtn.onclick = async () => {
                 const convId = getConversationId(currentUser.uid, found.uid);
@@ -509,10 +508,10 @@
                     unsub();
                 }
                 if (data?.status === "active") { /* already showing UI */ }
-                if (data?.status === "rejected" || data?.status === "ended") { unsub(); endCall(); if(data?.status === "rejected") showToast("কল প্রত্যাখ্যান"); }
+                if (data?.status === "rejected" || data?.status === "ended") { unsub(); endCall(); if(data?.status === "rejected") showToast("কল প্রত্যাখ্যান করা হয়েছে"); }
             });
             callSignalUnsubscribe = unsub;
-        } catch(e) { showToast("কল শুরু ব্যর্থ"); endCall(); }
+        } catch(e) { showToast("কল শুরু করা সম্ভব হয়নি"); endCall(); }
     }
     
     async function answerCall(callId, fromUserObj, isVideo) {
@@ -531,7 +530,7 @@
             showModernCallUI(fromUserObj.name, isVideo);
             const unsub = onSnapshot(callRef, (snap) => { if (snap.data()?.status === "ended") { unsub(); endCall(); } });
             callSignalUnsubscribe = unsub;
-        } catch(e) { showToast("কল গ্রহণ ব্যর্থ"); endCall(); }
+        } catch(e) { showToast("কল গ্রহণ করতে ব্যর্থ"); endCall(); }
     }
     
     async function endCall() {
@@ -561,49 +560,117 @@
         });
     }
 
-    // Auth handlers
-    async function createUserProfile(uid, name, phone, email) { await setDoc(doc(db, "users", uid), { name, phone, email, uid, createdAt: serverTimestamp() }); }
-    document.getElementById('doSignupBtn').addEventListener('click', async () => {
-        const name = document.getElementById('signupName').value.trim(), phone = document.getElementById('signupPhone').value.trim(), email = document.getElementById('signupEmail').value.trim(), password = document.getElementById('signupPassword').value;
-        if (!name || !phone || !email || !password) { authErrorSpan.innerText = 'সব ফিল্ড পূরণ করুন'; return; }
-        try { const userCred = await createUserWithEmailAndPassword(auth, email, password); await updateProfile(userCred.user, { displayName: name }); await createUserProfile(userCred.user.uid, name, phone, email); } catch(e) { authErrorSpan.innerText = e.message; }
-    });
-    document.getElementById('doLoginBtn').addEventListener('click', async () => {
-        const email = document.getElementById('loginEmail').value, password = document.getElementById('loginPassword').value;
-        if (!email || !password) { authErrorSpan.innerText = 'ইমেল ও পাসওয়ার্ড দিন'; return; }
-        try { await signInWithEmailAndPassword(auth, email, password); } catch(e) { authErrorSpan.innerText = e.message; }
-    });
-    document.getElementById('showSignupBtn').onclick = () => { loginFormDiv.classList.add('hide'); signupFormDiv.classList.remove('hide'); authErrorSpan.innerText = ''; };
-    document.getElementById('showLoginBtn').onclick = () => { signupFormDiv.classList.add('hide'); loginFormDiv.classList.remove('hide'); authErrorSpan.innerText = ''; };
-    logoutBtn.onclick = async () => { await signOut(auth); };
-    newChatBtn.onclick = openNewChatModal;
-    
-    setInterval(async () => { if(currentUser) await setDoc(doc(db, "presence", currentUser.uid), { uid: currentUser.uid, lastSeen: serverTimestamp() }, { merge: true }); }, 20000);
-    
+    // ---------- AUTHENTICATION & INITIALIZATION HANDLERS ----------
+
+    // Switch screens
+    document.getElementById('showSignupBtn').onclick = () => {
+        loginFormDiv.classList.add('hide');
+        signupFormDiv.classList.remove('hide');
+        authErrorSpan.innerText = '';
+    };
+
+    document.getElementById('showLoginBtn').onclick = () => {
+        signupFormDiv.classList.add('hide');
+        loginFormDiv.classList.remove('hide');
+        authErrorSpan.innerText = '';
+    };
+
+    // Sign Up Handler
+    document.getElementById('doSignupBtn').onclick = async () => {
+        const name = document.getElementById('signupName').value.trim();
+        const phone = document.getElementById('signupPhone').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value.trim();
+
+        if (!name || !phone || !email || !password) {
+            authErrorSpan.innerText = "সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন।";
+            return;
+        }
+
+        try {
+            authErrorSpan.innerText = '';
+            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCred.user, { displayName: name });
+            
+            // Save user info in Firestore database
+            await setDoc(doc(db, "users", userCred.user.uid), {
+                uid: userCred.user.uid,
+                name: name,
+                phone: phone,
+                email: email,
+                createdAt: serverTimestamp()
+            });
+
+        } catch (error) {
+            authErrorSpan.innerText = error.message;
+        }
+    };
+
+    // Sign In Handler
+    document.getElementById('doLoginBtn').onclick = async () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+
+        if (!email || !password) {
+            authErrorSpan.innerText = "ইমেল এবং পাসওয়ার্ড দিন।";
+            return;
+        }
+
+        try {
+            authErrorSpan.innerText = '';
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            authErrorSpan.innerText = "ইমেল বা পাসওয়ার্ড ভুল হয়েছে।";
+        }
+    };
+
+    // Logout Handler
+    logoutBtn.onclick = () => {
+        signOut(auth);
+    };
+
+    // Monitor Auth State Changes
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists()) currentUserDoc = userDoc.data();
-            else currentUserDoc = { name: user.displayName || "বন্ধু", phone: "" };
+            const uDoc = await getDoc(doc(db, "users", user.uid));
+            if (uDoc.exists()) currentUserDoc = uDoc.data();
+            
             authContainer.classList.add('hide');
             mainAppDiv.classList.remove('hide');
+            
             loadUserChats();
             listenIncomingCalls();
-            sendMsgBtn.onclick = sendPrivateMessage;
-            chatMessageInput.onkeypress = (e) => { if(e.key === 'Enter') sendPrivateMessage(); };
-            audioCallBtn.onclick = () => { if(selectedChat) startCall(selectedChat, false); else showToast("একটি চ্যাট নির্বাচন করুন"); };
-            videoCallBtn.onclick = () => { if(selectedChat) startCall(selectedChat, true); else showToast("একটি চ্যাট নির্বাচন করুন"); };
-            mobileBackBtn.onclick = () => chatsPanel.classList.remove('hide-mobile');
         } else {
+            currentUser = null;
+            currentUserDoc = null;
+            selectedChat = null;
             if (unsubscribeMessages) unsubscribeMessages();
             if (unsubscribeChats) unsubscribeChats();
-            endCall();
-            authContainer.classList.remove('hide');
+            
             mainAppDiv.classList.add('hide');
-            selectedChat = null;
+            authContainer.classList.remove('hide');
         }
     });
+
+    // Chat Actions UI Listeners
+    sendMsgBtn.onclick = sendPrivateMessage;
+    chatMessageInput.onkeypress = (e) => { if (e.key === 'Enter') sendPrivateMessage(); };
+    newChatBtn.onclick = openNewChatModal;
+
+    mobileBackBtn.onclick = () => {
+        chatsPanel.classList.remove('hide-mobile');
+    };
+
+    audioCallBtn.onclick = () => {
+        if (selectedChat) startCall(selectedChat, false);
+        else showToast("একটি চ্যাট নির্বাচন করুন");
+    };
+
+    videoCallBtn.onclick = () => {
+        if (selectedChat) startCall(selectedChat, true);
+        else showToast("একটি চ্যাট নির্বাচন করুন");
+    };
 </script>
 </body>
 </html>
