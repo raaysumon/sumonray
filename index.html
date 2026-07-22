@@ -548,7 +548,7 @@ Administered by Japan Science and Technology Agency. I was one of the ten studen
             </div>
         </section>
     <!-- Contact Section -->
-   <section id="contact" class="py-20 section-hidden">
+<section id="contact" class="py-20 section-hidden">
     <div class="max-w-4xl mx-auto px-6">
         <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
             <span class="gradient-underline">Get In Touch</span>
@@ -556,7 +556,7 @@ Administered by Japan Science and Technology Agency. I was one of the ten studen
         
         <div class="glass rounded-2xl p-8">
             <div class="grid md:grid-cols-2 gap-12">
-                <!-- Contact Info -->
+                <!-- Contact Info (Left Side) -->
                 <div>
                     <h3 class="text-2xl font-bold mb-6">Let's Connect</h3>
                     <div class="space-y-6">
@@ -590,37 +590,55 @@ Administered by Japan Science and Technology Agency. I was one of the ten studen
                             </div>
                         </div>
                     </div>
+
+                    <p class="text-gray-400 mt-12 text-sm leading-relaxed">
+                        Open to research collaborations, internships, and interesting projects.
+                    </p>
                 </div>
 
-                <!-- Contact Form -->
-                <div>
-                    <h3 class="text-2xl font-bold mb-6">Send a Message</h3>
-                   <form id="contactForm" class="space-y-4">
-    <input type="text" name="name" placeholder="Your Name" required
-           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
+                <!-- Contact Form & Live Chat (Right Side) -->
+                <div class="flex flex-col justify-between space-y-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">Send a Message</h3>
+                        <form id="contactForm" class="space-y-4">
+                            <input type="text" name="name" placeholder="Your Name" required
+                                   class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
 
-    <input type="email" name="email" placeholder="Your Email" required
-           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
+                            <input type="email" name="email" placeholder="Your Email" required
+                                   class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
 
-    <input type="text" name="subject" placeholder="Subject" required
-           class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
+                            <input type="text" name="subject" placeholder="Subject" required
+                                   class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"/>
 
-    <textarea name="message" rows="5" placeholder="Your Message" required
-              class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+                            <textarea name="message" rows="4" placeholder="Your Message" required
+                                      class="w-full p-3 rounded-lg bg-white/10 text-white placeholder-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
 
-    <button id="submitBtn" type="submit"
-            class="w-full py-3 gradient-bg text-white font-bold rounded-xl glow transition-transform duration-300">
-        Send Message
-    </button>
+                            <button id="submitBtn" type="submit"
+                                    class="w-full py-3 gradient-bg text-white font-bold rounded-xl glow transition-transform duration-300 hover:scale-[1.02]">
+                                Send Message
+                            </button>
 
-    <p id="formStatus" class="text-center text-sm mt-3"></p>
-</form>
+                            <p id="formStatus" class="text-center text-sm mt-3"></p>
+                        </form>
+                    </div>
 
-
-                    
-                    <p class="text-center text-gray-400 mt-8">
-                        Open to research collaborations, internships, and interesting projects
-                    </p>
+                    <!-- Animated Live Chat Option -->
+                    <div class="pt-4 border-t border-white/10">
+                        <div class="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/10">
+                            <div>
+                                <h4 class="font-bold text-white flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-green-400 animate-ping"></span>
+                                    Live Chat
+                                </h4>
+                                <p class="text-xs text-gray-400">Need a quick response?</p>
+                            </div>
+                            <a href="https://www.sumonray.site/demo.html" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-2 px-5 py-2.5 gradient-bg text-white font-bold rounded-xl shadow-lg animate-bounce hover:animate-none hover:scale-105 transition-all duration-300">
+                                <i class="fas fa-comments"></i>
+                                Start Chat
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
