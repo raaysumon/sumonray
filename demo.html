@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Raychat - ভিডিও কল ও মেসেঞ্জার</title>
+    <title>Raychat - সরাসরি মেসেঞ্জার</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script type="importmap">
         {
@@ -16,111 +16,99 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         body { background: linear-gradient(145deg, #1a2a3a 0%, #0f1724 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-        .app-container { width: 100%; max-width: 1200px; height: 92vh; background: rgba(255,255,255,0.96); border-radius: 2rem; box-shadow: 0 25px 45px rgba(0,0,0,0.3); overflow: hidden; display: flex; flex-direction: column; }
+        .app-container { width: 100%; max-width: 600px; height: 90vh; background: rgba(255,255,255,0.96); border-radius: 2rem; box-shadow: 0 25px 45px rgba(0,0,0,0.3); overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* নাম প্রম্পট স্ক্রিন */
         .auth-container { flex: 1; display: flex; justify-content: center; align-items: center; background: #075e54; padding: 20px; }
-        .auth-card { background: white; border-radius: 32px; padding: 30px 24px; width: 100%; max-width: 400px; text-align: center; }
+        .auth-card { background: white; border-radius: 32px; padding: 30px 24px; width: 100%; max-width: 380px; text-align: center; }
         .auth-card h2 { color: #075e54; margin-bottom: 20px; }
         .auth-input { width: 100%; padding: 12px 16px; margin: 12px 0; border: 1px solid #ddd; border-radius: 40px; font-size: 1rem; outline: none; }
-        .auth-btn { background: #25d366; color: #075e54; font-weight: bold; border: none; padding: 12px; width: 100%; border-radius: 40px; cursor: pointer; margin-top: 12px; }
-        .error-msg { color: #e74c3c; font-size: 0.8rem; margin-top: 6px; }
+        .auth-btn { background: #25d366; color: #075e54; font-weight: bold; border: none; padding: 12px; width: 100%; border-radius: 40px; cursor: pointer; margin-top: 12px; font-size: 1rem; }
+        .error-msg { color: #e74c3c; font-size: 0.85rem; margin-top: 8px; }
         .hide { display: none !important; }
-        .main-app { display: flex; height: 100%; width: 100%; overflow: hidden; }
-        .chats-panel { width: 35%; background: #f0f2f5; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; overflow-y: auto; }
-        .chat-panel { flex: 1; display: flex; flex-direction: column; background: #e5ddd5; background-image: radial-gradient(circle at 25% 40%, rgba(200,220,210,0.4) 1.5%, transparent 1.8%); }
-        @media (max-width: 700px) {
-            .chats-panel { width: 100%; position: absolute; z-index: 10; height: 100%; transition: transform 0.2s; }
-            .chats-panel.hide-mobile { transform: translateX(-100%); }
-            .back-btn { display: block !important; }
-        }
-        .profile-header { background: #075e54; color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .new-chat-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
-        .chat-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #e9ecef; }
-        .chat-item:hover, .chat-item.active { background: #e9ecef; }
-        .chat-avatar { width: 48px; height: 48px; background: #128c7e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; }
-        .chat-info { flex: 1; }
-        .chat-name { font-weight: 600; }
-        .chat-phone { font-size: 0.75rem; color: #6c757d; }
-        .chat-header { background: #075e54; color: white; padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
-        .back-btn { display: none; background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer; }
-        .chat-name-header { font-weight: 700; flex: 1; }
-        .call-btn-sm { background: rgba(255,255,255,0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; margin-left: 6px; }
-        .messages-area { flex: 1; overflow-y: auto; padding: 18px 14px; display: flex; flex-direction: column; gap: 12px; }
+        
+        /* চ্যাট ইন্টারফেস */
+        .main-app { display: flex; flex-direction: column; height: 100%; width: 100%; }
+        .chat-header { background: #075e54; color: white; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .chat-user-info { display: flex; align-items: center; gap: 12px; }
+        .chat-avatar { width: 42px; height: 42px; background: #25d366; color: #075e54; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        .chat-name-header { font-weight: 700; font-size: 1.1rem; }
+        .chat-status { font-size: 0.75rem; color: #e0e0e0; }
+        .header-actions { display: flex; gap: 8px; }
+        .call-btn-sm { background: rgba(255,255,255,0.2); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        .messages-area { flex: 1; overflow-y: auto; padding: 18px 14px; display: flex; flex-direction: column; gap: 12px; background: #e5ddd5; }
         .message { display: flex; flex-direction: column; max-width: 80%; animation: popIn 0.2s ease; }
         .message-own { align-self: flex-end; }
         .message-other { align-self: flex-start; }
-        .bubble { padding: 10px 14px; border-radius: 18px; word-wrap: break-word; background: white; }
+        .bubble { padding: 10px 14px; border-radius: 18px; word-wrap: break-word; font-size: 0.95rem; }
         .bubble-own { background: #dcf8c5; border-bottom-right-radius: 4px; }
         .bubble-other { background: white; border-bottom-left-radius: 4px; }
-        .message-time { font-size: 0.6rem; color: #6c757d; margin-top: 4px; margin-left: 10px; }
-        .input-area { background: #f0f2f5; padding: 12px 16px; display: flex; gap: 12px; }
-        .message-input { flex: 1; border: none; background: white; padding: 12px 18px; border-radius: 30px; outline: none; }
-        .send-btn { background: #25d366; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1200; }
-        .modal-card { background: white; width: 90%; max-width: 450px; max-height: 80vh; border-radius: 32px; padding: 24px; text-align: center; display: flex; flex-direction: column; }
-        .modal-card button { background: #25d366; padding: 10px 20px; border-radius: 40px; border: none; font-weight: bold; margin-top: 12px; cursor: pointer; }
-        .toast-error { position: fixed; bottom: 100px; left: 20px; right: 20px; background: #e74c3c; color: white; padding: 10px; border-radius: 30px; text-align: center; z-index: 2000; font-size: 0.9rem; }
+        .sender-name { font-size: 0.7rem; font-weight: bold; color: #075e54; margin-bottom: 2px; }
+        .message-time { font-size: 0.65rem; color: #6c757d; margin-top: 4px; align-self: flex-end; }
+        
+        .input-area { background: #f0f2f5; padding: 12px 16px; display: flex; gap: 12px; align-items: center; }
+        .message-input { flex: 1; border: none; background: white; padding: 12px 18px; border-radius: 30px; outline: none; font-size: 0.95rem; }
+        .send-btn { background: #25d366; border: none; color: white; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .toast-error { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #e74c3c; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; z-index: 2000; }
         @keyframes popIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
         
-        /* Fullscreen Video Call Styles */
-        .call-fullscreen-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        .remote-video-full { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #0a0a0a; }
-        .local-video-pip { position: absolute; bottom: 24px; right: 20px; width: 120px; aspect-ratio: 3 / 4; border-radius: 20px; overflow: hidden; background: #1e1e1e; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 8px 20px rgba(0,0,0,0.4); z-index: 10010; transition: all 0.2s; cursor: pointer; }
+        /* ভিডিও ও অডিও কল ইন্টারফেস */
+        .call-fullscreen-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; flex-direction: column; }
+        .remote-video-full { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .local-video-pip { position: absolute; bottom: 24px; right: 20px; width: 110px; height: 150px; border-radius: 16px; overflow: hidden; background: #1e1e1e; border: 2px solid rgba(255,255,255,0.7); z-index: 10010; }
         .local-video-pip video { width: 100%; height: 100%; object-fit: cover; }
-        .call-controls-overlay { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 28px; z-index: 10010; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); padding: 12px 24px; border-radius: 60px; width: fit-content; margin: 0 auto; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .call-controls-overlay button { background: #2c2c2e; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 24px; color: white; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
-        .call-controls-overlay button:active { transform: scale(0.96); }
+        .call-controls-overlay { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; z-index: 10010; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 12px 24px; border-radius: 60px; width: fit-content; margin: 0 auto; }
+        .call-controls-overlay button { background: #2c2c2e; border: none; border-radius: 50%; width: 52px; height: 52px; font-size: 20px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .call-end-btn { background: #e74c3c !important; }
-        .remote-info { position: absolute; top: 50px; left: 0; right: 0; text-align: center; color: white; text-shadow: 0 2px 8px black; font-size: 22px; font-weight: 600; z-index: 10010; background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent); padding: 16px; pointer-events: none; }
-        .audio-call-ui { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f2120; position: relative; }
-        .audio-avatar { background: #128c7e; width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: 0 12px 24px rgba(0,0,0,0.3); }
-        .audio-avatar i { font-size: 64px; color: white; }
+        .remote-info { position: absolute; top: 40px; left: 0; right: 0; text-align: center; color: white; text-shadow: 0 2px 8px black; font-size: 20px; font-weight: 600; z-index: 10010; }
+        .audio-call-ui { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f2120; }
+        .audio-avatar { background: #128c7e; width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        .audio-avatar i { font-size: 50px; color: white; }
     </style>
 </head>
 <body>
-<div class="app-container" id="appRoot">
-    <!-- শুধুমাত্র নাম দিয়ে ঢোকার জন্য সহজ ফর্ম -->
+<div class="app-container">
+    <!-- ১. নাম প্রম্পট -->
     <div id="authContainer" class="auth-container">
         <div class="auth-card">
             <h2><i class="fab fa-whatsapp"></i> Rayচ্যাট</h2>
-            <div>
-                <input type="text" id="userNameInput" class="auth-input" placeholder="আপনার নাম লিখুন...">
-                <button id="enterAppBtn" class="auth-btn">প্রবেশ করুন</button>
-            </div>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 12px;">আপনার নাম লিখে চ্যাট শুরু করুন</p>
+            <input type="text" id="userNameInput" class="auth-input" placeholder="আপনার নাম লিখুন...">
+            <button id="enterAppBtn" class="auth-btn">প্রবেশ করুন</button>
             <div id="authError" class="error-msg"></div>
         </div>
     </div>
 
+    <!-- ২. ডায়রেক্ট চ্যাট ইন্টারফেস -->
     <div id="mainApp" class="main-app hide">
-        <div id="chatsPanel" class="chats-panel">
-            <div class="profile-header">
-                <span><i class="fab fa-whatsapp"></i> চ্যাটসমূহ</span>
+        <div class="chat-header">
+            <div class="chat-user-info">
+                <div class="chat-avatar" id="headerAvatar"><i class="fas fa-user"></i></div>
                 <div>
-                    <button id="newChatBtn" class="new-chat-btn" title="সকল ইউজার দেখুন"><i class="fas fa-users"></i></button>
-                    <button id="logoutBtn" class="new-chat-btn" style="margin-left: 8px;"><i class="fas fa-sign-out-alt"></i></button>
+                    <div class="chat-name-header" id="headerTitle">01567854902</div>
+                    <div class="chat-status" id="headerStatus">সরাসরি মেসেজ পাঠান</div>
                 </div>
             </div>
-            <div id="chatsList" style="flex:1; overflow-y: auto;"></div>
+            <div class="header-actions">
+                <button id="audioCallBtn" class="call-btn-sm" title="অডিও কল"><i class="fas fa-phone-alt"></i></button>
+                <button id="videoCallBtn" class="call-btn-sm" title="ভিডিও কল"><i class="fas fa-video"></i></button>
+                <button id="logoutBtn" class="call-btn-sm" title="লগআউট"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
         </div>
-        <div id="chatPanel" class="chat-panel">
-            <div class="chat-header">
-                <button id="mobileBackBtn" class="back-btn"><i class="fas fa-arrow-left"></i></button>
-                <div class="chat-name-header" id="chatContactName">কাউকে সিলেক্ট করুন</div>
-                <button id="audioCallBtn" class="call-btn-sm"><i class="fas fa-phone-alt"></i></button>
-                <button id="videoCallBtn" class="call-btn-sm"><i class="fas fa-video"></i></button>
-            </div>
-            <div id="messagesArea" class="messages-area"></div>
-            <div class="input-area">
-                <input type="text" id="chatMessageInput" class="message-input" placeholder="মেসেজ লিখুন...">
-                <button id="sendMsgBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
-            </div>
+        
+        <div id="messagesArea" class="messages-area"></div>
+        
+        <div class="input-area">
+            <input type="text" id="chatMessageInput" class="message-input" placeholder="মেসেজ লিখুন...">
+            <button id="sendMsgBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "firebase/app";
-    import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+    import { getFirestore, collection, doc, setDoc, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
@@ -134,31 +122,25 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    const MAIN_TARGET_NUMBER = "01567854902"; // নির্দিষ্ট নম্বর
+
     // DOM Elements
     const authContainer = document.getElementById('authContainer');
     const mainAppDiv = document.getElementById('mainApp');
     const userNameInput = document.getElementById('userNameInput');
     const enterAppBtn = document.getElementById('enterAppBtn');
     const authErrorSpan = document.getElementById('authError');
-    const chatsListDiv = document.getElementById('chatsList');
-    const chatContactNameSpan = document.getElementById('chatContactName');
     const messagesArea = document.getElementById('messagesArea');
     const chatMessageInput = document.getElementById('chatMessageInput');
     const sendMsgBtn = document.getElementById('sendMsgBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const audioCallBtn = document.getElementById('audioCallBtn');
     const videoCallBtn = document.getElementById('videoCallBtn');
-    const mobileBackBtn = document.getElementById('mobileBackBtn');
-    const chatsPanel = document.getElementById('chatsPanel');
-    const newChatBtn = document.getElementById('newChatBtn');
+    const headerTitle = document.getElementById('headerTitle');
+    const headerStatus = document.getElementById('headerStatus');
 
     let currentUser = null;
-    let selectedChat = null;
     let unsubscribeMessages = null;
-    let unsubscribeChats = null;
-
-    // স্থায়ী নম্বর
-    const FIXED_PHONE_NUMBER = "01567854902";
 
     // WebRTC Globals
     let peerConnection = null, localStream = null, remoteAudio = null, remoteVideoElem = null;
@@ -171,176 +153,100 @@
         toast.className = 'toast-error';
         toast.innerText = msg;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
+        setTimeout(() => toast.remove(), 3000);
     }
 
-    function getConversationId(uid1, uid2) { return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`; }
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-    // চ্যাট লিস্ট লোড করার ফাংশন
-    function loadUserChats() {
-        if (unsubscribeChats) unsubscribeChats();
-        const convQuery = query(collection(db, "conversations"), where("participants", "array-contains", currentUser.uid));
-        unsubscribeChats = onSnapshot(convQuery, async (snapshot) => {
-            const chats = [];
-            for (const docSnap of snapshot.docs) {
-                const data = docSnap.data();
-                const otherId = data.participants.find(p => p !== currentUser.uid);
-                if (otherId) {
-                    const userDoc = await getDoc(doc(db, "users", otherId));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        chats.push({ conversationId: docSnap.id, contactId: otherId, name: userData.name || "ব্যবহারকারী", phone: FIXED_PHONE_NUMBER });
-                    }
-                }
-            }
-            renderChatsList(chats);
-        });
-    }
-
-    function renderChatsList(chats) {
-        if (chats.length === 0) { 
-            chatsListDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">কোনো সাম্প্রতিক চ্যাট নেই। উপরের <i class="fas fa-users"></i> বাটনে ক্লিক করে বিশ্বের যেকোনো ইউজারের সাথে কথা বলুন।</div>'; 
-            return; 
-        }
-        chatsListDiv.innerHTML = '';
-        chats.forEach(chat => {
-            const div = document.createElement('div');
-            div.className = 'chat-item';
-            if (selectedChat && selectedChat.contactId === chat.contactId) div.classList.add('active');
-            div.innerHTML = `<div class="chat-avatar">${chat.name.charAt(0).toUpperCase()}</div><div class="chat-info"><div class="chat-name">${escapeHtml(chat.name)}</div><div class="chat-phone">${FIXED_PHONE_NUMBER}</div></div>`;
-            div.addEventListener('click', () => { selectChat(chat); if (window.innerWidth <= 700) chatsPanel.classList.add('hide-mobile'); });
-            chatsListDiv.appendChild(div);
-        });
-    }
-
-    async function selectChat(chat) {
+    // মেসেজ লোড করার ফাংশন
+    function loadDirectMessages() {
         if (unsubscribeMessages) unsubscribeMessages();
-        selectedChat = chat;
-        chatContactNameSpan.innerText = `${chat.name} (${FIXED_PHONE_NUMBER})`;
-        messagesArea.innerHTML = '<div style="text-align:center; padding:10px;">মেসেজ লোড হচ্ছে...</div>';
-        const convId = getConversationId(currentUser.uid, chat.contactId);
-        const messagesRef = collection(db, "conversations", convId, "messages");
+        const messagesRef = collection(db, "direct_chats", MAIN_TARGET_NUMBER, "messages");
         const q = query(messagesRef, orderBy("timestamp", "asc"));
+
         unsubscribeMessages = onSnapshot(q, (snapshot) => {
-            if (snapshot.empty) { messagesArea.innerHTML = '<div style="text-align:center; color:gray; margin-top:20px;">কোনো মেসেজ নেই ✨ মেসেজ পাঠান!</div>'; return; }
+            if (snapshot.empty) {
+                messagesArea.innerHTML = `<div style="text-align:center; color:#666; margin-top:20px;">হ্যালো <b>${escapeHtml(currentUser.name)}</b>! <br>এখনো কোনো মেসেজ আসেনি।</div>`;
+                return;
+            }
             messagesArea.innerHTML = '';
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
+                
+                // Raye হলে সে যাকে উত্তর দেবে সেটা তার জন্য "own" মেসেজ
                 const isOwn = data.senderId === currentUser.uid;
                 const time = data.timestamp?.toDate() || new Date();
                 const timeStr = time.toLocaleTimeString('bn-BD', { hour:'2-digit', minute:'2-digit' });
+
                 const msgDiv = document.createElement('div');
                 msgDiv.className = `message ${isOwn ? 'message-own' : 'message-other'}`;
+
                 const bubble = document.createElement('div');
                 bubble.className = `bubble ${isOwn ? 'bubble-own' : 'bubble-other'}`;
-                bubble.innerText = data.text;
-                msgDiv.appendChild(bubble);
+                
+                // অন্য ইউজারদের নাম দেখানো
+                if (!isOwn) {
+                    const senderDiv = document.createElement('div');
+                    senderDiv.className = 'sender-name';
+                    senderDiv.innerText = data.senderName || 'ব্যবহারকারী';
+                    bubble.appendChild(senderDiv);
+                }
+
+                const textSpan = document.createElement('span');
+                textSpan.innerText = data.text;
+                bubble.appendChild(textSpan);
+
                 const timeSpan = document.createElement('div');
                 timeSpan.className = 'message-time';
                 timeSpan.innerText = timeStr;
-                msgDiv.appendChild(timeSpan);
+                bubble.appendChild(timeSpan);
+
+                msgDiv.appendChild(bubble);
                 messagesArea.appendChild(msgDiv);
             });
             messagesArea.scrollTop = messagesArea.scrollHeight;
         });
     }
 
-    async function sendPrivateMessage() {
-        if (!selectedChat) { showToast("একটি চ্যাট নির্বাচন করুন"); return; }
+    // মেসেজ পাঠানো
+    async function sendDirectMessage() {
         const text = chatMessageInput.value.trim();
         if (!text) return;
-        const convId = getConversationId(currentUser.uid, selectedChat.contactId);
-        
-        const convRef = doc(db, "conversations", convId);
-        await setDoc(convRef, { participants: [currentUser.uid, selectedChat.contactId], lastUpdated: serverTimestamp() }, { merge: true });
 
-        await addDoc(collection(db, "conversations", convId, "messages"), { 
-            text, 
-            senderId: currentUser.uid, 
-            senderName: currentUser.name, 
-            receiverId: selectedChat.contactId, 
-            timestamp: serverTimestamp() 
+        await addDoc(collection(db, "direct_chats", MAIN_TARGET_NUMBER, "messages"), {
+            text: text,
+            senderId: currentUser.uid,
+            senderName: currentUser.name,
+            timestamp: serverTimestamp()
         });
+
         chatMessageInput.value = "";
     }
 
-    // সকল রেজিস্টার্ড ইউজার দেখার মোডাল
-    async function openGlobalUsersModal() {
-        const modal = document.createElement('div'); modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal-card">
-                <h3 style="color:#075e54; margin-bottom:12px;"><i class="fas fa-globe"></i> বিশ্বের সকল ব্যবহারকারী</h3>
-                <div id="allUsersList" style="flex:1; overflow-y:auto; text-align:left; margin:10px 0;">
-                    <p style="text-align:center;">ইউজার লোড হচ্ছে...</p>
-                </div>
-                <button id="modalCloseBtn">বন্ধ করুন</button>
-            </div>`;
-        document.body.appendChild(modal);
-
-        const usersListContainer = modal.querySelector('#allUsersList');
-        const closeBtn = modal.querySelector('#modalCloseBtn');
-
-        try {
-            const querySnap = await getDocs(collection(db, "users"));
-            usersListContainer.innerHTML = '';
-            let userCount = 0;
-
-            querySnap.forEach(docSnap => {
-                const userData = docSnap.data();
-                if (userData.uid !== currentUser.uid) { 
-                    userCount++;
-                    const item = document.createElement('div');
-                    item.className = 'chat-item';
-                    item.style.borderRadius = '12px';
-                    item.style.marginBottom = '6px';
-                    item.style.background = '#f8f9fa';
-                    item.innerHTML = `
-                        <div class="chat-avatar">${userData.name ? userData.name.charAt(0).toUpperCase() : 'U'}</div>
-                        <div class="chat-info">
-                            <div class="chat-name">${escapeHtml(userData.name || "ব্যবহারকারী")}</div>
-                            <div class="chat-phone">${FIXED_PHONE_NUMBER}</div>
-                        </div>
-                    `;
-                    item.onclick = async () => {
-                        const convId = getConversationId(currentUser.uid, userData.uid);
-                        const convRef = doc(db, "conversations", convId);
-                        await setDoc(convRef, { participants: [currentUser.uid, userData.uid], lastUpdated: serverTimestamp() }, { merge: true });
-                        
-                        modal.remove();
-                        const selected = { contactId: userData.uid, name: userData.name || "ব্যবহারকারী", phone: FIXED_PHONE_NUMBER, conversationId: convId };
-                        selectChat(selected);
-                        loadUserChats();
-                        if (window.innerWidth <= 700) chatsPanel.classList.add('hide-mobile');
-                    };
-                    usersListContainer.appendChild(item);
-                }
-            });
-
-            if (userCount === 0) {
-                usersListContainer.innerHTML = '<p style="text-align:center; color:gray;">আপনি ছাড়া আর কোনো ইউজার নেই</p>';
-            }
-        } catch (e) {
-            usersListContainer.innerHTML = '<p style="text-align:center; color:red;">ইউজার তালিকা লোড করতে সমস্যা হয়েছে</p>';
-        }
-
-        closeBtn.onclick = () => modal.remove();
+    // ---------- WEBRTC CALLING ----------
+    const iceServers = [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }];
+    
+    async function getMediaStream(videoEnabled) { 
+        if (localStream) localStream.getTracks().forEach(t => t.stop()); 
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: videoEnabled }); 
+        localStream = stream; 
+        return stream; 
     }
 
-    // ---------- WEBRTC CALLING LOGIC ----------
-    const iceServers = [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }, { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" }];
-    async function getMediaStream(videoEnabled) { if (localStream) localStream.getTracks().forEach(t => t.stop()); const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: videoEnabled }); localStream = stream; return stream; }
-    
     async function createPeerConnection(callDocId) {
         if (peerConnection) peerConnection.close();
         const pc = new RTCPeerConnection({ iceServers });
         if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-        pc.onicecandidate = async (e) => { if (e.candidate) await addDoc(collection(db, "calls", callDocId, "candidates"), { candidate: e.candidate.toJSON(), senderId: currentUser.uid }); };
-        pc.ontrack = (e) => {
-            if (e.track.kind === "audio") { if (!remoteAudio) { remoteAudio = new Audio(); remoteAudio.srcObject = e.streams[0]; remoteAudio.play(); } else remoteAudio.srcObject = e.streams[0]; }
-            else if (e.track.kind === "video" && remoteVideoElem) remoteVideoElem.srcObject = e.streams[0];
+        pc.onicecandidate = async (e) => { 
+            if (e.candidate) await addDoc(collection(db, "calls", callDocId, "candidates"), { candidate: e.candidate.toJSON(), senderId: currentUser.uid }); 
         };
-        pc.onconnectionstatechange = () => { if (pc.connectionState === "failed") { endCall(); showToast("কল বিচ্ছিন্ন হয়ে গেছে"); } };
+        pc.ontrack = (e) => {
+            if (e.track.kind === "audio") { 
+                if (!remoteAudio) { remoteAudio = new Audio(); remoteAudio.srcObject = e.streams[0]; remoteAudio.play(); } 
+                else remoteAudio.srcObject = e.streams[0]; 
+            } else if (e.track.kind === "video" && remoteVideoElem) remoteVideoElem.srcObject = e.streams[0];
+        };
+        pc.onconnectionstatechange = () => { if (pc.connectionState === "failed") { endCall(); showToast("কল কেটে গেছে"); } };
         return pc;
     }
 
@@ -352,66 +258,58 @@
         if (isVideoCall) {
             callPanelDiv.innerHTML = `
                 <video id="remoteVideoFullscreen" class="remote-video-full" autoplay playsinline></video>
-                <div class="local-video-pip" id="localVideoPip"><video id="localPreviewVideo" autoplay muted playsinline></video></div>
+                <div class="local-video-pip"><video id="localPreviewVideo" autoplay muted playsinline></video></div>
                 <div class="call-controls-overlay">
-                    <button class="call-mute-btn" id="callMuteBtn"><i class="fas fa-microphone"></i></button>
-                    <button class="call-video-toggle" id="callVideoToggleBtn"><i class="fas fa-video"></i></button>
+                    <button id="callMuteBtn"><i class="fas fa-microphone"></i></button>
+                    <button id="callVideoToggleBtn"><i class="fas fa-video"></i></button>
                     <button class="call-end-btn" id="callEndBtn"><i class="fas fa-phone-slash"></i></button>
                 </div>
                 <div class="remote-info">${escapeHtml(remoteName)}</div>
             `;
             document.body.appendChild(callPanelDiv);
-            const localVid = document.getElementById('localPreviewVideo');
-            if (localStream) localVid.srcObject = localStream;
+            document.getElementById('localPreviewVideo').srcObject = localStream;
             remoteVideoElem = document.getElementById('remoteVideoFullscreen');
         } else {
             callPanelDiv.innerHTML = `
                 <div class="audio-call-ui">
-                    <div class="audio-avatar"><i class="fas fa-user-circle"></i></div>
-                    <div style="color:white; font-size:28px; font-weight:bold;">${escapeHtml(remoteName)}</div>
-                    <div style="color:#a0c0c0; margin:12px 0;">অডিও কল সংযুক্ত</div>
-                    <div class="call-controls-overlay" style="position:relative; background:rgba(0,0,0,0.6); margin-top:40px;">
-                        <button class="call-mute-btn" id="callMuteBtn"><i class="fas fa-microphone"></i></button>
+                    <div class="audio-avatar"><i class="fas fa-user"></i></div>
+                    <div style="color:white; font-size:24px; font-weight:bold;">${escapeHtml(remoteName)}</div>
+                    <div style="color:#a0c0c0; margin-top:8px;">অডিও কল সংযুক্ত</div>
+                    <div class="call-controls-overlay" style="position:relative; margin-top:40px;">
+                        <button id="callMuteBtn"><i class="fas fa-microphone"></i></button>
                         <button class="call-end-btn" id="callEndBtn"><i class="fas fa-phone-slash"></i></button>
                     </div>
                 </div>
             `;
             document.body.appendChild(callPanelDiv);
-            remoteVideoElem = null;
         }
         
-        const endBtn = callPanelDiv.querySelector('#callEndBtn');
-        if (endBtn) endBtn.addEventListener('click', () => endCall());
-        const muteBtn = callPanelDiv.querySelector('#callMuteBtn');
-        if (muteBtn && localStream) {
-            let muted = false;
-            muteBtn.addEventListener('click', () => {
-                muted = !muted;
-                localStream.getAudioTracks().forEach(t => t.enabled = !muted);
-                muteBtn.innerHTML = muted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
-            });
-        }
+        callPanelDiv.querySelector('#callEndBtn').onclick = () => endCall();
+        
+        let muted = false;
+        callPanelDiv.querySelector('#callMuteBtn').onclick = (e) => {
+            muted = !muted;
+            localStream.getAudioTracks().forEach(t => t.enabled = !muted);
+            e.currentTarget.innerHTML = muted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
+        };
+
         if (isVideoCall) {
-            const videoToggle = callPanelDiv.querySelector('#callVideoToggleBtn');
-            if (videoToggle && localStream && localStream.getVideoTracks().length) {
-                let videoOff = false;
-                videoToggle.addEventListener('click', () => {
-                    videoOff = !videoOff;
-                    localStream.getVideoTracks()[0].enabled = !videoOff;
-                    videoToggle.innerHTML = videoOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>';
-                });
-            }
+            let videoOff = false;
+            callPanelDiv.querySelector('#callVideoToggleBtn').onclick = (e) => {
+                videoOff = !videoOff;
+                localStream.getVideoTracks()[0].enabled = !videoOff;
+                e.currentTarget.innerHTML = videoOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>';
+            };
         }
     }
-    
-    async function startCall(targetUser, isVideo) {
-        if (!selectedChat) { showToast("একটি চ্যাট নির্বাচন করুন"); return; }
-        if (isCallActive) { showToast("কল ইতিমধ্যেই চলছে"); return; }
+
+    async function startCall(isVideo) {
+        if (isCallActive) return;
         try {
             isCallActive = true;
             await getMediaStream(isVideo);
             const callDoc = await addDoc(collection(db, "calls"), {
-                from: currentUser.uid, fromName: currentUser.name || "ইউজার", to: targetUser.contactId, toName: targetUser.name,
+                from: currentUser.uid, fromName: currentUser.name, to: MAIN_TARGET_NUMBER,
                 status: "calling", type: isVideo ? "video" : "audio", createdAt: serverTimestamp()
             });
             currentCallDocId = callDoc.id;
@@ -420,7 +318,7 @@
             await peerConnection.setLocalDescription(offer);
             await updateDoc(doc(db, "calls", currentCallDocId), { offer: { sdp: offer.sdp, type: offer.type }, status: "offer_sent" });
             
-            showModernCallUI(targetUser.name, isVideo);
+            showModernCallUI(MAIN_TARGET_NUMBER, isVideo);
             
             const unsub = onSnapshot(doc(db, "calls", currentCallDocId), async (snap) => {
                 const data = snap.data();
@@ -428,121 +326,82 @@
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                     unsub();
                 }
-                if (data?.status === "rejected" || data?.status === "ended") { unsub(); endCall(); if(data?.status === "rejected") showToast("কল প্রত্যাখান করা হয়েছে"); }
+                if (data?.status === "rejected" || data?.status === "ended") { unsub(); endCall(); }
             });
             callSignalUnsubscribe = unsub;
-        } catch(e) { showToast("কল ব্যর্থ হয়েছে"); endCall(); }
+        } catch(e) { showToast("কল করতে সমস্যা হয়েছে"); endCall(); }
     }
-    
-    async function answerCall(callId, fromUserObj, isVideo) {
-        try {
-            await getMediaStream(isVideo);
-            const callRef = doc(db, "calls", callId);
-            const callSnap = await getDoc(callRef);
-            if (!callSnap.exists()) throw new Error();
-            const callData = callSnap.data();
-            currentCallDocId = callId;
-            peerConnection = await createPeerConnection(callId);
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-            await updateDoc(callRef, { answer: { sdp: answer.sdp, type: answer.type }, status: "active" });
-            showModernCallUI(fromUserObj.name, isVideo);
-            const unsub = onSnapshot(callRef, (snap) => { if (snap.data()?.status === "ended") { unsub(); endCall(); } });
-            callSignalUnsubscribe = unsub;
-        } catch(e) { showToast("কল গ্রহণ করতে ব্যর্থ"); endCall(); }
-    }
-    
+
     async function endCall() {
         if (currentCallDocId) await updateDoc(doc(db, "calls", currentCallDocId), { status: "ended" }).catch(()=>{});
         if (peerConnection) { peerConnection.close(); peerConnection = null; }
-        if (remoteAudio) { remoteAudio.srcObject = null; remoteAudio = null; }
         if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
         if (callSignalUnsubscribe) callSignalUnsubscribe();
         isCallActive = false; currentCallDocId = null;
         if (callPanelDiv) callPanelDiv.remove(); callPanelDiv = null;
-        remoteVideoElem = null;
-    }
-    
-    function listenIncomingCalls() {
-        if (!currentUser) return;
-        const q = query(collection(db, "calls"), where("to", "==", currentUser.uid), where("status", "in", ["calling", "offer_sent"]));
-        onSnapshot(q, async (snapshot) => {
-            for (const change of snapshot.docChanges()) {
-                if (change.type === "added") {
-                    const callData = change.doc.data();
-                    if (isCallActive) { await updateDoc(doc(db, "calls", change.doc.id), { status: "rejected" }); return; }
-                    const accept = confirm(`${callData.fromName || "অজানা"} ${callData.type === "video" ? "ভিডিও কল" : "অডিও কল"} করছেন। রিসিভ করবেন?`);
-                    if (accept) await answerCall(change.doc.id, { name: callData.fromName, uid: callData.from }, callData.type === "video");
-                    else await updateDoc(doc(db, "calls", change.doc.id), { status: "rejected" });
-                }
-            }
-        });
     }
 
-    // ---------- নাম দিয়ে প্রবেশের লজিক ----------
-    enterAppBtn.onclick = async () => {
-        const name = userNameInput.value.trim();
-        if (!name) {
+    // নাম চেক ও প্রবেশের লজিক
+    enterAppBtn.onclick = () => {
+        const inputName = userNameInput.value.trim();
+        if (!inputName) {
             authErrorSpan.innerText = "দয়া করে আপনার নাম লিখুন!";
             return;
         }
 
-        // নামের উপর ভিত্তি করে একটি ইউনিক ID তৈরি করা
-        const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const userId = "user_" + (cleanName || "anonymous") + "_" + Math.floor(1000 + Math.random() * 9000);
+        // নাম 'Raye' হলে বিশেষ অ্যাডমিন রোল
+        const isRaye = inputName.toLowerCase() === 'raye';
 
         currentUser = {
-            uid: userId,
-            name: name,
-            phone: FIXED_PHONE_NUMBER
+            uid: isRaye ? "raye_admin_id" : "usr_" + Math.random().toString(36).substring(2, 9),
+            name: isRaye ? "Raye" : inputName,
+            isAdmin: isRaye
         };
 
-        try {
-            // ফায়ারবেস ডেটাবেসে ইউজার সেভ করা
-            await setDoc(doc(db, "users", userId), {
-                uid: userId,
-                name: name,
-                phone: FIXED_PHONE_NUMBER,
-                createdAt: serverTimestamp()
-            }, { merge: true });
+        localStorage.setItem('raychat_direct_user', JSON.stringify(currentUser));
 
-            // লোকাল স্টোরেজে তথ্য রাখা যাতে রিফ্রেশ দিলেও লগআউট না হয়ে যায়
-            localStorage.setItem('raychat_user', JSON.stringify(currentUser));
+        authContainer.classList.add('hide');
+        mainAppDiv.classList.remove('hide');
 
-            authContainer.classList.add('hide');
-            mainAppDiv.classList.remove('hide');
-
-            loadUserChats();
-            listenIncomingCalls();
-        } catch (e) {
-            authErrorSpan.innerText = "প্রবেশ করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।";
+        if (isRaye) {
+            headerTitle.innerText = "Ray (Admin)";
+            headerStatus.innerText = "সকল মেসেজের ইনবক্স";
+        } else {
+            headerTitle.innerText = "01567854902";
+            headerStatus.innerText = "সরাসরি মেসেজ পাঠান";
         }
+
+        loadDirectMessages();
     };
 
-    // লগআউট সিস্টেম
     logoutBtn.onclick = () => {
-        localStorage.removeItem('raychat_user');
+        localStorage.removeItem('raychat_direct_user');
         location.reload();
     };
 
-    // অটো-লগইন চেক (লোকাল স্টোরেজ থেকে)
-    const savedUser = localStorage.getItem('raychat_user');
+    // অটো লগইন
+    const savedUser = localStorage.getItem('raychat_direct_user');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
         authContainer.classList.add('hide');
         mainAppDiv.classList.remove('hide');
-        loadUserChats();
-        listenIncomingCalls();
+        
+        if (currentUser.isAdmin) {
+            headerTitle.innerText = "Ray (Admin)";
+            headerStatus.innerText = "সকল মেসেজের ইনবক্স";
+        } else {
+            headerTitle.innerText = "01567854902";
+            headerStatus.innerText = "সরাসরি মেসেজ পাঠান";
+        }
+        
+        loadDirectMessages();
     }
 
     // Event Listeners
-    newChatBtn.onclick = () => openGlobalUsersModal();
-    sendMsgBtn.onclick = () => sendPrivateMessage();
-    chatMessageInput.onkeypress = (e) => { if (e.key === 'Enter') sendPrivateMessage(); };
-    audioCallBtn.onclick = () => { if (selectedChat) startCall(selectedChat, false); };
-    videoCallBtn.onclick = () => { if (selectedChat) startCall(selectedChat, true); };
-    mobileBackBtn.onclick = () => chatsPanel.classList.remove('hide-mobile');
+    sendMsgBtn.onclick = () => sendDirectMessage();
+    chatMessageInput.onkeypress = (e) => { if (e.key === 'Enter') sendDirectMessage(); };
+    audioCallBtn.onclick = () => startCall(false);
+    videoCallBtn.onclick = () => startCall(true);
 </script>
 </body>
 </html>
