@@ -9,7 +9,8 @@
         {
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+                "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"
             }
         }
     </script>
@@ -66,11 +67,7 @@
             text-align: center; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
-        .auth-card i.main-icon {
-            font-size: 3rem;
-            color: #075e54;
-            margin-bottom: 12px;
-        }
+        .auth-card i.main-icon { font-size: 3rem; color: #075e54; margin-bottom: 12px; }
         .auth-card h2 { color: #075e54; margin-bottom: 6px; font-weight: 700; }
         .auth-input { 
             width: 100%; 
@@ -80,7 +77,6 @@
             border-radius: 30px; 
             font-size: 1rem; 
             outline: none; 
-            transition: 0.3s;
             background: #f8f9fa;
         }
         .auth-input:focus { border-color: #075e54; background: #fff; }
@@ -95,9 +91,7 @@
             cursor: pointer; 
             font-size: 1rem; 
             box-shadow: 0 4px 12px rgba(7, 94, 84, 0.3);
-            transition: 0.2s active;
         }
-        .auth-btn:active { transform: scale(0.98); }
         .error-msg { color: #e74c3c; font-size: 0.85rem; margin-top: 10px; font-weight: 500; }
         .hide { display: none !important; }
 
@@ -111,10 +105,9 @@
             display: flex; 
             flex-direction: column; 
             position: absolute;
-            left: 0;
-            top: 0;
+            left: 0; top: 0;
             z-index: 10;
-            transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            transition: transform 0.3s ease;
         }
         .sidebar-header { 
             padding: 16px; 
@@ -123,7 +116,6 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .sidebar-title { font-weight: 700; font-size: 1.2rem; color: #00a884; }
         .user-list { flex: 1; overflow-y: auto; }
@@ -135,78 +127,50 @@
             border-bottom: 1px solid #222d34; 
             cursor: pointer; 
             color: #e9edef; 
-            transition: background 0.2s; 
-            user-select: none;
         }
-        .user-item:active { background: #2a3942; }
         .user-avatar { 
-            width: 48px; 
-            height: 48px; 
+            width: 48px; height: 48px; 
             background: linear-gradient(135deg, #00a884, #056162); 
-            color: white; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            font-size: 1.2rem; 
-            flex-shrink: 0;
+            color: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; font-size: 1.2rem; flex-shrink: 0;
         }
         .user-info { flex: 1; overflow: hidden; }
         .user-name { font-size: 1rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
         .user-last-msg { font-size: 0.85rem; color: #8696a0; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-top: 2px; }
 
         .chat-area { 
-            width: 100%; 
-            height: 100%;
-            display: flex; 
-            flex-direction: column; 
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; 
             background: #0b141a; 
-            position: absolute;
-            left: 0;
-            top: 0;
+            position: absolute; left: 0; top: 0;
             z-index: 20;
             transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            transition: transform 0.3s ease;
         }
 
         .show-chat .chat-area { transform: translateX(0); }
         .show-chat .sidebar { transform: translateX(-20%); }
 
         .chat-header { 
-            background: #202c33; 
-            color: #e9edef; 
+            background: #202c33; color: #e9edef; 
             padding: 10px 14px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
+            display: flex; align-items: center; justify-content: space-between; 
             z-index: 5;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .chat-user-details { display: flex; align-items: center; gap: 10px; }
         .header-actions { display: flex; gap: 6px; }
         .action-btn { 
-            background: transparent; 
-            border: none; 
-            color: #00a884; 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+            background: transparent; border: none; 
+            color: #00a884; width: 40px; height: 40px; 
+            border-radius: 50%; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; 
             font-size: 1.1rem; 
         }
-        .action-btn:active { background: rgba(255,255,255,0.08); }
 
         .messages-area { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 16px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
+            flex: 1; overflow-y: auto; padding: 16px; 
+            display: flex; flex-direction: column; gap: 10px; 
             background-image: radial-gradient(#1e2930 1px, transparent 0); 
             background-size: 16px 16px; 
         }
@@ -215,163 +179,78 @@
         .message-other { align-self: flex-start; }
         
         .bubble { 
-            padding: 10px 14px; 
-            border-radius: 16px; 
-            word-break: break-word; 
-            font-size: 0.95rem; 
-            line-height: 1.4; 
-            position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            padding: 8px 12px; border-radius: 16px; 
+            word-break: break-word; font-size: 0.95rem; line-height: 1.4; 
+            position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.15);
         }
         .bubble-own { background: #005c4b; color: #e9edef; border-bottom-right-radius: 4px; }
         .bubble-other { background: #202c33; color: #e9edef; border-bottom-left-radius: 4px; }
         .message-time { font-size: 0.65rem; color: rgba(241, 241, 241, 0.6); margin-top: 4px; text-align: right; }
 
+        /* ফাইল মেসেজ স্টাইল */
+        .chat-image { max-width: 100%; max-height: 250px; border-radius: 10px; margin-top: 4px; display: block; cursor: pointer; }
+        .chat-file-link { 
+            display: flex; align-items: center; gap: 10px; 
+            background: rgba(0,0,0,0.2); padding: 10px; 
+            border-radius: 8px; text-decoration: none; color: #e9edef; 
+            margin-top: 4px;
+        }
+        .chat-file-link i { font-size: 1.8rem; color: #00a884; }
+
+        /* ইনপুট এরিয়া */
         .input-area { 
-            background: #202c33; 
-            padding: 10px 12px; 
-            display: flex; 
-            gap: 8px; 
-            align-items: center; 
+            background: #202c33; padding: 10px 12px; 
+            display: flex; gap: 8px; align-items: center; 
+            position: relative;
         }
+        .file-btn { 
+            background: transparent; border: none; 
+            color: #8696a0; font-size: 1.3rem; 
+            cursor: pointer; padding: 8px; 
+        }
+        .file-btn:hover { color: #00a884; }
         .message-input { 
-            flex: 1; 
-            border: none; 
-            background: #2a3942; 
-            color: #e9edef; 
-            padding: 12px 18px; 
-            border-radius: 24px; 
-            outline: none; 
-            font-size: 0.95rem; 
+            flex: 1; border: none; background: #2a3942; 
+            color: #e9edef; padding: 12px 18px; 
+            border-radius: 24px; outline: none; font-size: 0.95rem; 
         }
-        .message-input::placeholder { color: #8696a0; }
         .send-btn { 
-            background: #00a884; 
-            border: none; 
-            color: white; 
-            width: 44px; 
-            height: 44px; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 1.1rem; 
-            flex-shrink: 0;
+            background: #00a884; border: none; color: white; 
+            width: 44px; height: 44px; border-radius: 50%; 
+            cursor: pointer; display: flex; align-items: center; 
+            justify-content: center; font-size: 1.1rem; flex-shrink: 0;
         }
-        .send-btn:active { transform: scale(0.95); }
+
+        /* আপলোড ইন্ডিকেটর */
+        .upload-status {
+            position: absolute; top: -35px; left: 0; right: 0;
+            background: #00a884; color: white;
+            font-size: 0.8rem; padding: 6px 12px;
+            text-align: center; font-weight: 500;
+        }
 
         .toast-error { 
-            position: fixed; 
-            bottom: 80px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: #e74c3c; 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            font-size: 0.85rem; 
-            z-index: 2000; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); 
+            background: #e74c3c; color: white; padding: 10px 20px; 
+            border-radius: 30px; font-size: 0.85rem; z-index: 2000; 
         }
 
-        .mobile-back-btn { 
-            background: none; 
-            border: none; 
-            color: #aebac1; 
-            font-size: 1.2rem; 
-            cursor: pointer; 
-            padding: 6px;
-            margin-right: 2px; 
-        }
+        .mobile-back-btn { background: none; border: none; color: #aebac1; font-size: 1.2rem; cursor: pointer; padding: 6px; }
 
         @keyframes popIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
 
         /* WebRTC Call Panel */
-        .call-fullscreen-panel { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            height: 100dvh;
-            background: #111b21; 
-            z-index: 10000; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        .call-fullscreen-panel { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #111b21; z-index: 10000; display: flex; flex-direction: column; }
         .remote-video-full { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .local-video-pip { 
-            position: absolute; 
-            top: 20px; 
-            right: 20px; 
-            width: 100px; 
-            height: 140px; 
-            border-radius: 14px; 
-            overflow: hidden; 
-            background: #1e1e1e; 
-            border: 2px solid rgba(255,255,255,0.5); 
-            z-index: 10010; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+        .local-video-pip { position: absolute; top: 20px; right: 20px; width: 100px; height: 140px; border-radius: 14px; overflow: hidden; background: #1e1e1e; border: 2px solid rgba(255,255,255,0.5); z-index: 10010; }
         .local-video-pip video { width: 100%; height: 100%; object-fit: cover; }
-        .call-controls-overlay { 
-            position: absolute; 
-            bottom: 40px; 
-            left: 0; 
-            right: 0; 
-            display: flex; 
-            justify-content: center; 
-            gap: 24px; 
-            z-index: 10010; 
-        }
-        .call-controls-overlay button { 
-            border: none; 
-            border-radius: 50%; 
-            width: 56px; 
-            height: 56px; 
-            font-size: 22px; 
-            color: white; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
+        .call-controls-overlay { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 24px; z-index: 10010; }
+        .call-controls-overlay button { border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 22px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .call-end-btn { background: #ea4335 !important; }
         .call-accept-btn { background: #00a884 !important; }
-
-        .remote-info { 
-            position: absolute; 
-            top: 50px; 
-            left: 0; 
-            right: 0; 
-            text-align: center; 
-            color: white; 
-            z-index: 10010; 
-        }
-        .remote-info h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: 4px; }
-        .remote-info p { font-size: 0.9rem; color: #8696a0; }
-
-        .audio-call-ui { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            background: #111b21; 
-        }
-        .audio-avatar { 
-            background: linear-gradient(135deg, #00a884, #056162); 
-            width: 110px; 
-            height: 110px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin-bottom: 24px; 
-            box-shadow: 0 0 30px rgba(0, 168, 132, 0.3);
-        }
+        .remote-info { position: absolute; top: 50px; left: 0; right: 0; text-align: center; color: white; z-index: 10010; }
+        .audio-call-ui { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111b21; }
+        .audio-avatar { background: linear-gradient(135deg, #00a884, #056162); width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
         .audio-avatar i { font-size: 48px; color: white; }
     </style>
 </head>
@@ -408,9 +287,9 @@
             <div class="chat-header">
                 <div class="chat-user-details">
                     <button class="mobile-back-btn" id="mobileBackBtn"><i class="fas fa-arrow-left"></i></button>
-                    <div class="user-avatar" id="activeAvatar" style="width: 40px; height: 40px; font-size: 1rem;"><i class="fas fa-user"></i></div>
+                    <div class="user-avatar" id="activeAvatar" style="width: 40px; height: 40px; font-size: 1rem;">R</div>
                     <div>
-                        <div style="font-weight: bold; font-size: 0.95rem;" id="activeChatTitle">চ্যাট</div>
+                        <div style="font-weight: bold; font-size: 0.95rem;" id="activeChatTitle">Roy</div>
                         <div style="font-size: 0.72rem; color: #8696a0;" id="activeChatStatus">অনলাইন</div>
                     </div>
                 </div>
@@ -425,6 +304,13 @@
             <div id="messagesArea" class="messages-area"></div>
 
             <div class="input-area">
+                <div id="uploadStatus" class="upload-status hide">ফাইল আপলোড হচ্ছে... 0%</div>
+                
+                <button class="file-btn" id="attachFileBtn" title="ছবি বা PDF পাঠাও">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <input type="file" id="fileInput" class="hide" accept="image/*,.pdf,.doc,.docx">
+
                 <input type="text" id="chatMessageInput" class="message-input" placeholder="মেসেজ লিখুন..." autocomplete="off">
                 <button id="sendMsgBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
             </div>
@@ -434,19 +320,21 @@
 
 <script type="module">
     import { initializeApp } from "firebase/app";
-    import { getFirestore, collection, doc, setDoc, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc } from "firebase/firestore";
+    import { getFirestore, collection, doc, setDoc, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDocs, deleteDoc } from "firebase/firestore";
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
         authDomain: "rayvid-c074a.firebaseapp.com",
         projectId: "rayvid-c074a",
-        storageBucket: "rayvid-c074a.firebasestorage.app",
+        storageBucket: "rayvid-c074a.appspot.com",
         messagingSenderId: "970771885312",
         appId: "1:970771885312:web:104ae741f28287a01ad7e5"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const authContainer = document.getElementById('authContainer');
     const mainAppDiv = document.getElementById('mainApp');
@@ -468,6 +356,10 @@
     const audioCallBtn = document.getElementById('audioCallBtn');
     const videoCallBtn = document.getElementById('videoCallBtn');
     const deleteThreadBtn = document.getElementById('deleteThreadBtn');
+    
+    const attachFileBtn = document.getElementById('attachFileBtn');
+    const fileInput = document.getElementById('fileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
 
     let currentUser = null;
     let selectedUserChatId = null;
@@ -477,14 +369,11 @@
     let peerConnection = null, localStream = null, remoteAudio = null, remoteVideoElem = null;
     let currentCallDocId = null, isCallActive = false, callSignalUnsubscribe = null, callPanelDiv = null;
 
-    // High-performance Global Metered TURN + Google STUN Infra
     const iceServers = [
         { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
         { urls: "stun:openrelay.metered.ca:80" },
         { urls: "turn:openrelay.metered.ca:80", username: "openrelay", credential: "openrelay" },
-        { urls: "turn:openrelay.metered.ca:443", username: "openrelay", credential: "openrelay" },
-        { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelay", credential: "openrelay" }
+        { urls: "turn:openrelay.metered.ca:443", username: "openrelay", credential: "openrelay" }
     ];
 
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
@@ -517,9 +406,9 @@
             deleteThreadBtn.classList.add('hide');
             sidebar.style.display = 'none';
             appContainer.classList.add('show-chat');
-            activeChatTitle.innerText = "Admin Support";
+            activeChatTitle.innerText = "Roy";
             activeChatStatus.innerText = "অনলাইন";
-            activeAvatar.innerText = "A";
+            activeAvatar.innerText = "R";
             loadMessagesForThread(currentUser.uid);
         }
         listenForIncomingCalls();
@@ -534,41 +423,6 @@
     };
     adminLogoutBtn.onclick = logoutAction;
     userLogoutBtn.onclick = logoutAction;
-
-    // ইউজার থ্রেড ও চ্যাট সম্পূর্ণ মুছে ফেলার লজিক
-    async function deleteUserThread(userId, userName) {
-        if(!currentUser.isAdmin) return;
-        const confirmDelete = confirm(`আপনি কি নিশ্চিত যে "${userName}" এর সমস্ত চ্যাট মুছে ফেলতে চান?`);
-        if(!confirmDelete) return;
-
-        try {
-            const messagesRef = collection(db, "user_threads", userId, "messages");
-            const msgsSnap = await getDocs(messagesRef);
-            const deletePromises = [];
-            msgsSnap.forEach(msgDoc => {
-                deletePromises.push(deleteDoc(doc(db, "user_threads", userId, "messages", msgDoc.id)));
-            });
-            await Promise.all(deletePromises);
-            await deleteDoc(doc(db, "user_threads", userId));
-
-            showToast("ইনবক্স সম্পূর্ণ মুছে ফেলা হয়েছে");
-
-            if (selectedUserChatId === userId) {
-                selectedUserChatId = null;
-                messagesArea.innerHTML = '';
-                appContainer.classList.remove('show-chat');
-            }
-        } catch(e) {
-            console.error(e);
-            showToast("ইনবক্স মুছে ফেলা সম্ভব হয়নি");
-        }
-    }
-
-    deleteThreadBtn.onclick = () => {
-        if(selectedUserChatId) {
-            deleteUserThread(selectedUserChatId, activeChatTitle.innerText);
-        }
-    };
 
     function loadAdminInboxList() {
         if (unsubscribeUsersList) unsubscribeUsersList();
@@ -599,25 +453,9 @@
                     activeChatTitle.innerText = data.userName || 'ইউজার';
                     activeChatStatus.innerText = "আইডি: " + userId.substring(0,6);
                     activeAvatar.innerText = data.userName ? data.userName[0].toUpperCase() : 'U';
-                    
                     appContainer.classList.add('show-chat');
                     loadMessagesForThread(userId);
                 };
-
-                let pressTimer = null;
-                item.addEventListener('touchstart', () => {
-                    pressTimer = setTimeout(() => {
-                        deleteUserThread(userId, data.userName || 'ইউজার');
-                    }, 700);
-                }, { passive: true });
-
-                item.addEventListener('touchend', () => { clearTimeout(pressTimer); });
-                item.addEventListener('touchmove', () => { clearTimeout(pressTimer); });
-
-                item.ondblclick = () => {
-                    deleteUserThread(userId, data.userName || 'ইউজার');
-                };
-
                 userList.appendChild(item);
             });
         });
@@ -646,9 +484,34 @@
                 const bubble = document.createElement('div');
                 bubble.className = `bubble ${isOwn ? 'bubble-own' : 'bubble-other'}`;
 
-                const textSpan = document.createElement('span');
-                textSpan.innerText = data.text;
-                bubble.appendChild(textSpan);
+                if (data.text) {
+                    const textSpan = document.createElement('div');
+                    textSpan.innerText = data.text;
+                    bubble.appendChild(textSpan);
+                }
+
+                if (data.fileUrl) {
+                    if (data.fileType === 'image') {
+                        const img = document.createElement('img');
+                        img.src = data.fileUrl;
+                        img.className = 'chat-image';
+                        img.onclick = () => window.open(data.fileUrl, '_blank');
+                        bubble.appendChild(img);
+                    } else {
+                        const fileLink = document.createElement('a');
+                        fileLink.href = data.fileUrl;
+                        fileLink.target = '_blank';
+                        fileLink.className = 'chat-file-link';
+                        fileLink.innerHTML = `
+                            <i class="fas fa-file-pdf"></i>
+                            <div>
+                                <div style="font-weight: bold; font-size:0.85rem;">${escapeHtml(data.fileName || 'ডকুমেন্ট')}</div>
+                                <div style="font-size: 0.7rem; color: #8696a0;">ডাউনলোড বা দেখতে ক্লিক করুন</div>
+                            </div>
+                        `;
+                        bubble.appendChild(fileLink);
+                    }
+                }
 
                 const timeSpan = document.createElement('div');
                 timeSpan.className = 'message-time';
@@ -662,31 +525,81 @@
         });
     }
 
-    async function sendMessage() {
+    async function sendMessage(fileData = null) {
         const text = chatMessageInput.value.trim();
-        if (!text) return;
+        if (!text && !fileData) return;
 
         const threadId = currentUser.isAdmin ? selectedUserChatId : currentUser.uid;
         if (!threadId) { showToast("অনুগ্রহ করে একটি ইনবক্স নির্বাচন করুন"); return; }
 
         chatMessageInput.value = "";
 
-        await addDoc(collection(db, "user_threads", threadId, "messages"), {
-            text: text,
+        const payload = {
             senderId: currentUser.uid,
             senderName: currentUser.name,
             timestamp: serverTimestamp()
-        });
+        };
 
+        if (text) payload.text = text;
+        if (fileData) {
+            payload.fileUrl = fileData.url;
+            payload.fileType = fileData.type;
+            payload.fileName = fileData.name;
+        }
+
+        await addDoc(collection(db, "user_threads", threadId, "messages"), payload);
+
+        let lastMsgText = text || (fileData.type === 'image' ? '📷 ছবি পাঠানো হয়েছে' : '📄 ফাইল পাঠানো হয়েছে');
         await setDoc(doc(db, "user_threads", threadId), {
             userName: currentUser.isAdmin ? activeChatTitle.innerText : currentUser.name,
-            lastMessage: text,
+            lastMessage: lastMsgText,
             lastUpdated: serverTimestamp()
         }, { merge: true });
     }
 
-    sendMsgBtn.onclick = sendMessage;
+    sendMsgBtn.onclick = () => sendMessage();
     chatMessageInput.onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+
+    attachFileBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const threadId = currentUser.isAdmin ? selectedUserChatId : currentUser.uid;
+        if (!threadId) { showToast("আগে ইনবক্স নির্বাচন করুন"); return; }
+
+        const isImage = file.type.startsWith('image/');
+        const fileType = isImage ? 'image' : 'file';
+
+        const storageRef = ref(storage, `chat_files/${threadId}/${Date.now()}_${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadStatus.classList.remove('hide');
+
+        uploadTask.on('state_changed', 
+            (snapshot) => {
+                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                uploadStatus.innerText = `আপলোড হচ্ছে... ${progress}%`;
+            }, 
+            (error) => {
+                console.error(error);
+                showToast("ফাইল আপলোড ব্যর্থ হয়েছে!");
+                uploadStatus.classList.add('hide');
+            }, 
+            async () => {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                uploadStatus.classList.add('hide');
+                fileInput.value = "";
+                
+                sendMessage({
+                    url: downloadURL,
+                    type: fileType,
+                    name: file.name
+                });
+            }
+        );
+    };
 
     async function getMediaStream(videoEnabled) { 
         if (localStream) localStream.getTracks().forEach(t => t.stop()); 
@@ -697,7 +610,6 @@
     async function createPeerConnection(callDocId) {
         if (peerConnection) peerConnection.close();
         const pc = new RTCPeerConnection({ iceServers });
-        
         if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
         
         pc.onicecandidate = async (e) => { 
@@ -712,12 +624,8 @@
         pc.ontrack = (e) => {
             if (e.track.kind === "audio") { 
                 if (!remoteAudio) { 
-                    remoteAudio = new Audio(); 
-                    remoteAudio.autoplay = true;
-                    remoteAudio.srcObject = e.streams[0]; 
-                } else {
-                    remoteAudio.srcObject = e.streams[0]; 
-                }
+                    remoteAudio = new Audio(); remoteAudio.autoplay = true; remoteAudio.srcObject = e.streams[0]; 
+                } else { remoteAudio.srcObject = e.streams[0]; }
             } else if (e.track.kind === "video" && remoteVideoElem) {
                 remoteVideoElem.srcObject = e.streams[0];
             }
@@ -725,8 +633,7 @@
         
         pc.onconnectionstatechange = () => { 
             if (pc.connectionState === "failed" || pc.connectionState === "disconnected") { 
-                endCall(); 
-                showToast("কল বিচ্ছিন্ন হয়েছে"); 
+                endCall(); showToast("কল বিচ্ছিন্ন হয়েছে"); 
             } 
         };
         return pc;
@@ -769,7 +676,6 @@
             `;
             document.body.appendChild(callPanelDiv);
         }
-        
         callPanelDiv.querySelector('#callEndBtn').onclick = () => endCall();
     }
 
@@ -782,12 +688,8 @@
             isCallActive = true;
             await getMediaStream(isVideo);
             const callDoc = await addDoc(collection(db, "calls"), {
-                from: currentUser.uid, 
-                fromName: currentUser.name, 
-                to: targetId,
-                status: "calling", 
-                type: isVideo ? "video" : "audio", 
-                createdAt: serverTimestamp()
+                from: currentUser.uid, fromName: currentUser.name, to: targetId,
+                status: "calling", type: isVideo ? "video" : "audio", createdAt: serverTimestamp()
             });
             
             currentCallDocId = callDoc.id;
@@ -807,11 +709,7 @@
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
-            
-            await updateDoc(doc(db, "calls", currentCallDocId), { 
-                offer: { sdp: offer.sdp, type: offer.type }, 
-                status: "offer_sent" 
-            });
+            await setDoc(doc(db, "calls", currentCallDocId), { offer: { sdp: offer.sdp, type: offer.type }, status: "offer_sent" }, { merge: true });
 
             showCallUI(activeChatTitle.innerText, isVideo);
 
@@ -825,11 +723,7 @@
                 if (data?.status === "ended") { unsub(); endCall(); }
             });
             callSignalUnsubscribe = unsub;
-        } catch(e) { 
-            console.error(e);
-            showToast("কল দেওয়া সম্ভব হয়নি"); 
-            endCall(); 
-        }
+        } catch(e) { console.error(e); showToast("কল দেওয়া সম্ভব হয়নি"); endCall(); }
     }
 
     function listenForIncomingCalls() {
@@ -851,20 +745,16 @@
                                 acceptBtn.remove();
                                 document.getElementById('callStatusTxt').innerText = "সংযুক্ত হচ্ছে...";
                                 await getMediaStream(isVideo);
-                                
                                 peerConnection = await createPeerConnection(currentCallDocId);
 
-                                const callSnap = await getDoc(doc(db, "calls", currentCallDocId));
+                                const callSnap = await getDocs(doc(db, "calls", currentCallDocId));
                                 const offerData = callSnap.data().offer;
 
                                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offerData));
                                 const answer = await peerConnection.createAnswer();
                                 await peerConnection.setLocalDescription(answer);
 
-                                await updateDoc(doc(db, "calls", currentCallDocId), {
-                                    answer: { sdp: answer.sdp, type: answer.type },
-                                    status: "connected"
-                                });
+                                await setDoc(doc(db, "calls", currentCallDocId), { answer: { sdp: answer.sdp, type: answer.type }, status: "connected" }, { merge: true });
 
                                 const candRef = collection(db, "calls", currentCallDocId, "candidates");
                                 onSnapshot(candRef, snapshot => {
@@ -891,7 +781,7 @@
 
     async function endCall() {
         if (currentCallDocId) {
-            await updateDoc(doc(db, "calls", currentCallDocId), { status: "ended" }).catch(()=>{});
+            await setDoc(doc(db, "calls", currentCallDocId), { status: "ended" }, { merge: true }).catch(()=>{});
         }
         if (peerConnection) { peerConnection.close(); peerConnection = null; }
         if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
