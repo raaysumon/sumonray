@@ -22,14 +22,14 @@
             justify-content: center; 
             align-items: center; 
             height: 100vh;
-            height: 100dvh; /* Mobile viewport height fix */
+            height: 100dvh;
             width: 100vw;
             overflow: hidden;
         }
 
         .app-container { 
             width: 100%; 
-            max-width: 500px; /* Mobile View Centered on Desktop */
+            max-width: 500px; 
             height: 100%; 
             background: #111b21; 
             display: flex; 
@@ -104,7 +104,6 @@
         /* ২. মূল লেআউট */
         .main-app { display: flex; width: 100%; height: 100%; position: relative; overflow: hidden; }
 
-        /* সাইডবার (ইনবক্স) */
         .sidebar { 
             width: 100%; 
             height: 100%;
@@ -156,7 +155,6 @@
         .user-name { font-size: 1rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
         .user-last-msg { font-size: 0.85rem; color: #8696a0; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-top: 2px; }
 
-        /* চ্যাট উইন্ডো */
         .chat-area { 
             width: 100%; 
             height: 100%;
@@ -171,7 +169,6 @@
             transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
 
-        /* যখন কোনো ইনবক্স ওপেন থাকবে */
         .show-chat .chat-area { transform: translateX(0); }
         .show-chat .sidebar { transform: translateX(-20%); }
 
@@ -229,7 +226,6 @@
         .bubble-other { background: #202c33; color: #e9edef; border-bottom-left-radius: 4px; }
         .message-time { font-size: 0.65rem; color: rgba(241, 241, 241, 0.6); margin-top: 4px; text-align: right; }
 
-        /* ইনপুট বার */
         .input-area { 
             background: #202c33; 
             padding: 10px 12px; 
@@ -290,7 +286,7 @@
 
         @keyframes popIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
 
-        /* ওয়েব-আরটিসি (WebRTC) কল স্ক্রিন */
+        /* WebRTC Call Panel */
         .call-fullscreen-panel { 
             position: fixed; 
             top: 0; 
@@ -395,7 +391,6 @@
 
     <!-- ২. মূল চ্যাট ইন্টারফেস -->
     <div id="mainApp" class="main-app hide">
-        <!-- সাইডবার (ইনবক্স) -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title">মেসেজ ইনবক্স</div>
@@ -404,11 +399,10 @@
                 </button>
             </div>
             <div class="user-list" id="userList">
-                <div style="text-align: center; color: #8696a0; padding: 30px;">কোনো ইনবক্স পাওয়া যায়নি</div>
+                <div style="text-align: center; color: #8696a0; padding: 30px;">কোনো ইনবক্স পাওয়া যায়নি</div>
             </div>
         </div>
 
-        <!-- চ্যাট এলাকা -->
         <div class="chat-area" id="chatArea">
             <div class="chat-header">
                 <div class="chat-user-details">
@@ -452,7 +446,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // DOM এলিমেন্টসমূহ
     const authContainer = document.getElementById('authContainer');
     const mainAppDiv = document.getElementById('mainApp');
     const userNameInput = document.getElementById('userNameInput');
@@ -478,9 +471,18 @@
     let unsubscribeMessages = null;
     let unsubscribeUsersList = null;
 
-    // WebRTC গ্লোবাল
     let peerConnection = null, localStream = null, remoteAudio = null, remoteVideoElem = null;
     let currentCallDocId = null, isCallActive = false, callSignalUnsubscribe = null, callPanelDiv = null;
+
+    // Free Open-Relay TURN Servers for Global NAT Traversal
+    const iceServers = [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:openrelay.metered.ca:80" },
+        { urls: "turn:openrelay.metered.ca:80", username: "openrelay", credential: "openrelay" },
+        { urls: "turn:openrelay.metered.ca:443", username: "openrelay", credential: "openrelay" },
+        { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelay", credential: "openrelay" }
+    ];
 
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
     
@@ -492,7 +494,43 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
-    // অ্যাডমিন: ইনবক্সের তালিকা লোড করা
+    // Auth & App Flow
+    enterAppBtn.onclick = () => {
+        const name = userNameInput.value.trim();
+        if (!name) { authErrorSpan.innerText = "অনুগ্রহ করে নামটি লিখুন"; return; }
+        
+        let uid = localStorage.getItem('raychat_uid') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('raychat_uid', uid);
+        
+        const isAdmin = (name.toLowerCase() === 'raye' || name.toLowerCase() === 'admin');
+        currentUser = { uid: isAdmin ? "raye_admin" : uid, name: name, isAdmin: isAdmin };
+
+        authContainer.classList.add('hide');
+        mainAppDiv.classList.remove('hide');
+
+        if (currentUser.isAdmin) {
+            loadAdminInboxList();
+        } else {
+            sidebar.style.display = 'none';
+            appContainer.classList.add('show-chat');
+            activeChatTitle.innerText = "Admin Support";
+            activeChatStatus.innerText = "অনলাইন";
+            activeAvatar.innerText = "A";
+            loadMessagesForThread(currentUser.uid);
+        }
+        listenForIncomingCalls();
+    };
+
+    mobileBackBtn.onclick = () => appContainer.classList.remove('show-chat');
+    
+    const logoutAction = () => {
+        if(isCallActive) endCall();
+        localStorage.removeItem('raychat_uid');
+        location.reload();
+    };
+    adminLogoutBtn.onclick = logoutAction;
+    userLogoutBtn.onclick = logoutAction;
+
     function loadAdminInboxList() {
         if (unsubscribeUsersList) unsubscribeUsersList();
         const usersRef = collection(db, "user_threads");
@@ -530,7 +568,6 @@
         });
     }
 
-    // মেসেজ লোড করা
     function loadMessagesForThread(threadId) {
         if (unsubscribeMessages) unsubscribeMessages();
         const messagesRef = collection(db, "user_threads", threadId, "messages");
@@ -570,16 +607,12 @@
         });
     }
 
-    // মেসেজ পাঠানো
     async function sendMessage() {
         const text = chatMessageInput.value.trim();
         if (!text) return;
 
         const threadId = currentUser.isAdmin ? selectedUserChatId : currentUser.uid;
-        if (!threadId) {
-            showToast("অনুগ্রহ করে একটি ইনবক্স নির্বাচন করুন");
-            return;
-        }
+        if (!threadId) { showToast("অনুগ্রহ করে একটি ইনবক্স নির্বাচন করুন"); return; }
 
         chatMessageInput.value = "";
 
@@ -597,9 +630,10 @@
         }, { merge: true });
     }
 
-    // ---------- WEBRTC CALLING SYSTEM ----------
-    const iceServers = [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }];
-    
+    sendMsgBtn.onclick = sendMessage;
+    chatMessageInput.onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+
+    // WebRTC Realtime Calling System
     async function getMediaStream(videoEnabled) { 
         if (localStream) localStream.getTracks().forEach(t => t.stop()); 
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: videoEnabled }); 
@@ -613,18 +647,33 @@
         if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
         
         pc.onicecandidate = async (e) => { 
-            if (e.candidate) await addDoc(collection(db, "calls", callDocId, "candidates"), { candidate: e.candidate.toJSON(), senderId: currentUser.uid }); 
+            if (e.candidate) {
+                await addDoc(collection(db, "calls", callDocId, "candidates"), { 
+                    candidate: e.candidate.toJSON(), 
+                    senderId: currentUser.uid 
+                }); 
+            }
         };
         
         pc.ontrack = (e) => {
             if (e.track.kind === "audio") { 
-                if (!remoteAudio) { remoteAudio = new Audio(); remoteAudio.srcObject = e.streams[0]; remoteAudio.play(); } 
-                else remoteAudio.srcObject = e.streams[0]; 
-            } else if (e.track.kind === "video" && remoteVideoElem) remoteVideoElem.srcObject = e.streams[0];
+                if (!remoteAudio) { 
+                    remoteAudio = new Audio(); 
+                    remoteAudio.autoplay = true;
+                    remoteAudio.srcObject = e.streams[0]; 
+                } else {
+                    remoteAudio.srcObject = e.streams[0]; 
+                }
+            } else if (e.track.kind === "video" && remoteVideoElem) {
+                remoteVideoElem.srcObject = e.streams[0];
+            }
         };
         
         pc.onconnectionstatechange = () => { 
-            if (pc.connectionState === "failed") { endCall(); showToast("কল বিচ্ছিন্ন হয়েছে"); } 
+            if (pc.connectionState === "failed" || pc.connectionState === "disconnected") { 
+                endCall(); 
+                showToast("কল বিচ্ছিন্ন হয়েছে"); 
+            } 
         };
         return pc;
     }
@@ -673,7 +722,7 @@
     async function startCall(isVideo) {
         if (isCallActive) return;
         const targetId = currentUser.isAdmin ? selectedUserChatId : "raye_admin";
-        if(!targetId) { showToast("কল দেওয়ার জন্য ইউজার নির্বাচন করুন"); return; }
+        if(!targetId) { showToast("কল দেওয়ার জন্য ইউজার নির্বাচন করুন"); return; }
 
         try {
             isCallActive = true;
@@ -689,6 +738,20 @@
             
             currentCallDocId = callDoc.id;
             peerConnection = await createPeerConnection(currentCallDocId);
+
+            // Listen for Remote ICE Candidates (Caller Side)
+            const candRef = collection(db, "calls", currentCallDocId, "candidates");
+            onSnapshot(candRef, snapshot => {
+                snapshot.docChanges().forEach(async change => {
+                    if (change.type === "added") {
+                        let data = change.doc.data();
+                        if (data.senderId !== currentUser.uid && peerConnection) {
+                            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(() => {});
+                        }
+                    }
+                });
+            });
+
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
             
@@ -709,10 +772,13 @@
                 if (data?.status === "ended") { unsub(); endCall(); }
             });
             callSignalUnsubscribe = unsub;
-        } catch(e) { showToast("কল দেওয়া সম্ভব হয়নি"); endCall(); }
+        } catch(e) { 
+            console.error(e);
+            showToast("কল দেওয়া সম্ভব হয়নি"); 
+            endCall(); 
+        }
     }
 
-    // ইনকামিং কল রিসিভ করা এবং দেখা
     function listenForIncomingCalls() {
         const callsRef = collection(db, "calls");
         onSnapshot(callsRef, (snapshot) => {
@@ -747,14 +813,14 @@
                                     status: "connected"
                                 });
 
-                                // ICE Candidates লিঙ্ক করা
+                                // Listen for Remote ICE Candidates (Callee Side)
                                 const candRef = collection(db, "calls", currentCallDocId, "candidates");
                                 onSnapshot(candRef, snapshot => {
                                     snapshot.docChanges().forEach(async change => {
                                         if (change.type === "added") {
                                             let data = change.doc.data();
-                                            if (data.senderId !== currentUser.uid) {
-                                                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                                            if (data.senderId !== currentUser.uid && peerConnection) {
+                                                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(() => {});
                                             }
                                         }
                                     });
@@ -762,7 +828,6 @@
                             };
                         }
 
-                        // বাতিল হওয়ার খবর রাখা
                         const unsub = onSnapshot(doc(db, "calls", currentCallDocId), (snap) => {
                             if (snap.data()?.status === "ended") { unsub(); endCall(); }
                         });
@@ -773,78 +838,18 @@
     }
 
     async function endCall() {
-        if (currentCallDocId) await updateDoc(doc(db, "calls", currentCallDocId), { status: "ended" }).catch(()=>{});
+        if (currentCallDocId) {
+            await updateDoc(doc(db, "calls", currentCallDocId), { status: "ended" }).catch(()=>{});
+        }
         if (peerConnection) { peerConnection.close(); peerConnection = null; }
         if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-        if (callSignalUnsubscribe) callSignalUnsubscribe();
-        isCallActive = false; currentCallDocId = null;
-        if (callPanelDiv) callPanelDiv.remove(); callPanelDiv = null;
+        if (remoteAudio) { remoteAudio.pause(); remoteAudio.srcObject = null; remoteAudio = null; }
+        if (callSignalUnsubscribe) { callSignalUnsubscribe(); callSignalUnsubscribe = null; }
+        if (callPanelDiv) { callPanelDiv.remove(); callPanelDiv = null; }
+        isCallActive = false;
+        currentCallDocId = null;
     }
 
-    // লগইন সিস্টেম
-    enterAppBtn.onclick = () => {
-        const inputName = userNameInput.value.trim();
-        if (!inputName) {
-            authErrorSpan.innerText = "আপনার নাম লিখুন!";
-            return;
-        }
-
-        const isRaye = inputName.toLowerCase() === 'raye';
-
-        currentUser = {
-            uid: isRaye ? "raye_admin" : "user_" + Math.random().toString(36).substring(2, 9),
-            name: isRaye ? "Raye" : inputName,
-            isAdmin: isRaye
-        };
-
-        localStorage.setItem('raychat_inbox_user', JSON.stringify(currentUser));
-        setupAppInterface();
-    };
-
-    function setupAppInterface() {
-        authContainer.classList.add('hide');
-        mainAppDiv.classList.remove('hide');
-
-        listenForIncomingCalls(); // কল রিসিভ করা সিস্টেম স্টার্ট করা
-
-        if (currentUser.isAdmin) {
-            // অ্যাডমিন মোড
-            mobileBackBtn.style.display = "block";
-            activeChatTitle.innerText = "ইনবক্স সিলেক্ট করুন";
-            activeChatStatus.innerText = "";
-            userLogoutBtn.style.display = "none";
-            loadAdminInboxList();
-        } else {
-            // সাধারণ ইউজার মোড
-            mobileBackBtn.style.display = "none";
-            activeChatTitle.innerText = "Ray (01567854902)";
-            activeChatStatus.innerText = "অনলাইন";
-            selectedUserChatId = currentUser.uid;
-            
-            appContainer.classList.add('show-chat');
-            loadMessagesForThread(currentUser.uid);
-        }
-    }
-
-    const logout = () => {
-        localStorage.removeItem('raychat_inbox_user');
-        location.reload();
-    };
-
-    adminLogoutBtn.onclick = logout;
-    userLogoutBtn.onclick = logout;
-    mobileBackBtn.onclick = () => appContainer.classList.remove('show-chat');
-
-    // অটো লগইন চেকিং
-    const saved = localStorage.getItem('raychat_inbox_user');
-    if (saved) {
-        currentUser = JSON.parse(saved);
-        setupAppInterface();
-    }
-
-    // ইভেন্ট লিসেনার
-    sendMsgBtn.onclick = sendMessage;
-    chatMessageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
     audioCallBtn.onclick = () => startCall(false);
     videoCallBtn.onclick = () => startCall(true);
 </script>
