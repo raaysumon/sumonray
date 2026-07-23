@@ -136,6 +136,7 @@
             cursor: pointer; 
             color: #e9edef; 
             transition: background 0.2s; 
+            user-select: none;
         }
         .user-item:active { background: #2a3942; }
         .user-avatar { 
@@ -414,6 +415,7 @@
                     </div>
                 </div>
                 <div class="header-actions">
+                    <button id="deleteThreadBtn" class="action-btn hide" title="ইনবক্স ডিলিট করুন" style="color: #e74c3c;"><i class="fas fa-trash-alt"></i></button>
                     <button id="audioCallBtn" class="action-btn"><i class="fas fa-phone"></i></button>
                     <button id="videoCallBtn" class="action-btn"><i class="fas fa-video"></i></button>
                     <button id="userLogoutBtn" class="action-btn" title="লগআউট"><i class="fas fa-sign-out-alt"></i></button>
@@ -432,7 +434,7 @@
 
 <script type="module">
     import { initializeApp } from "firebase/app";
-    import { getFirestore, collection, doc, setDoc, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, getDoc } from "firebase/firestore";
+    import { getFirestore, collection, doc, setDoc, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc } from "firebase/firestore";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAoZdkD0PZz25lIVrNy3hQE2fBrkHELs2Q",
@@ -465,6 +467,7 @@
     const userLogoutBtn = document.getElementById('userLogoutBtn');
     const audioCallBtn = document.getElementById('audioCallBtn');
     const videoCallBtn = document.getElementById('videoCallBtn');
+    const deleteThreadBtn = document.getElementById('deleteThreadBtn');
 
     let currentUser = null;
     let selectedUserChatId = null;
@@ -474,7 +477,7 @@
     let peerConnection = null, localStream = null, remoteAudio = null, remoteVideoElem = null;
     let currentCallDocId = null, isCallActive = false, callSignalUnsubscribe = null, callPanelDiv = null;
 
-    // Free Open-Relay TURN Servers for Global NAT Traversal
+    // High-performance Global Metered TURN + Google STUN Infra
     const iceServers = [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
@@ -494,7 +497,6 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
-    // Auth & App Flow
     enterAppBtn.onclick = () => {
         const name = userNameInput.value.trim();
         if (!name) { authErrorSpan.innerText = "অনুগ্রহ করে নামটি লিখুন"; return; }
@@ -509,8 +511,10 @@
         mainAppDiv.classList.remove('hide');
 
         if (currentUser.isAdmin) {
+            deleteThreadBtn.classList.remove('hide');
             loadAdminInboxList();
         } else {
+            deleteThreadBtn.classList.add('hide');
             sidebar.style.display = 'none';
             appContainer.classList.add('show-chat');
             activeChatTitle.innerText = "Admin Support";
@@ -531,13 +535,48 @@
     adminLogoutBtn.onclick = logoutAction;
     userLogoutBtn.onclick = logoutAction;
 
+    // ইউজার থ্রেড ও চ্যাট সম্পূর্ণ মুছে ফেলার লজিক
+    async function deleteUserThread(userId, userName) {
+        if(!currentUser.isAdmin) return;
+        const confirmDelete = confirm(`আপনি কি নিশ্চিত যে "${userName}" এর সমস্ত চ্যাট মুছে ফেলতে চান?`);
+        if(!confirmDelete) return;
+
+        try {
+            const messagesRef = collection(db, "user_threads", userId, "messages");
+            const msgsSnap = await getDocs(messagesRef);
+            const deletePromises = [];
+            msgsSnap.forEach(msgDoc => {
+                deletePromises.push(deleteDoc(doc(db, "user_threads", userId, "messages", msgDoc.id)));
+            });
+            await Promise.all(deletePromises);
+            await deleteDoc(doc(db, "user_threads", userId));
+
+            showToast("ইনবক্স সম্পূর্ণ মুছে ফেলা হয়েছে");
+
+            if (selectedUserChatId === userId) {
+                selectedUserChatId = null;
+                messagesArea.innerHTML = '';
+                appContainer.classList.remove('show-chat');
+            }
+        } catch(e) {
+            console.error(e);
+            showToast("ইনবক্স মুছে ফেলা সম্ভব হয়নি");
+        }
+    }
+
+    deleteThreadBtn.onclick = () => {
+        if(selectedUserChatId) {
+            deleteUserThread(selectedUserChatId, activeChatTitle.innerText);
+        }
+    };
+
     function loadAdminInboxList() {
         if (unsubscribeUsersList) unsubscribeUsersList();
         const usersRef = collection(db, "user_threads");
 
         unsubscribeUsersList = onSnapshot(usersRef, (snapshot) => {
             if(snapshot.empty) {
-                userList.innerHTML = `<div style="text-align: center; color: #8696a0; padding: 30px;">কোনো মেসেজ নেই</div>`;
+                userList.innerHTML = `<div style="text-align: center; color: #8696a0; padding: 30px;">কোনো ইনবক্স পাওয়া যায়নি</div>`;
                 return;
             }
             userList.innerHTML = '';
@@ -554,6 +593,7 @@
                         <div class="user-last-msg">${escapeHtml(data.lastMessage || 'চ্যাট শুরু করুন')}</div>
                     </div>
                 `;
+
                 item.onclick = () => {
                     selectedUserChatId = userId;
                     activeChatTitle.innerText = data.userName || 'ইউজার';
@@ -563,6 +603,21 @@
                     appContainer.classList.add('show-chat');
                     loadMessagesForThread(userId);
                 };
+
+                let pressTimer = null;
+                item.addEventListener('touchstart', () => {
+                    pressTimer = setTimeout(() => {
+                        deleteUserThread(userId, data.userName || 'ইউজার');
+                    }, 700);
+                }, { passive: true });
+
+                item.addEventListener('touchend', () => { clearTimeout(pressTimer); });
+                item.addEventListener('touchmove', () => { clearTimeout(pressTimer); });
+
+                item.ondblclick = () => {
+                    deleteUserThread(userId, data.userName || 'ইউজার');
+                };
+
                 userList.appendChild(item);
             });
         });
@@ -633,7 +688,6 @@
     sendMsgBtn.onclick = sendMessage;
     chatMessageInput.onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
 
-    // WebRTC Realtime Calling System
     async function getMediaStream(videoEnabled) { 
         if (localStream) localStream.getTracks().forEach(t => t.stop()); 
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: videoEnabled }); 
@@ -739,7 +793,6 @@
             currentCallDocId = callDoc.id;
             peerConnection = await createPeerConnection(currentCallDocId);
 
-            // Listen for Remote ICE Candidates (Caller Side)
             const candRef = collection(db, "calls", currentCallDocId, "candidates");
             onSnapshot(candRef, snapshot => {
                 snapshot.docChanges().forEach(async change => {
@@ -813,7 +866,6 @@
                                     status: "connected"
                                 });
 
-                                // Listen for Remote ICE Candidates (Callee Side)
                                 const candRef = collection(db, "calls", currentCallDocId, "candidates");
                                 onSnapshot(candRef, snapshot => {
                                     snapshot.docChanges().forEach(async change => {
